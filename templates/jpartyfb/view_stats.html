@@ -1,0 +1,54 @@
+{% extends "backendBase.html" %}
+
+{% load staticfiles %}
+{% load static %}
+
+{%block mainContent%}	
+	<div class="container" style="border:1px solid #C0C0C0;" align="center">
+          {% csrf_token %}
+		<div class='row' style='text-align:center;'>
+            <div style="float:left;">
+			</div>
+			<h1>{{ welcome_message }}</h1></div><br>
+        <div class='breadcrumb' style='text-color: blue; background-color: white;'>
+            <a href="{% url 'jpartyfb:index' %}">Home</a> >
+            <a href="{% url 'jpartyfb:view_stats' %}">View Stats</a>
+        </div>
+
+{% if Error_message %}
+    <p style="color: red;">
+        {{ Error_message }}
+    </p>
+{% endif %}
+
+    <table align="center">
+        <tr>
+            <img style="border-radius:1px;height:160px; width:160px;" src="{% static 'jpartyfb/images/league_logo.png' %}"/>
+        </tr>
+    </table>
+    <div style="height: 75px;"></div>
+
+    <table width="100%">
+	    <tr align="center">
+	        
+	        <td width="33%" align="center">
+                <a href="{% url 'jpartyfb:index' %}">
+                    <img style="border-radius:1px;height:143px; width:156px;" src="{% static 'jpartyfb/images/football.png' %}"/>
+                    <img style="border-radius:1px;height:45px; width:227px;" src="{% static 'jpartyfb/images/play_football.png' %}"/>
+                </a>
+	        </td>
+            <td width="33%">
+                <img style="border-radius:1px;height:143px; width:156px;" src="{% static 'jpartyfb/images/football.png' %}"/>
+                <img style="border-radius:1px;height:41px; width:300px;" src="{% static 'jpartyfb/images/manage_leagues.png' %}"/>
+	        </td>
+            <td width="33%">
+                <img style="border-radius:1px;height:143px; width:156px;" src="{% static 'jpartyfb/images/football.png' %}"/><br>
+                <img style="border-radius:1px;height:37px; width:189px;" src="{% static 'jpartyfb/images/view_stats.png' %}"/>
+	        </td>
+	    </tr>
+	</table>
+
+</div>
+
+
+{% endblock%}
