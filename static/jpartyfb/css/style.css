@@ -1,0 +1,303 @@
+.header {
+    width:600px;
+    height:56px;
+    position:absolute;
+    top:0px;
+    left:25%;
+    background:#fff;
+}
+
+a.back{
+    width:256px;
+    height:73px;
+    position:fixed;
+    bottom:15px;
+    right:15px;
+    background:#fff;
+}
+
+.scroll{
+    width:133px;
+    height:61px;
+    position:fixed;
+    bottom:15px;
+    left:150px;
+    background: #fff;
+}
+
+.info{
+    text-align:right;
+}
+
+.popup_content {
+    display: none;
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    height: 400px;
+    width: 800px;
+    border: 3px solid black;
+    background-color: #fff;
+    padding: 0px 10px;
+    overflow: auto;
+}
+
+div {
+    text-align:left;
+}
+
+div#footer {
+    top: 800px;
+}
+
+.headerTable {
+    display:table;
+    width:100%;
+    padding:0px 0px 15px 0px
+}
+
+.tr {
+    display:table-row;
+    background-color:#fff;
+}
+
+.headerPre {
+        display:table-cell;
+        width:25%;
+}
+.popupHeader {
+        display:table-cell;
+        text-align:center;
+        width:50%;
+}
+
+.closeButton {
+        display:table-cell;
+        text-align:right;
+        width:25%;
+        text-decoration:none;
+        font-size:24px;
+}
+
+ul#navigation {
+    position: fixed;
+    margin:  0px;
+    padding: 0px;
+    top: 80px;
+    left: 0px;
+    list-style: none;
+    z-index:9999;
+}
+ul#navigation li {
+    width: 100px;
+}
+ul#navigation li a {
+    display: block;
+    margin-left: -2px;
+	text-align: right;
+    width: 150px;
+    height: 70px;    
+    background-color:#CFCFCF;
+    background-repeat:no-repeat;
+    background-position:center center;
+    border:1px solid #AFAFAF;
+	text-decoration: none;
+    -moz-border-radius:0px 10px 10px 0px;
+    -webkit-border-bottom-right-radius: 10px;
+    -webkit-border-top-right-radius: 10px;
+    -khtml-border-bottom-right-radius: 10px;
+    -khtml-border-top-right-radius: 10px;
+    /*-moz-box-shadow: 0px 4px 3px #000;
+    -webkit-box-shadow: 0px 4px 3px #000;
+    */
+    opacity: 0.6;
+    filter:progid:DXImageTransform.Microsoft.Alpha(opacity=60);
+}
+ul#navigation .home a{
+    /*background-image: url(../images/home.png);*/
+}
+ul#navigation .about a      {
+    /*background-image: url(../images/id_card.png);*/
+}
+ul#navigation .search a      {
+    /*background-image: url(../images/search.png);*/
+}
+ul#navigation .podcasts a      {
+    /*background-image: url(../images/ipod.png);*/
+}
+ul#navigation .rssfeed a   {
+    /*background-image: url(../images/rss.png);*/
+}
+ul#navigation .photos a     {
+    /*ckground-image: url(../images/camera.png);*/
+}
+ul#navigation .contact a    {
+    /*background-image: url(../images/mail.png);*/
+}
+
+table.mytable {
+        font-family: times;
+        font-size:12px;
+        color:#000000;
+        border-width: 1px;
+        border-color: #eeeeee;
+        border-collapse: collapse;
+        background-color: #ffffff;
+        width: 100%;
+        max-width:550px;
+        table-layout:fixed;
+    }
+    table.mytable th {
+        border-width: 1px;
+        padding: 8px;
+        border-style: solid;
+        border-color: #eeeeee;
+        background-color: #e6eed6;
+        color:#000000;
+    }
+	table.mytable td {
+        border-width: 1px;
+        padding: 8px;
+        border-style: solid;
+        border-color: #eeeeee;
+    }
+
+
+    .nav-menu {
+        padding-top: 5px;
+        padding-bottom: 5px;
+        margin-top: 20px;
+        margin-bottom: 20px;
+    }
+
+    .menu-icon {
+        padding-left: 15px;
+        padding-right: 15px;
+        width: 100%;
+        height: 100%;
+    }
+    
+    .leftnav_links {
+        padding: 40px 5px;
+        text-align: center;
+        font-size: 24px;
+    }
+    .nav-menu:hover {
+        background-color: aliceblue !important;
+    }
+
+    #nav-menu-col {
+        width: 80px;
+        padding-left: 0px;
+        padding-right: 0px;
+    }
+
+    #apply_button {
+        padding-left: 10px;
+        padding-right: 10px;
+    }
+
+    .removal-check-col {
+        padding-left: 0px;
+        padding-right: 0px;
+        text-align: right;
+    }
+
+    .removal-check {
+        width: inherit;
+    }
+    
+    .alert {
+        background-color: #c6f4f5;
+        border: 1px black;
+        font-size:24px;
+        display:none;
+        text-align:center;
+    }
+
+#removal_content_section .row {
+    padding-top: 10px;
+    padding-bottom: 10px;
+    margin-left: -5px;
+}
+
+#removal_content_section .panel {
+    border-width: 0px;
+    margin-bottom: 0px;
+}
+
+#removal_content_section .panel-heading {
+    border-width: 0px;
+    padding-bottom: 10px;
+    background-color: aliceblue;
+}
+
+#removal_content_section .panel-body {
+    border-width: 0px;
+    padding-top: 0px;
+    background-color: aliceblue;
+}
+
+#manage_removal_dlg #add_rm_section .row {
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+
+#analysis_tables_content .green {
+    background-color: green;
+}
+
+#analysis_tables_content .red {
+    background-color: red;
+}
+
+#analysis_tables_content .yellow {
+    background-color: yellow;
+}
+
+.highlight {
+    background-color: yellow;
+}
+
+.imgDelete {
+    display: none;
+}
+
+#analysis_tables_content table thead tr {
+    background-color: #d3d3d3;
+}
+
+.study_part_field {
+    width: 200px;
+}
+
+#config_menu_content .row {
+    margin-left: 0px;
+    margin-right: 0px;
+    padding-right: 0px;
+}
+
+#config_menu_content {
+    padding-right: 0px;
+}
+
+#analysis_setting_content_section .row {
+    margin-bottom: 20px;
+}
+
+.new_study_period_button {
+    width: 200px;
+}
+
+.study_period_days_field {
+
+    background: transparent;
+    border: none;
+    width: 40px;
+    text-align:center;
+
+}
+
+#id_metric_spreadsheet_column, #id_edit_metric_spreadsheet_column {
+    width:200px;
+}
