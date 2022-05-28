@@ -11,6 +11,8 @@ urlpatterns = patterns('',
     url(r'^start_new_season/$', views.start_new_season, name='start_new_season'),
     url(r'^edit_league_settings/$', views.edit_league_settings, name='edit_league_settings'),
     url(r'^process_create_league_form_1/$', views.process_create_league_form_1, name='process_create_league_form_1'),
+    url(r'^process_create_league_form_final/$', views.process_create_league_form_final, name='process_create_league_form_final'),
+
 
 
 )
