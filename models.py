@@ -6,7 +6,7 @@ class City(models.Model):
     city_weather_profile_id = models.IntegerField()
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'city'
 
 
@@ -19,7 +19,7 @@ class Coach(models.Model):
     time_management_skills_id = models.IntegerField()
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'coach'
 
 
@@ -30,9 +30,18 @@ class Conference(models.Model):
     league_id = models.IntegerField(blank=True, null=True)
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'conference'
 
+class DefaultTeams(models.Model):
+    id = models.IntegerField(primary_key=True)
+    city = models.ForeignKey(City)
+    nickname = models.CharField(max_length=25)
+    logo_file_name = models.TextField()
+
+    class Meta:
+        managed = True
+        db_table = 'default_teams'
 
 class Division(models.Model):
     id = models.IntegerField(primary_key=True)
@@ -42,7 +51,7 @@ class Division(models.Model):
     league_id = models.IntegerField()
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'division'
 
 
@@ -52,7 +61,7 @@ class DjangoMigrations(models.Model):
     applied = models.DateTimeField()
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'django_migrations'
 
 
@@ -63,7 +72,7 @@ class Draft(models.Model):
     num_rounds = models.IntegerField()
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'draft'
 
 
@@ -76,7 +85,7 @@ class DraftPick(models.Model):
     team_id = models.IntegerField()
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'draft_pick'
 
 
@@ -97,7 +106,7 @@ class Game(models.Model):
     league_id = models.IntegerField()
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'game'
 
 
@@ -120,7 +129,7 @@ class GameDlStats(models.Model):
     num_forced_fumbles = models.IntegerField()
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'game_dl_stats'
 
 
@@ -140,7 +149,7 @@ class GameKStats(models.Model):
     passing_tds = models.IntegerField()
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'game_k_stats'
 
 
@@ -156,7 +165,7 @@ class GameOlStats(models.Model):
     fumble_recoveries = models.IntegerField()
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'game_ol_stats'
 
 
@@ -174,7 +183,7 @@ class GamePStats(models.Model):
     passing_tds = models.IntegerField()
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'game_p_stats'
 
 
@@ -185,7 +194,7 @@ class GamePlayerPenalty(models.Model):
     penalty_play_id = models.IntegerField()
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'game_player_penalty'
 
 
@@ -199,7 +208,7 @@ class GamePlays(models.Model):
     source_play_id = models.IntegerField(blank=True, null=True)
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'game_plays'
 
 
@@ -224,7 +233,7 @@ class GameQbStats(models.Model):
     rush_attempts = models.IntegerField()
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'game_qb_stats'
 
 
@@ -248,7 +257,7 @@ class GameRbStats(models.Model):
     passing_attempts = models.IntegerField()
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'game_rb_stats'
 
 
@@ -267,7 +276,7 @@ class GameSecStats(models.Model):
     num_forced_fumbles = models.IntegerField()
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'game_sec_stats'
 
 
@@ -282,7 +291,7 @@ class GameStdStats(models.Model):
     fumble_recovery_tds = models.IntegerField()
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'game_std_stats'
 
 
@@ -299,7 +308,7 @@ class GameStoStats(models.Model):
     num_fumbles = models.IntegerField()
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'game_sto_stats'
 
 
@@ -316,7 +325,7 @@ class GameTeStats(models.Model):
     num_block_draws = models.IntegerField()
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'game_te_stats'
 
 
@@ -376,7 +385,7 @@ class GameTeamStats(models.Model):
     dl_team_block_draws = models.IntegerField()
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'game_team_stats'
 
 
@@ -385,7 +394,7 @@ class GameType(models.Model):
     type_id = models.IntegerField()
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'game_type'
 
 
@@ -403,7 +412,7 @@ class GameWrStats(models.Model):
     num_rushing_2_point_conversions = models.IntegerField()
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'game_wr_stats'
 
 
@@ -413,7 +422,7 @@ class League(models.Model):
     abbreviation = models.CharField(max_length=4, blank=True, null=True)
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'league'
 
 
@@ -437,7 +446,7 @@ class Player(models.Model):
     league_id = models.IntegerField()
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'player'
 
 
@@ -447,7 +456,7 @@ class PlayerGamePlays(models.Model):
     game_play_id = models.IntegerField()
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'player_game_plays'
 
 
@@ -458,7 +467,7 @@ class PlayerPool(models.Model):
     league_id = models.IntegerField()
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'player_pool'
 
 
@@ -476,7 +485,7 @@ class PlayerSpecsDl(models.Model):
     career_arc_dict = models.TextField()  # This field type is a guess.
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'player_specs_dl'
 
 
@@ -491,7 +500,7 @@ class PlayerSpecsK(models.Model):
     career_arc_dict = models.TextField()  # This field type is a guess.
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'player_specs_k'
 
 
@@ -505,7 +514,7 @@ class PlayerSpecsOl(models.Model):
     career_arc_dict = models.TextField()  # This field type is a guess.
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'player_specs_ol'
 
 
@@ -521,7 +530,7 @@ class PlayerSpecsP(models.Model):
     career_arc_dict = models.TextField()  # This field type is a guess.
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'player_specs_p'
 
 
@@ -537,7 +546,7 @@ class PlayerSpecsQb(models.Model):
     career_arc_dict = models.TextField()  # This field type is a guess.
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'player_specs_qb'
 
 
@@ -553,7 +562,7 @@ class PlayerSpecsRb(models.Model):
     career_arc_dict = models.TextField()  # This field type is a guess.
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'player_specs_rb'
 
 
@@ -570,7 +579,7 @@ class PlayerSpecsSec(models.Model):
     career_arc_dict = models.TextField()  # This field type is a guess.
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'player_specs_sec'
 
 
@@ -584,7 +593,7 @@ class PlayerSpecsStd(models.Model):
     career_arc_dict = models.TextField()  # This field type is a guess.
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'player_specs_std'
 
 
@@ -598,7 +607,7 @@ class PlayerSpecsSto(models.Model):
     career_arc_dict = models.TextField()  # This field type is a guess.
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'player_specs_sto'
 
 
@@ -616,7 +625,7 @@ class PlayerSpecsTe(models.Model):
     career_arc_dict = models.TextField()  # This field type is a guess.
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'player_specs_te'
 
 
@@ -633,7 +642,7 @@ class PlayerSpecsWr(models.Model):
     career_arc_dict = models.TextField()  # This field type is a guess.
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'player_specs_wr'
 
 
@@ -644,7 +653,7 @@ class PlayerTeam(models.Model):
     season_id = models.IntegerField()
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'player_team'
 
 
@@ -656,7 +665,7 @@ class Season(models.Model):
     league_id = models.IntegerField()
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'season'
 
 
@@ -668,7 +677,7 @@ class Stadium(models.Model):
     is_dome = models.BooleanField()
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'stadium'
 
 
@@ -682,9 +691,10 @@ class Team(models.Model):
     conference_id = models.IntegerField()
     division_id = models.IntegerField()
     league_id = models.IntegerField()
+    nickname = models.CharField(max_length=50)
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'team'
 
 
@@ -696,7 +706,7 @@ class TeamCity(models.Model):
     stadium_id = models.IntegerField()
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'team_city'
 
 
@@ -706,5 +716,5 @@ class TeamSeason(models.Model):
     season_id = models.IntegerField()
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'team_season'
