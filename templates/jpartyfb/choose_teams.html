@@ -13,7 +13,9 @@
         <div class='breadcrumb' style='text-color: blue; background-color: white;'>
             <a href="{% url 'jpartyfb:index' %}">Home</a> >
             <a href="{% url 'jpartyfb:manage_leagues' %}">Manage Leagues</a> >
-            <a href="{% url 'jpartyfb:create_new_league' %}">Create New League</a>
+            <a href="{% url 'jpartyfb:create_new_league' %}">Create New League</a> >
+            <a href="{% url 'jpartyfb:process_create_league_form_1' %}">Choose Teams</a>
+
         </div>
 
 {% if Error_message %}
@@ -29,11 +31,59 @@
     </table>
     <div style="height: 75px;"></div>
 
-    <form name="create_league_form_1" action="{% url 'jpartyfb:process_create_league_form_1' %}" method="post">
+    <form name="create_league_form_final" action="{% url 'jpartyfb:process_create_league_form_final' %}" method="post">
+
+        <table cellpadding="5" width="100%" border="1">
+            <tr>
+                <td width="50%" align="center" style="background-color: blue;">
+                     <input type="text" id="eastern_conf_name_text" name="eastern_conf_name_text" class="conference" maxlength="35" value="Eastern" style="width: 280px; border: none; background: transparent; text-align:center; font-weight: bold; font-size: 20px; color: white;" />
+                </td>
+                <td width="50%" align="center" style="background-color: red;">
+                    <input type="text" id="western_conf_name_text" name="western_conf_name_text" class="conference" maxlength="35" value="Western" style="width: 280px; border: none; background: transparent; text-align:center; font-weight: bold; font-size: 20px; color: white;" />
+                </td>
+            </tr>
+        </table>
+
+        <div style="height: 35px;"></div>
+
+        <!-- create divisions based on user settings-->
+        {{ team_html_str | safe }}
+
+        <div style="height: 35px;"></div>
+
+        <table>
+            <tr>
+                <td colspan="2" align="center">
+                  <input type="button" id="submit_button" value='Finalize League' />
+                </td>
+            </tr>
+        </table>
+
+       <!-- values from the first part of the create league form-->
+       <input type="hidden" id="injury_hidden" name="injury_hidden" value="{{ injury_mode }}" />
+       <input type="hidden" id="weather_hidden" name="weather_hidden" value="{{ weather_mode }}" />
+       <input type="hidden" id="number_of_weeks_hidden" name="number_of_weeks_hidden" value="{{ number_of_weeks }}" />
+       <input type="hidden" id="number_of_playoff_teams_hidden" name="number_of_playoff_teams_hidden" value="{{ number_of_playoff_teams }}" />
+       <input type="hidden" id="number_of_teams_conf_hidden" name="number_of_teams_conf_hidden" value="{{ number_of_teams_conf }}" />
+       <input type="hidden" id="number_of_divisions_conf_hidden" name="number_of_divisions_conf_hidden" value="{{ number_of_divisions_conf }}" />
 
 
     </form>
+    <div style="height: 35px;"></div>
+
 </div>
+
+<script language="Javascript">
+
+    $("#submit_button").click(function() {
+
+        //we will need to grab the conference names, division names, team names, and team to division and team to conference mappings
+        alert("League submitted")
+
+    })
+
+</script>
+
 
 
 {% endblock%}
