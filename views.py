@@ -69,17 +69,17 @@ def build_choose_teams_html(number_of_divisions_select, number_of_teams_conf_sel
         team_html_str += "<table cellpadding='5' width='100%' border='1'><tr>"
 
         # print out division header html - first easter division
-        team_html_str += "<td width='50%' align='center' style='background-color: #eeeeee;'>"
-        team_html_str += "<input type='text' id='eastern_division_" + str(
+        team_html_str += "<td width='50%' align='center' style='background-color: #eeeeee;' id='td_division_eastern_" + str(conf_division_idx) + "' class='td_division'>"
+        team_html_str += "<input type='text' id='Eastern_division_" + str(
             conf_division_idx) + "' name='eastern_division_" + str(
-            conf_division_idx) + "' class='division' maxlength='35' value='" + conf_division_name + "' style='width: 220px; border: none; background: transparent; text-align:center; font-weight: bold;' />"
+            conf_division_idx) + "' class='division' maxlength='35' value='" + "Eastern " + conf_division_name + "' style='width: 220px; border: none; background: transparent; text-align:center; font-weight: bold;' />"
         team_html_str += "</td>"
 
         # now western division
-        team_html_str += "<td width='50%' align='center' style='background-color: #eeeeee;'>"
-        team_html_str += "<input type='text' id='western_division_" + str(
+        team_html_str += "<td width='50%' align='center' style='background-color: #eeeeee;' id='td_division_western_" + str(conf_division_idx) + "' class='td_division'>"
+        team_html_str += "<input type='text' id='Western_division_" + str(
             conf_division_idx) + "' name='western_division_" + str(
-            conf_division_idx) + "' class='division' maxlength='35' value='" + conf_division_name + "' style='width: 220px; border: none; background: transparent; text-align:center; font-weight: bold;' />"
+            conf_division_idx) + "' class='division' maxlength='35' value='" + "Western " + conf_division_name + "' style='width: 220px; border: none; background: transparent; text-align:center; font-weight: bold;' />"
         team_html_str += "</td>"
 
         # close division html row
@@ -87,6 +87,7 @@ def build_choose_teams_html(number_of_divisions_select, number_of_teams_conf_sel
 
         # open team html row - each row is a conference division of teams
         color_key_str = ""
+        conference_str = ""
 
         for actual_division_number, division_team_list in division_num_to_team_list_dict.items():
 
@@ -95,8 +96,10 @@ def build_choose_teams_html(number_of_divisions_select, number_of_teams_conf_sel
                 if actual_division_number < conf_division_idx * 2:
                     team_html_str += "<tr>"
                     color_list = color_to_rgb_list_dict["blue"]
+                    conference_str = "Eastern"
                 else:
                     color_list = color_to_rgb_list_dict["red"]
+                    conference_str = "Western"
 
                 team_html_str += "<td><table align='center' style='background-color: white;' width='100%'>"
                 for this_team_div_idx, this_team_name in enumerate(division_team_list, 1):
@@ -108,8 +111,8 @@ def build_choose_teams_html(number_of_divisions_select, number_of_teams_conf_sel
 
                     team_html_str += "<tr style='background-color: " + this_team_row_color + ";'>"
 
-                    team_html_str += "<td width='50%' align='center'>"
-                    team_html_str += "<input type='text' id='" + this_team_name + "' name='" + this_team_name + "' class='team' maxlength='35' value='" + this_team_name + "' style='width: 220px; border: none; background: transparent; text-align:center; font-weight: bold;' />"
+                    team_html_str += "<td width='50%' align='center' id='td_team_" + str(this_team_div_idx) + "_" + conference_str + "_division_" + str(conf_division_idx) + "' class='td_team'>"
+                    team_html_str += "<input type='text' id='" + conference_str + "_division_" + str(conf_division_idx) + "_team_" + str(this_team_div_idx) + "' name='" + conference_str + "_division_" + str(conf_division_idx) + "_team_" + str(this_team_div_idx) + "' class='team' maxlength='35' value='" + this_team_name + "' style='width: 220px; border: none; background: transparent; text-align:center; font-weight: bold;' />"
                     team_html_str += "</td></tr>"
 
                 team_html_str += "</table></td>"
