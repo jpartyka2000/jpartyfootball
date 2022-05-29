@@ -35,11 +35,11 @@
 
         <table cellpadding="5" width="100%" border="1">
             <tr>
-                <td width="50%" align="center" style="background-color: blue;">
-                     <input type="text" id="eastern_conf_name_text" name="eastern_conf_name_text" class="conference" maxlength="35" value="Eastern" style="width: 280px; border: none; background: transparent; text-align:center; font-weight: bold; font-size: 20px; color: white;" />
+                <td width="50%" align="center" style="background-color: blue;" id="td_conference_eastern" class="td_conference">
+                     <input type="text" id="Eastern_conf_name_text" name="Eastern_conf_name_text" class="conference" maxlength="35" value="Eastern" style="width: 280px; border: none; background: transparent; text-align:center; font-weight: bold; font-size: 20px; color: white;" />
                 </td>
-                <td width="50%" align="center" style="background-color: red;">
-                    <input type="text" id="western_conf_name_text" name="western_conf_name_text" class="conference" maxlength="35" value="Western" style="width: 280px; border: none; background: transparent; text-align:center; font-weight: bold; font-size: 20px; color: white;" />
+                <td width="50%" align="center" style="background-color: red;" id="td_conference_western" class="td_conference">
+                    <input type="text" id="Western_conf_name_text" name="Western_conf_name_text" class="conference" maxlength="35" value="Western" style="width: 280px; border: none; background: transparent; text-align:center; font-weight: bold; font-size: 20px; color: white;" />
                 </td>
             </tr>
         </table>
@@ -75,12 +75,182 @@
 
 <script language="Javascript">
 
+    var clicked_team_td_id_str = ""
+    var clicked_team_td_orig_color_str = ""
+
     $("#submit_button").click(function() {
 
         //we will need to grab the conference names, division names, team names, and team to division and team to conference mappings
-        alert("League submitted")
+        var conference_element_list = []
+        var division_element_list = []
+        var team_element_list = []
+
+        var conference_name_list = []
+        var division_name_list = []
+        var team_name_list = []
+
+        $(".conference").each(function() {
+
+            var this_conference_element = $(this)
+            conference_element_list.push(this_conference_element)
+
+            this_conference_name = this_conference_element.val()
+            conference_name_list.push(this_conference_name)
+        });
+
+        $(".division").each(function() {
+
+            var this_division_element = $(this)
+            division_element_list.push(this_division_element)
+
+            this_division_name = this_division_element.val()
+            division_name_list.push(this_division_name)
+        });
+
+        $(".team").each(function() {
+
+            var this_team_element = $(this)
+            team_element_list.push(this_team_element)
+
+            this_team_name = this_team_element.val()
+            team_name_list.push(this_team_name)
+        });
+
+        //perform quality control checks
+
+        //you can't duplicate a conference name, division name or team name
+        var conference_set = new Set(conference_name_list);
+
+        if (conference_set.size != conference_name_list.length) {
+            alert("Please choose unique names for each conference")
+            return
+        }
+
+        var division_set = new Set(division_name_list);
+
+        if (division_set.size != division_name_list.length) {
+            alert("Please choose unique names for each division")
+            return
+        }
+
+        var team_set = new Set(team_name_list);
+
+        if (team_set.size != team_name_list.length) {
+            alert("Please choose unique names for each team")
+            return
+        }
+
+        //next, make sure that no value is an empty string
+        if (conference_name_list.includes('')) {
+            alert("No conference can have a blank name")
+            return
+        }
+
+        if (division_name_list.includes('')) {
+            alert("No division can have a blank name")
+            return
+        }
+
+        if (team_name_list.includes('')) {
+            alert("No team can have a blank name")
+            return
+        }
+
+        //now we will get mappings of division -> conference and team -> division
+        var conference_geoname_to_username_dict = {}
+        var division_geoname_to_username_dict = {}
+        var division_to_conference_dict = {}
+        var team_to_division_dict = {}
+        var team_to_conference_dict = {}
+
+        for (var i = 0; i < conference_element_list.length; i++) {
+            var this_conference_element = conference_element_list[i];
+            var this_conference_id = this_conference_element.attr("id")
+            var this_conference_name = this_conference_element.val()
+
+            var this_conference_part_list = this_conference_id.split("_")
+            var this_conference_geoname = this_conference_part_list[0]
+
+            conference_geoname_to_username_dict[this_conference_geoname] = this_conference_name
+
+        }//end if
+
+        for (var i = 0; i < division_element_list.length; i++) {
+            var this_division_element = division_element_list[i];
+            var this_division_id = this_division_element.attr("id")
+            var this_division_name = this_division_element.val()
+
+            this_division_part_list = this_division_id.split("_")
+            this_division_conference_geoname = this_division_part_list[0] + "_" + this_division_part_list[2]
+
+            division_geoname_to_username_dict[this_division_conference_geoname] = this_division_name
+
+            this_division_conference = conference_geoname_to_username_dict[this_division_part_list[0]]
+
+            division_to_conference_dict[this_division_name] = this_division_conference
+
+        }//end for
+
+
+        for (var i = 0; i < team_element_list.length; i++) {
+            var this_team_element = team_element_list[i];
+            var this_team_id = this_team_element.attr("id")
+            var this_team_name = this_team_element.val()
+
+            this_team_part_list = this_team_id.split("_")
+
+            this_team_conference_geoname = this_team_part_list[0]
+            team_to_conference_dict[this_team_name] = conference_geoname_to_username_dict[this_team_conference_geoname]
+
+            this_team_division_geoname = this_team_part_list[0] + "_" + this_team_part_list[2]
+
+            team_to_division_dict[this_team_name] = division_geoname_to_username_dict[this_team_division_geoname]
+
+        }//end for
+
+        //next, we will push the form data on this page to the backend via an ajax call
+
 
     })
+
+    $(".td_team").click(function() {
+
+        this_clicked_td_id = $(this).attr('id')
+
+        if (clicked_team_td_id_str == "") {
+
+            clicked_team_td_orig_color_str = $(this).css("background-color")
+            $(this).css("background-color", "yellow");
+            clicked_team_td_id_str = this_clicked_td_id
+
+        } else {
+
+            if (clicked_team_td_id_str == this_clicked_td_id) {
+
+                $(this).css("background-color", clicked_team_td_orig_color_str);
+
+            } else {
+
+                //perform the switcheroo
+                var clicked_td_1_val = $("#" + clicked_team_td_id_str).find("input").val()
+                var temp_val = $(this).find("input").val()
+
+                $("#" + this_clicked_td_id).find("input").val(clicked_td_1_val)
+                $("#" + clicked_team_td_id_str).find("input").val(temp_val)
+
+                //set original background color of first clicked td
+                $("#" + clicked_team_td_id_str).css("background-color", clicked_team_td_orig_color_str);
+
+            }//end if
+
+             clicked_team_td_orig_color_str = ""
+             clicked_team_td_id_str = ""
+
+        }//end if
+
+    }).children().click(function(e) {
+        return false;
+    });
 
 </script>
 
