@@ -22,6 +22,7 @@ class JPartyFBInputForm(forms.Form):
     candidate_csv_file = forms.FileField(label='Load a new candidate spreadsheet:',widget=forms.ClearableFileInput(attrs={'multiple': True}))
 
 class CreateLeagueForm1(forms.Form):
+    league_name = forms.CharField(label='League Name:', max_length=50)
     number_of_playoff_teams_select = forms.CharField(label='Number of Playoff Teams Per Conference', widget=forms.Select(choices=NUM_PLAYOFF_TEAMS))
     number_of_weeks_select = forms.CharField(label='Number of Weeks in Regular Season', widget=forms.Select(choices=NUM_WEEKS_REG_SEASON))
     number_of_teams_conf_select = forms.CharField(label='Number of Teams Per Conference', widget=forms.Select(choices=NUM_TEAMS_PER_CONFERENCE))
