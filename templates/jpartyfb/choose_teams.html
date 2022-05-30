@@ -35,10 +35,10 @@
 
         <table cellpadding="5" width="100%" border="1">
             <tr>
-                <td width="50%" align="center" style="background-color: blue;" id="td_conference_eastern" class="td_conference">
+                <td width="50%" align="center" style="background-color: navy;" id="td_conference_eastern" class="td_conference">
                      <input type="text" id="Eastern_conf_name_text" name="Eastern_conf_name_text" class="conference" maxlength="35" value="Eastern" style="width: 280px; border: none; background: transparent; text-align:center; font-weight: bold; font-size: 20px; color: white;" />
                 </td>
-                <td width="50%" align="center" style="background-color: red;" id="td_conference_western" class="td_conference">
+                <td width="50%" align="center" style="background-color: #630b0f;" id="td_conference_western" class="td_conference">
                     <input type="text" id="Western_conf_name_text" name="Western_conf_name_text" class="conference" maxlength="35" value="Western" style="width: 280px; border: none; background: transparent; text-align:center; font-weight: bold; font-size: 20px; color: white;" />
                 </td>
             </tr>
@@ -56,12 +56,17 @@
                 <td colspan="2" align="center">
                   <input type="button" id="submit_button" value='Finalize League' />
                 </td>
+                <td style="vertical-align: top;">
+                    <img id="loading_image" src="{% static 'jpartyfb/images/loading.gif' %}" alt="Loading" title="Loading" width="100px" style="display: none; margin-top: 20px;"/>
+                </td>
             </tr>
         </table>
 
        <!-- values from the first part of the create league form-->
+       <input type="hidden" id="league_name_hidden" name="league_name_hidden" value="{{ league_name }}" />
        <input type="hidden" id="injury_hidden" name="injury_hidden" value="{{ injury_mode }}" />
        <input type="hidden" id="weather_hidden" name="weather_hidden" value="{{ weather_mode }}" />
+       <input type="hidden" id="female_hidden" name="female_hidden" value="{{ female_mode }}" />
        <input type="hidden" id="number_of_weeks_hidden" name="number_of_weeks_hidden" value="{{ number_of_weeks }}" />
        <input type="hidden" id="number_of_playoff_teams_hidden" name="number_of_playoff_teams_hidden" value="{{ number_of_playoff_teams }}" />
        <input type="hidden" id="number_of_teams_conf_hidden" name="number_of_teams_conf_hidden" value="{{ number_of_teams_conf }}" />
@@ -208,8 +213,67 @@
 
         }//end for
 
-        //next, we will push the form data on this page to the backend via an ajax call
 
+        //next, we will push the form data on this page to the backend via an ajax call
+        var formData = new FormData()
+
+        formData.append("league_name_hidden", $("#league_name_hidden").val())
+        formData.append("injury_hidden", $("#injury_hidden").val())
+        formData.append("weather_hidden", $("#weather_hidden").val())
+        formData.append("female_hidden", $("#female_hidden").val())
+        formData.append("number_of_weeks_hidden", $("#number_of_weeks_hidden").val())
+        formData.append("number_of_playoff_teams_hidden", $("#number_of_playoff_teams_hidden").val())
+        formData.append("number_of_teams_conf_hidden", $("#number_of_teams_conf_hidden").val())
+        formData.append("number_of_divisions_conf_hidden", $("#number_of_divisions_conf_hidden").val())
+
+        formData.append("conference_name_list", JSON.stringify(conference_name_list))
+        formData.append("division_name_list", JSON.stringify(division_name_list))
+        formData.append("team_name_list", JSON.stringify(team_name_list))
+
+        formData.append("division_to_conference_dict", JSON.stringify(division_to_conference_dict))
+        formData.append("team_to_division_dict", JSON.stringify(team_to_division_dict))
+        formData.append("team_to_conference_dict", JSON.stringify(team_to_conference_dict))
+
+        $("#loading_image").show()
+
+        $.ajax({
+
+            type: "POST",
+            url: "/jpartyfb/process_create_league_form_final/",
+            data: formData,
+            processData: false,
+            contentType: false,
+            cache: false,
+            success: function(data) {
+
+               alert(JSON.stringify(data))
+               $("#loading_image").hide()
+
+               //result = JSON.parse(data)
+               //var status = result[0]
+               //var variable_names = result[1]
+               //var unmatched_variables_dict = result[2]
+               //alert(JSON.stringify(unmatched_variables_dict))
+               //return
+
+
+               if (data == "-1") {
+                   alert("Error in trying to save to League db table")
+                   return
+               }
+
+               if (data == "-2") {
+                   alert("Error in trying to save to Conference db table")
+                   return
+               }
+
+               if (data == "-3") {
+                   alert("Error in trying to save to Division db table")
+                   return
+               }
+
+           }
+        })
 
     })
 
