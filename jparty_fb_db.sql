@@ -55,12 +55,27 @@ ALTER TABLE public.coach OWNER TO postgres;
 
 CREATE TABLE public.conference (
     id integer NOT NULL,
-    conference_name character varying NOT NULL,
-    first_season_id integer NOT NULL
+    conference_name character varying(35) NOT NULL,
+    league_id integer,
+    first_season_id integer
 );
 
 
 ALTER TABLE public.conference OWNER TO postgres;
+
+--
+-- Name: default_teams; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.default_teams (
+    id integer NOT NULL,
+    city_id integer NOT NULL,
+    nickname character varying(25) NOT NULL,
+    logo_file_name text
+);
+
+
+ALTER TABLE public.default_teams OWNER TO postgres;
 
 --
 -- Name: division; Type: TABLE; Schema: public; Owner: postgres
@@ -70,11 +85,48 @@ CREATE TABLE public.division (
     id integer NOT NULL,
     division_name character varying(25) NOT NULL,
     conference_id integer NOT NULL,
-    first_season_id integer NOT NULL
+    first_season_id integer NOT NULL,
+    league_id integer NOT NULL
 );
 
 
 ALTER TABLE public.division OWNER TO postgres;
+
+--
+-- Name: django_migrations; Type: TABLE; Schema: public; Owner: django
+--
+
+CREATE TABLE public.django_migrations (
+    id integer NOT NULL,
+    app character varying(255) NOT NULL,
+    name character varying(255) NOT NULL,
+    applied timestamp with time zone NOT NULL
+);
+
+
+ALTER TABLE public.django_migrations OWNER TO django;
+
+--
+-- Name: django_migrations_id_seq; Type: SEQUENCE; Schema: public; Owner: django
+--
+
+CREATE SEQUENCE public.django_migrations_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.django_migrations_id_seq OWNER TO django;
+
+--
+-- Name: django_migrations_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: django
+--
+
+ALTER SEQUENCE public.django_migrations_id_seq OWNED BY public.django_migrations.id;
+
 
 --
 -- Name: draft; Type: TABLE; Schema: public; Owner: postgres
@@ -123,7 +175,8 @@ CREATE TABLE public.game (
     home_team_points integer NOT NULL,
     num_overtimes integer NOT NULL,
     stadium_id integer NOT NULL,
-    attendance integer NOT NULL
+    attendance integer NOT NULL,
+    league_id integer NOT NULL
 );
 
 
@@ -481,6 +534,22 @@ CREATE TABLE public.game_wr_stats (
 ALTER TABLE public.game_wr_stats OWNER TO postgres;
 
 --
+-- Name: league; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.league (
+    id integer NOT NULL,
+    name character varying(50) NOT NULL,
+    abbreviation character varying(4),
+    weather_setting boolean,
+    injury_setting boolean,
+    female_setting boolean
+);
+
+
+ALTER TABLE public.league OWNER TO postgres;
+
+--
 -- Name: player; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -500,7 +569,8 @@ CREATE TABLE public.player (
     draft_position character varying(5),
     salary integer NOT NULL,
     height character varying(4) NOT NULL,
-    weight integer NOT NULL
+    weight integer NOT NULL,
+    league_id integer NOT NULL
 );
 
 
@@ -526,7 +596,8 @@ ALTER TABLE public.player_game_plays OWNER TO postgres;
 CREATE TABLE public.player_pool (
     id integer NOT NULL,
     player_id integer NOT NULL,
-    status integer NOT NULL
+    status integer NOT NULL,
+    league_id integer NOT NULL
 );
 
 
@@ -762,7 +833,8 @@ CREATE TABLE public.season (
     id integer NOT NULL,
     start_time timestamp without time zone NOT NULL,
     end_time timestamp without time zone NOT NULL,
-    season_number integer NOT NULL
+    season_year integer NOT NULL,
+    league_id integer NOT NULL
 );
 
 
@@ -789,14 +861,14 @@ ALTER TABLE public.stadium OWNER TO postgres;
 
 CREATE TABLE public.team (
     id integer NOT NULL,
-    city_id integer NOT NULL,
-    name character varying(50) NOT NULL,
+    nickname character varying(50) NOT NULL,
     first_season_id integer NOT NULL,
     current_season_wins integer NOT NULL,
     current_season_losses integer NOT NULL,
     stadium_id integer NOT NULL,
     conference_id integer NOT NULL,
-    division_id integer NOT NULL
+    division_id integer NOT NULL,
+    league_id integer NOT NULL
 );
 
 
@@ -831,6 +903,362 @@ CREATE TABLE public.team_season (
 ALTER TABLE public.team_season OWNER TO postgres;
 
 --
+-- Name: django_migrations id; Type: DEFAULT; Schema: public; Owner: django
+--
+
+ALTER TABLE ONLY public.django_migrations ALTER COLUMN id SET DEFAULT nextval('public.django_migrations_id_seq'::regclass);
+
+
+--
+-- Data for Name: city; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+INSERT INTO public.city VALUES (1, 'New York', 1);
+INSERT INTO public.city VALUES (2, 'Miami', 1);
+INSERT INTO public.city VALUES (3, 'Atlanta', 1);
+INSERT INTO public.city VALUES (4, 'Buffalo', 1);
+INSERT INTO public.city VALUES (5, 'Washington', 1);
+INSERT INTO public.city VALUES (6, 'Philadelphia', 1);
+INSERT INTO public.city VALUES (7, 'Chicago', 1);
+INSERT INTO public.city VALUES (8, 'Detroit', 1);
+INSERT INTO public.city VALUES (9, 'Pittsburgh', 1);
+INSERT INTO public.city VALUES (10, 'Green Bay', 1);
+INSERT INTO public.city VALUES (11, 'New Orleans', 1);
+INSERT INTO public.city VALUES (12, 'Cincinnati', 1);
+INSERT INTO public.city VALUES (13, 'Dallas', 1);
+INSERT INTO public.city VALUES (14, 'Minnesota', 1);
+INSERT INTO public.city VALUES (15, 'Kansas City', 1);
+INSERT INTO public.city VALUES (16, 'Denver', 1);
+INSERT INTO public.city VALUES (17, 'St. Louis', 1);
+INSERT INTO public.city VALUES (18, 'Houston', 1);
+INSERT INTO public.city VALUES (19, 'Seattle', 1);
+INSERT INTO public.city VALUES (20, 'San Francisco', 1);
+INSERT INTO public.city VALUES (21, 'Oakland', 1);
+INSERT INTO public.city VALUES (22, 'San Diego', 1);
+INSERT INTO public.city VALUES (23, 'Arizona', 1);
+INSERT INTO public.city VALUES (24, 'Las Vegas', 1);
+
+
+--
+-- Data for Name: coach; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+
+
+--
+-- Data for Name: conference; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+
+
+--
+-- Data for Name: default_teams; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+INSERT INTO public.default_teams VALUES (1, 1, 'Titans', 'new_york_titans.png');
+INSERT INTO public.default_teams VALUES (2, 2, 'Swordfish', 'miami_swordfish.png');
+INSERT INTO public.default_teams VALUES (3, 3, 'Talons', 'atlanta_talons.png');
+INSERT INTO public.default_teams VALUES (4, 4, 'Bison', 'buffalo_bison.png');
+INSERT INTO public.default_teams VALUES (5, 5, 'Fascists', 'washington_fascists.png');
+INSERT INTO public.default_teams VALUES (6, 6, 'Vermin', 'philadelphia_vermin.png');
+INSERT INTO public.default_teams VALUES (7, 7, 'Soldiers', 'chicago_soldiers.png');
+INSERT INTO public.default_teams VALUES (8, 8, 'Autos', 'detroit_autos.png');
+INSERT INTO public.default_teams VALUES (9, 9, 'Steel', 'pittsburgh_steel.png');
+INSERT INTO public.default_teams VALUES (10, 10, 'Cheeseheads', 'green_bay_cheeseheads.png');
+INSERT INTO public.default_teams VALUES (11, 11, 'Melody', 'new_orleans_melody.png');
+INSERT INTO public.default_teams VALUES (12, 12, 'Inferno', 'cincinnati_inferno.png');
+INSERT INTO public.default_teams VALUES (13, 13, 'Lone Stars', 'dallas_lone_stars.png');
+INSERT INTO public.default_teams VALUES (14, 14, 'Nordics', 'minnesota_nordics.png');
+INSERT INTO public.default_teams VALUES (15, 15, 'Tomahawks', 'kansas_city_tomahawks.png');
+INSERT INTO public.default_teams VALUES (18, 18, 'Brawlers', 'houston_brawlers.png');
+INSERT INTO public.default_teams VALUES (16, 16, '14ers', 'denver_14ers.png');
+INSERT INTO public.default_teams VALUES (17, 17, 'Bighorns', 'st_louis_bighorns.png');
+INSERT INTO public.default_teams VALUES (22, 22, 'Sharks', 'san_diego_sharks.png');
+INSERT INTO public.default_teams VALUES (21, 21, 'Knights', 'oakland_knights.png');
+INSERT INTO public.default_teams VALUES (20, 20, 'Goldens', 'san_francisco_goldens.png');
+INSERT INTO public.default_teams VALUES (19, 19, 'Tsunami', 'seattle_tsunami.png');
+INSERT INTO public.default_teams VALUES (23, 23, 'Vistas', 'arizona_vistas.png');
+INSERT INTO public.default_teams VALUES (24, 24, 'Rollers', 'las_vegas_rollers.png');
+
+
+--
+-- Data for Name: division; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+
+
+--
+-- Data for Name: django_migrations; Type: TABLE DATA; Schema: public; Owner: django
+--
+
+
+
+--
+-- Data for Name: draft; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+
+
+--
+-- Data for Name: draft_pick; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+
+
+--
+-- Data for Name: game; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+
+
+--
+-- Data for Name: game_dl_stats; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+
+
+--
+-- Data for Name: game_k_stats; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+
+
+--
+-- Data for Name: game_ol_stats; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+
+
+--
+-- Data for Name: game_p_stats; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+
+
+--
+-- Data for Name: game_player_penalty; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+
+
+--
+-- Data for Name: game_plays; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+
+
+--
+-- Data for Name: game_qb_stats; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+
+
+--
+-- Data for Name: game_rb_stats; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+
+
+--
+-- Data for Name: game_sec_stats; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+
+
+--
+-- Data for Name: game_std_stats; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+
+
+--
+-- Data for Name: game_sto_stats; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+
+
+--
+-- Data for Name: game_te_stats; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+
+
+--
+-- Data for Name: game_team_stats; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+
+
+--
+-- Data for Name: game_type; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+
+
+--
+-- Data for Name: game_wr_stats; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+
+
+--
+-- Data for Name: league; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+
+
+--
+-- Data for Name: player; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+
+
+--
+-- Data for Name: player_game_plays; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+
+
+--
+-- Data for Name: player_pool; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+
+
+--
+-- Data for Name: player_specs_dl; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+
+
+--
+-- Data for Name: player_specs_k; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+
+
+--
+-- Data for Name: player_specs_ol; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+
+
+--
+-- Data for Name: player_specs_p; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+
+
+--
+-- Data for Name: player_specs_qb; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+
+
+--
+-- Data for Name: player_specs_rb; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+
+
+--
+-- Data for Name: player_specs_sec; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+
+
+--
+-- Data for Name: player_specs_std; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+
+
+--
+-- Data for Name: player_specs_sto; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+
+
+--
+-- Data for Name: player_specs_te; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+
+
+--
+-- Data for Name: player_specs_wr; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+
+
+--
+-- Data for Name: player_team; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+
+
+--
+-- Data for Name: season; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+
+
+--
+-- Data for Name: stadium; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+INSERT INTO public.stadium VALUES (1, 'Titans Stadium', 75000, 1, false);
+INSERT INTO public.stadium VALUES (2, 'South Beach Field', 71500, 2, false);
+INSERT INTO public.stadium VALUES (3, 'The Peach Dome', 82000, 3, true);
+INSERT INTO public.stadium VALUES (4, 'Bison Park', 80000, 4, false);
+INSERT INTO public.stadium VALUES (5, 'Corruption Field', 78500, 5, false);
+INSERT INTO public.stadium VALUES (6, 'The Sewers', 74750, 6, false);
+INSERT INTO public.stadium VALUES (7, 'Soldier Stadium', 88700, 7, false);
+INSERT INTO public.stadium VALUES (8, 'Soul Stadium', 81300, 8, true);
+INSERT INTO public.stadium VALUES (9, 'The Foundry', 82450, 9, false);
+INSERT INTO public.stadium VALUES (10, 'The Ice Bowl', 94500, 10, false);
+INSERT INTO public.stadium VALUES (11, 'The Bourbon Dome', 76500, 11, true);
+INSERT INTO public.stadium VALUES (12, 'Nasty Natti Stadium', 73700, 12, false);
+INSERT INTO public.stadium VALUES (13, 'Lone Star Stadium', 86000, 13, false);
+INSERT INTO public.stadium VALUES (14, 'The Berserker Dome', 80500, 14, true);
+INSERT INTO public.stadium VALUES (15, 'Tomahawk Stadium', 88300, 15, false);
+INSERT INTO public.stadium VALUES (16, 'Elway Stadium', 83900, 16, false);
+INSERT INTO public.stadium VALUES (17, 'The Gateway Dome', 79200, 17, true);
+INSERT INTO public.stadium VALUES (18, 'Oiler Stadium', 85600, 18, false);
+INSERT INTO public.stadium VALUES (19, 'The Tsunami Dome', 91030, 19, true);
+INSERT INTO public.stadium VALUES (20, 'Golden Gate Field', 79830, 20, false);
+INSERT INTO public.stadium VALUES (21, 'Thunderdome', 84675, 21, false);
+INSERT INTO public.stadium VALUES (22, 'Ocean Beach Field', 81290, 22, false);
+INSERT INTO public.stadium VALUES (23, 'Grand Canyon Field', 86250, 23, false);
+INSERT INTO public.stadium VALUES (24, 'Caesars Stadium', 84350, 24, false);
+
+
+--
+-- Data for Name: team; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+
+
+--
+-- Data for Name: team_city; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+
+
+--
+-- Data for Name: team_season; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+
+
+--
+-- Name: django_migrations_id_seq; Type: SEQUENCE SET; Schema: public; Owner: django
+--
+
+SELECT pg_catalog.setval('public.django_migrations_id_seq', 1, false);
+
+
+--
 -- Name: city city_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -855,11 +1283,27 @@ ALTER TABLE ONLY public.conference
 
 
 --
+-- Name: default_teams default_teams_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.default_teams
+    ADD CONSTRAINT default_teams_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: division division_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.division
     ADD CONSTRAINT division_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: django_migrations django_migrations_pkey; Type: CONSTRAINT; Schema: public; Owner: django
+--
+
+ALTER TABLE ONLY public.django_migrations
+    ADD CONSTRAINT django_migrations_pkey PRIMARY KEY (id);
 
 
 --
@@ -1004,6 +1448,14 @@ ALTER TABLE ONLY public.game_type
 
 ALTER TABLE ONLY public.game_wr_stats
     ADD CONSTRAINT game_wr_stats_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: league league_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.league
+    ADD CONSTRAINT league_pkey PRIMARY KEY (id);
 
 
 --
