@@ -420,6 +420,9 @@ class League(models.Model):
     id = models.IntegerField(primary_key=True)
     name = models.CharField(max_length=50)
     abbreviation = models.CharField(max_length=4, blank=True, null=True)
+    weather_setting = models.BooleanField()
+    injury_setting = models.BooleanField()
+    female_setting = models.BooleanField()
 
     class Meta:
         managed = True
