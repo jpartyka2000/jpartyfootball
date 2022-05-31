@@ -676,7 +676,7 @@ class Stadium(models.Model):
     stadium_id = models.IntegerField(primary_key=True)
     stadium_name = models.CharField(max_length=60)
     stadium_capacity = models.IntegerField()
-    city_id = models.IntegerField()
+    city = models.ForeignKey(City)
     is_dome = models.BooleanField()
 
     class Meta:
@@ -686,15 +686,14 @@ class Stadium(models.Model):
 
 class Team(models.Model):
     id = models.IntegerField(primary_key=True)
-    name = models.CharField(max_length=50)
+    nickname = models.CharField(max_length=50)
     first_season_id = models.IntegerField()
     current_season_wins = models.IntegerField()
     current_season_losses = models.IntegerField()
-    stadium_id = models.IntegerField()
-    conference_id = models.IntegerField()
-    division_id = models.IntegerField()
-    league_id = models.IntegerField()
-    nickname = models.CharField(max_length=50)
+    stadium = models.ForeignKey(Stadium)
+    conference = models.ForeignKey(Conference)
+    division = models.ForeignKey(Division)
+    league = models.ForeignKey(League)
 
     class Meta:
         managed = True
@@ -703,10 +702,10 @@ class Team(models.Model):
 
 class TeamCity(models.Model):
     team_city_id = models.IntegerField(primary_key=True)
-    team_id = models.IntegerField()
-    city_id = models.IntegerField()
+    team = models.ForeignKey(Team)
+    city = models.ForeignKey(City)
     first_season_id = models.IntegerField()
-    stadium_id = models.IntegerField()
+    stadium = models.ForeignKey(Stadium)
 
     class Meta:
         managed = True
