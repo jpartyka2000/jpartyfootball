@@ -13,7 +13,7 @@ import time
 import json
 
 from jpartyfb.forms import JPartyFBInputForm, CreateLeagueForm1
-from jpartyfb.models import DefaultTeams, City, League, Division, Conference
+from jpartyfb.models import DefaultTeams, City, League, Division, Conference, Stadium, Team, TeamCity
 
 def build_choose_teams_html(number_of_divisions_select, number_of_teams_conf_select, number_of_teams_per_division):
 
@@ -48,9 +48,15 @@ def build_choose_teams_html(number_of_divisions_select, number_of_teams_conf_sel
 
 
     division_counter = 1
+    city_nickname_to_city_id_dict = {}
+
     for this_default_team in DefaultTeams.objects.using("xactly_dev").filter(id__lte=(number_of_teams_conf_select * 2)).order_by("id"):
         this_default_team_nickname = this_default_team.nickname
         this_default_team_city_name = this_default_team.city.city_name
+        this_default_team_city_id = this_default_team.city.city_id
+
+        city_nickname_to_city_id_dict[this_default_team_nickname] = this_default_team_city_id
+
         division_num_to_team_list_dict[division_counter].append(this_default_team_city_name + " " + this_default_team_nickname)
 
         if len(division_num_to_team_list_dict[division_counter]) == number_of_teams_per_division:
@@ -123,7 +129,7 @@ def build_choose_teams_html(number_of_divisions_select, number_of_teams_conf_sel
 
     team_html_str += "</table>"
 
-    return team_html_str
+    return team_html_str, city_nickname_to_city_id_dict
 
 
 @ensure_csrf_cookie
@@ -224,7 +230,7 @@ def process_create_league_form_1(request):
 
     number_of_teams_per_division = number_of_teams_conf_select / number_of_divisions_select
 
-    team_html_str = build_choose_teams_html(number_of_divisions_select, number_of_teams_conf_select, number_of_teams_per_division)
+    team_html_str, city_nickname_to_city_id_dict = build_choose_teams_html(number_of_divisions_select, number_of_teams_conf_select, number_of_teams_per_division)
 
     context = {}
 
@@ -239,6 +245,7 @@ def process_create_league_form_1(request):
     context['number_of_teams_conf'] = number_of_teams_conf_select
     context['number_of_divisions_conf'] = number_of_divisions_select
     context['number_of_teams_per_division'] = number_of_teams_per_division
+    context['city_nickname_to_city_id_dict'] = city_nickname_to_city_id_dict
     context['team_html_str'] = team_html_str
 
     return render(request, 'jpartyfb/choose_teams.html', context)
@@ -274,6 +281,9 @@ def process_create_league_form_final(request):
 
     team_to_conference_dict_str = request.POST['team_to_conference_dict']
     team_to_conference_dict = json.loads(team_to_conference_dict_str)
+
+    city_nickname_to_city_id_dict_str = request.POST['city_nickname_to_city_id_dict']
+    city_nickname_to_city_id_dict = json.loads(city_nickname_to_city_id_dict_str)
 
     #create league abbrevation. If the league has >= 2 words, then use the first letter of each word
     #if it has only one word, then use the first 3 letters of that word
@@ -338,10 +348,14 @@ def process_create_league_form_final(request):
     except Exception:
         division_id = 1
 
+    #we need this for proper insertions into the Team table
+    division_name_to_id_dict = {}
+
     for division_idx, this_division_name in enumerate(division_name_list):
 
         this_conference_name = division_to_conference_dict[this_division_name]
         this_conference_id = conference_name_to_id_dict[this_conference_name]
+        division_name_to_id_dict[this_division_name] = division_id
 
         try:
             Division.objects.using("xactly_dev").create(id=division_id, division_name=this_division_name,
@@ -352,6 +366,61 @@ def process_create_league_form_final(request):
 
         division_id += 1
 
+    # next insert team rows for this league
+    try:
+        team_id = int(
+            Team.objects.using('xactly_dev').latest('id').id) + 1
+    except Exception:
+        team_id = 1
+
+    #also insert team_city rows for this league
+    try:
+        team_city_id = int(
+            TeamCity.objects.using('xactly_dev').latest('team_city_id').team_city_id) + 1
+    except Exception:
+        team_city_id = 1
+
+    team_id_to_city_stadium_id_list_dict = {}
+
+    for team_idx, this_team_name in enumerate(team_name_list):
+
+        this_team_conference_name = team_to_conference_dict[this_team_name]
+        this_team_conference_id = conference_name_to_id_dict[this_team_conference_name]
+        this_team_division_name = team_to_division_dict[this_team_name]
+        this_team_division_id = division_name_to_id_dict[this_team_division_name]
+
+        this_team_name_parts_list = this_team_name.split()
+
+        if this_team_name_parts_list[0] == "Dallas":
+            this_team_nickname = this_team_name_parts_list[1] + " " + this_team_name_parts_list[2]
+        else:
+            this_team_nickname = this_team_name_parts_list[-1]
+
+        this_team_city_id = city_nickname_to_city_id_dict[this_team_nickname]
+
+        stadium_row = Stadium.objects.using("xactly_dev").get(city_id=this_team_city_id)
+        this_team_stadium_id = stadium_row.stadium_id
+
+        team_id_to_city_stadium_id_list_dict[team_id] = [this_team_city_id, this_team_stadium_id]
+
+        try:
+            Team.objects.using("xactly_dev").create(id=team_id, nickname=this_team_nickname,
+                                                    first_season_id=-1, current_season_wins=0, current_season_losses=0,
+                                                    stadium_id=this_team_stadium_id, conference_id=this_team_conference_id,
+                                                    division_id=this_team_division_id,league_id=league_id)
+        except Exception:
+            return HttpResponse(-4)
+
+        try:
+            TeamCity.objects.using("xactly_dev").create(team_city_id=team_city_id, team_id=team_id,
+                                                    city_id=this_team_city_id,
+                                                    first_season_id=-1,stadium_id=this_team_stadium_id)
+        except Exception:
+            return HttpResponse(-5)
+
+
+        team_id += 1
+        team_city_id += 1
 
     #status_and_variable_name_list = [result_status, variable_name_dict, unmatched_variables_dict]
     #status_variable_names_json = json.dumps(status_and_variable_name_list)
