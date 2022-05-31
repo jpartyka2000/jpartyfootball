@@ -72,13 +72,22 @@
        <input type="hidden" id="number_of_teams_conf_hidden" name="number_of_teams_conf_hidden" value="{{ number_of_teams_conf }}" />
        <input type="hidden" id="number_of_divisions_conf_hidden" name="number_of_divisions_conf_hidden" value="{{ number_of_divisions_conf }}" />
 
-
     </form>
     <div style="height: 35px;"></div>
 
 </div>
 
 <script language="Javascript">
+
+    city_nickname_to_city_id_dict = {
+        {% for key, value in city_nickname_to_city_id_dict.items %}
+            {% if not forloop.first %}
+                 ,
+            {% endif %}
+            '{{ key }}':{{ value }}
+        {% endfor %}
+
+     }
 
     var clicked_team_td_id_str = ""
     var clicked_team_td_orig_color_str = ""
@@ -233,6 +242,10 @@
         formData.append("division_to_conference_dict", JSON.stringify(division_to_conference_dict))
         formData.append("team_to_division_dict", JSON.stringify(team_to_division_dict))
         formData.append("team_to_conference_dict", JSON.stringify(team_to_conference_dict))
+        formData.append("city_nickname_to_city_id_dict", JSON.stringify(city_nickname_to_city_id_dict))
+
+        //alert(JSON.stringify(city_nickname_to_city_id_dict))
+        //return
 
         $("#loading_image").show()
 
@@ -246,7 +259,7 @@
             cache: false,
             success: function(data) {
 
-               alert(JSON.stringify(data))
+               //alert(JSON.stringify(data))
                $("#loading_image").hide()
 
                //result = JSON.parse(data)
@@ -271,6 +284,20 @@
                    alert("Error in trying to save to Division db table")
                    return
                }
+
+               if (data == "-4") {
+                   alert("Error in trying to save to Team db table")
+                   return
+               }
+
+               if (data == "-5") {
+                   alert("Error in trying to save to TeamCity db table")
+                   return
+               }
+
+               alert("League has been successfully created")
+
+               window.location.href = "/jpartyfb/"
 
            }
         })
