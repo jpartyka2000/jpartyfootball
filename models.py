@@ -260,8 +260,31 @@ class GameRbStats(models.Model):
         managed = True
         db_table = 'game_rb_stats'
 
+class GameFbStats(models.Model):
+    id = models.IntegerField(primary_key=True)
+    game_id = models.IntegerField()
+    player_id = models.IntegerField()
+    rushing_yards = models.IntegerField()
+    rushing_attempts = models.IntegerField()
+    receiving_yards = models.IntegerField()
+    rushing_tds = models.IntegerField()
+    receiving_tds = models.IntegerField()
+    rushing_2_point_conversions = models.IntegerField()
+    receiving_2_point_conversions = models.IntegerField()
+    num_fumbles = models.IntegerField()
+    num_block_wins = models.IntegerField()
+    num_block_losses = models.IntegerField()
+    num_block_draws = models.IntegerField()
+    passing_yards = models.IntegerField()
+    passing_tds = models.IntegerField()
+    passing_attempts = models.IntegerField()
 
-class GameSecStats(models.Model):
+    class Meta:
+        managed = True
+        db_table = 'game_fb_stats'
+
+
+class GameLbStats(models.Model):
     id = models.IntegerField(primary_key=True)
     game_id = models.IntegerField()
     player_id = models.IntegerField()
@@ -277,8 +300,43 @@ class GameSecStats(models.Model):
 
     class Meta:
         managed = True
-        db_table = 'game_sec_stats'
+        db_table = 'game_lb_stats'
 
+class GameCbStats(models.Model):
+    id = models.IntegerField(primary_key=True)
+    game_id = models.IntegerField()
+    player_id = models.IntegerField()
+    num_receptions_allowed = models.IntegerField()
+    num_challenges = models.IntegerField()
+    num_interceptions = models.IntegerField()
+    int_return_yards = models.IntegerField()
+    int_return_tds = models.IntegerField()
+    num_fumbles_recovered = models.IntegerField()
+    fumble_return_yards = models.IntegerField()
+    num_tackles = models.IntegerField()
+    num_forced_fumbles = models.IntegerField()
+
+    class Meta:
+        managed = True
+        db_table = 'game_cb_stats'
+
+class GameSfStats(models.Model):
+    id = models.IntegerField(primary_key=True)
+    game_id = models.IntegerField()
+    player_id = models.IntegerField()
+    num_receptions_allowed = models.IntegerField()
+    num_challenges = models.IntegerField()
+    num_interceptions = models.IntegerField()
+    int_return_yards = models.IntegerField()
+    int_return_tds = models.IntegerField()
+    num_fumbles_recovered = models.IntegerField()
+    fumble_return_yards = models.IntegerField()
+    num_tackles = models.IntegerField()
+    num_forced_fumbles = models.IntegerField()
+
+    class Meta:
+        managed = True
+        db_table = 'game_sf_stats'
 
 class GameStdStats(models.Model):
     id = models.IntegerField(primary_key=True)
@@ -446,7 +504,7 @@ class Player(models.Model):
     salary = models.IntegerField()
     height = models.CharField(max_length=4)
     weight = models.IntegerField()
-    league_id = models.IntegerField()
+    league = models.ForeignKey(League)
 
     class Meta:
         managed = True
@@ -455,7 +513,7 @@ class Player(models.Model):
 
 class PlayerGamePlays(models.Model):
     id = models.IntegerField(primary_key=True)
-    player_id = models.IntegerField()
+    player = models.ForeignKey(Player)
     game_play_id = models.IntegerField()
 
     class Meta:
@@ -465,9 +523,9 @@ class PlayerGamePlays(models.Model):
 
 class PlayerPool(models.Model):
     id = models.IntegerField(primary_key=True)
-    player_id = models.IntegerField()
+    player = models.ForeignKey(Player)
     status = models.IntegerField()
-    league_id = models.IntegerField()
+    league = models.ForeignKey(League)
 
     class Meta:
         managed = True
@@ -476,7 +534,7 @@ class PlayerPool(models.Model):
 
 class PlayerSpecsDl(models.Model):
     id = models.IntegerField(primary_key=True)
-    player_id = models.IntegerField()
+    player = models.ForeignKey(Player)
     block_power_rating = models.IntegerField()
     block_agility_rating = models.IntegerField()
     speed_rating = models.IntegerField()
@@ -494,7 +552,7 @@ class PlayerSpecsDl(models.Model):
 
 class PlayerSpecsK(models.Model):
     id = models.IntegerField(primary_key=True)
-    player_id = models.IntegerField()
+    player = models.ForeignKey(Player)
     leg_rating = models.IntegerField()
     accuracy_rating = models.IntegerField()
     adjustment_rating = models.IntegerField()
@@ -509,7 +567,7 @@ class PlayerSpecsK(models.Model):
 
 class PlayerSpecsOl(models.Model):
     id = models.IntegerField(primary_key=True)
-    player_id = models.IntegerField()
+    player = models.ForeignKey(Player)
     block_power_rating = models.IntegerField()
     block_agility_rating = models.IntegerField()
     penalty_avoidance_rating = models.IntegerField()
@@ -523,7 +581,7 @@ class PlayerSpecsOl(models.Model):
 
 class PlayerSpecsP(models.Model):
     id = models.IntegerField(primary_key=True)
-    player_id = models.IntegerField()
+    player = models.ForeignKey(Player)
     leg_rating = models.IntegerField()
     directionality_rating = models.IntegerField()
     hangtime_rating = models.IntegerField()
@@ -539,7 +597,7 @@ class PlayerSpecsP(models.Model):
 
 class PlayerSpecsQb(models.Model):
     id = models.IntegerField(primary_key=True)
-    player_id = models.IntegerField()
+    player = models.ForeignKey(Player)
     arm_strength_rating = models.IntegerField()
     arm_accuracy_rating = models.IntegerField()
     intelligence_rating = models.IntegerField()
@@ -555,7 +613,7 @@ class PlayerSpecsQb(models.Model):
 
 class PlayerSpecsRb(models.Model):
     id = models.IntegerField(primary_key=True)
-    player_id = models.IntegerField()
+    player = models.ForeignKey(Player)
     speed_rating = models.IntegerField()
     elusiveness_rating = models.IntegerField()
     strength_rating = models.IntegerField()
@@ -568,10 +626,25 @@ class PlayerSpecsRb(models.Model):
         managed = True
         db_table = 'player_specs_rb'
 
-
-class PlayerSpecsSec(models.Model):
+class PlayerSpecsFb(models.Model):
     id = models.IntegerField(primary_key=True)
-    player_id = models.IntegerField()
+    player = models.ForeignKey(Player)
+    speed_rating = models.IntegerField()
+    elusiveness_rating = models.IntegerField()
+    strength_rating = models.IntegerField()
+    ball_protection_rating = models.IntegerField()
+    catching_rating = models.IntegerField()
+    stamina_rating = models.IntegerField()
+    career_arc_dict = models.TextField()  # This field type is a guess.
+
+    class Meta:
+        managed = True
+        db_table = 'player_specs_fb'
+
+
+class PlayerSpecsLb(models.Model):
+    id = models.IntegerField(primary_key=True)
+    player = models.ForeignKey(Player)
     speed_rating = models.IntegerField()
     route_rating = models.IntegerField()
     pass_defense_rating = models.IntegerField()
@@ -583,12 +656,43 @@ class PlayerSpecsSec(models.Model):
 
     class Meta:
         managed = True
-        db_table = 'player_specs_sec'
+        db_table = 'player_specs_lb'
 
+class PlayerSpecsCb(models.Model):
+    id = models.IntegerField(primary_key=True)
+    player = models.ForeignKey(Player)
+    speed_rating = models.IntegerField()
+    route_rating = models.IntegerField()
+    pass_defense_rating = models.IntegerField()
+    interception_rating = models.IntegerField()
+    fumble_inducement_rating = models.IntegerField()
+    tackle_rating = models.IntegerField()
+    penalty_avoidance_rating = models.IntegerField()
+    career_arc_dict = models.TextField()  # This field type is a guess.
+
+    class Meta:
+        managed = True
+        db_table = 'player_specs_cb'
+
+class PlayerSpecsSf(models.Model):
+    id = models.IntegerField(primary_key=True)
+    player = models.ForeignKey(Player)
+    speed_rating = models.IntegerField()
+    route_rating = models.IntegerField()
+    pass_defense_rating = models.IntegerField()
+    interception_rating = models.IntegerField()
+    fumble_inducement_rating = models.IntegerField()
+    tackle_rating = models.IntegerField()
+    penalty_avoidance_rating = models.IntegerField()
+    career_arc_dict = models.TextField()  # This field type is a guess.
+
+    class Meta:
+        managed = True
+        db_table = 'player_specs_sf'
 
 class PlayerSpecsStd(models.Model):
     id = models.IntegerField(primary_key=True)
-    player_id = models.IntegerField()
+    player = models.ForeignKey(Player)
     speed_rating = models.IntegerField()
     agility_rating = models.IntegerField()
     tackle_rating = models.IntegerField()
@@ -602,7 +706,7 @@ class PlayerSpecsStd(models.Model):
 
 class PlayerSpecsSto(models.Model):
     id = models.IntegerField(primary_key=True)
-    player_id = models.IntegerField()
+    player = models.ForeignKey(Player)
     speed_rating = models.IntegerField()
     elusiveness_rating = models.IntegerField()
     strength_rating = models.IntegerField()
@@ -616,7 +720,7 @@ class PlayerSpecsSto(models.Model):
 
 class PlayerSpecsTe(models.Model):
     id = models.IntegerField(primary_key=True)
-    player_id = models.IntegerField()
+    player = models.ForeignKey(Player)
     catching_rating = models.IntegerField()
     route_rating = models.IntegerField()
     speed_rating = models.IntegerField()
@@ -634,7 +738,7 @@ class PlayerSpecsTe(models.Model):
 
 class PlayerSpecsWr(models.Model):
     id = models.IntegerField(primary_key=True)
-    player_id = models.IntegerField()
+    player = models.ForeignKey(Player)
     catching_rating = models.IntegerField()
     route_rating = models.IntegerField()
     jumping_rating = models.IntegerField()
@@ -647,17 +751,6 @@ class PlayerSpecsWr(models.Model):
     class Meta:
         managed = True
         db_table = 'player_specs_wr'
-
-
-class PlayerTeam(models.Model):
-    player_team_id = models.IntegerField(primary_key=True)
-    player_id = models.IntegerField()
-    team_id = models.IntegerField()
-    season_id = models.IntegerField()
-
-    class Meta:
-        managed = True
-        db_table = 'player_team'
 
 
 class Season(models.Model):
@@ -699,6 +792,15 @@ class Team(models.Model):
         managed = True
         db_table = 'team'
 
+class PlayerTeam(models.Model):
+    player_team_id = models.IntegerField(primary_key=True)
+    player = models.ForeignKey(Player)
+    team = models.ForeignKey(Team)
+    season_id = models.IntegerField()
+
+    class Meta:
+        managed = True
+        db_table = 'player_team'
 
 class TeamCity(models.Model):
     team_city_id = models.IntegerField(primary_key=True)
