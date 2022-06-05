@@ -46,6 +46,18 @@ fcs_school_list = ['Alabama A&M University', 'Alabama State University', 'Alcorn
 d2_school_list = ['Adams State University', 'Albany State University', 'Alderson Broaddus University', 'Allen University', 'American International College', 'Anderson University – South Carolina', 'Angelo State University', 'Arkansas Tech University', 'Ashland University', 'Assumption University', 'Augustana University – South Dakota', 'Barton College', 'Bemidji State University', 'Benedict College', 'Bentley University', 'Black Hills State University', 'Bloomsburg University of Pennsylvania', 'Bluefield State College', 'Bowie State University', 'California University of Pennsylvania', 'Carson-Newman University', 'Catawba College', 'Central State University', 'Central Washington University', 'Chadron State College', 'Chowan University', 'Clarion University of Pennsylvania', 'Clark Atlanta University', 'Colorado Mesa University', 'Colorado School of Mines', 'Colorado State University – Pueblo', 'Concord University', 'Concordia University, St. Paul – Minnesota', 'Davenport University', 'Delta State University', 'East Central University', 'East Stroudsburg University of Pennsylvania', 'Eastern New Mexico University', 'Edinboro University', 'Edward Waters University', 'Elizabeth City State University', 'Emporia State University', 'Erskine College', 'Fairmont State University', 'Fayetteville State University', 'Ferris State University', 'Fort Hays State University', 'Fort Lewis College', 'Fort Valley State University', 'Franklin Pierce University', 'Frostburg State University', 'Gannon University', 'Glenville State College', 'Grand Valley State University', 'Harding University', 'Henderson State University', 'Hillsdale College', 'Indiana University of Pennsylvania', 'Johnson C. Smith University', 'Kentucky State University', 'Kentucky Wesleyan College', 'Kutztown University of Pennsylvania', 'Lake Erie College', 'Lane College', 'Lenoir-Rhyne University', 'Limestone University', 'Lincoln University – Missouri', 'Lincoln University Pennsylvania', 'Lindenwood University', 'Livingstone College', 'Lock Haven University', 'Mars Hill University', 'McKendree University', 'Mercyhurst University', 'Michigan Technological University', 'Midwestern State University', 'Miles College', 'Millersville University of Pennsylvania', 'Minnesota State University – Mankato', 'Minnesota State University – Moorhead', 'Minot State University', 'Mississippi College', 'Missouri Southern State University', 'Missouri University of Science & Technology', 'Missouri Western State University', 'Morehouse College', 'New Mexico Highlands University', 'Newberry College', 'North Greenville University', 'Northeastern State University', 'Northern Michigan University', 'Northern State University', 'Northwest Missouri State University', 'Northwestern Oklahoma State University', 'Northwood University – Michigan', 'Notre Dame College', 'Ohio Dominican University', 'Oklahoma Baptist University', 'Ouachita Baptist University', 'Pace University', 'Pittsburg State University', 'Post University', 'Quincy University', 'Saginaw Valley State University', 'Saint Anselm College', "Saint Augustine's University", 'Savannah State University', 'Seton Hill University', 'Shaw University', 'Shepherd University', 'Shippensburg University of Pennsylvania', 'Shorter University', 'Slippery Rock University', 'South Dakota Mines', 'Southeastern Oklahoma State University', 'Southern Arkansas University', 'Southern Connecticut State University', 'Southern Nazarene University', 'Southwest Baptist University', 'Southwest Minnesota State University', 'Southwestern Oklahoma State University', 'Stonehill College', 'Texas A&M University – Commerce', 'Texas A&M University – Kingsville', "The University of Virginia's College at Wise", 'Tiffin University', 'Truman State University', 'Tusculum University', 'Tuskegee University', 'University of Arkansas at Monticello', 'University of Central Missouri', 'University of Central Oklahoma', 'University of Charleston', 'University of Findlay', 'University of Indianapolis', 'University of Mary', 'University of Minnesota – Duluth', 'University of Nebraska at Kearney', 'University of New Haven', 'University of North Carolina at Pembroke', 'University of Sioux Falls', 'University of Texas – Permian Basin', 'University of West Alabama', 'University of West Florida', 'University of West Georgia', 'Upper Iowa University', 'Valdosta State University', 'Virginia State University', 'Virginia Union University', 'Walsh University', 'Washburn University', 'Wayne State College', 'Wayne State University', 'West Chester University of Pennsylvania', 'West Liberty University', 'West Texas A&M University', 'West Virginia State University', 'West Virginia Wesleyan College', 'Western Colorado University', 'Western New Mexico University', 'Western Oregon University', 'Wheeling University', 'William Jewell College', 'Wingate University', 'Winona State University', 'Winston-Salem State University']
 d3_school_list = ['Adrian College', 'Albion College', 'Albright College', 'Alfred University', 'Allegheny College', 'Alma College', 'Alvernia University', 'Amherst College', 'Anderson University – Indiana', 'Anna Maria College', 'Augsburg University', 'Augustana College – Illinois', 'Aurora University', 'Austin College', 'Averett University', 'Baldwin Wallace University', 'Bates College', 'Belhaven University', 'Beloit College', 'Benedictine University', 'Berry College', 'Bethany College – West Virginia', 'Bethel University – Minnesota', 'Birmingham-Southern College', 'Bluffton University', 'Bowdoin College', 'Brevard College', 'Bridgewater College', 'Bridgewater State University', 'Buena Vista University', 'California Lutheran University', 'Capital University', 'Carleton College', 'Carnegie Mellon University', 'Carroll University', 'Carthage College', 'Case Western Reserve University', 'Castleton University', 'Catholic University of America', 'Central College', 'Centre College', 'Chapman University', 'Christopher Newport University', 'Claremont-Mudd-Scripps Colleges', 'Coe College', 'Colby College', 'College of Wooster', 'Concordia College – Minnesota', 'Concordia University – Chicago', 'Concordia University Wisconsin', 'Cornell College', 'Crown College', 'Curry College', 'Dean College', 'Defiance College', 'Delaware Valley University', 'Denison University', 'DePauw University', 'Dickinson College', 'East Texas Baptist University', 'Elmhurst University', 'Endicott College', 'Eureka College', 'Fairleigh Dickinson University – College at Florham', 'Ferrum College', 'Finlandia University', 'Fitchburg State University', 'Framingham State University', 'Franklin & Marshall College', 'Franklin College', 'Gallaudet University', 'Geneva College', 'George Fox University', 'Gettysburg College', 'Greensboro College', 'Greenville University', 'Grinnell College', 'Grove City College', 'Guilford College', 'Gustavus Adolphus College', 'Hamilton College', 'Hamline University', 'Hampden-Sydney College', 'Hanover College', 'Hardin-Simmons University', 'Hartwick College', 'Heidelberg University', 'Hendrix College', 'Hilbert College', 'Hiram College', 'Hobart & William Smith College', 'Hope College', 'Howard Payne University', 'Huntingdon College', 'Husson University', 'Illinois College', 'Illinois Wesleyan University', 'Ithaca College', 'John Carroll University', 'Johns Hopkins University', 'Juniata College', 'Kalamazoo College', 'Kean University', 'Kenyon College', 'Keystone College', "King's College – Pennsylvania", 'Knox College', 'LaGrange College', 'Lake Forest College', 'Lakeland University', 'Lawrence University', 'Lebanon Valley College', 'Lewis & Clark College', 'Linfield University', 'Loras College', 'Luther College', 'Lycoming College', 'Macalester College', 'Manchester University', 'Marietta College', 'Martin Luther College', 'Maryville College', 'Massachusetts Institute of Technology – MIT', 'McDaniel College', 'McMurry University', 'Methodist University', 'Middlebury College', 'Millikin University', 'Millsaps College', 'Misericordia University', 'Monmouth College', 'Montclair State University', 'Moravian University', 'Mount St. Joseph University', 'Muhlenberg College', 'Muskingum University', 'Nebraska Wesleyan University', 'Nichols College', 'North Carolina Wesleyan College', 'North Central College', 'North Park University', 'Norwich University', 'Oberlin College', 'Ohio Northern University', 'Ohio Wesleyan University', 'Olivet College', 'Otterbein University', 'Pacific Lutheran University', 'Pacific University', 'Plymouth State University', 'Pomona-Pitzer Colleges', 'Randolph-Macon College', 'Rensselaer Polytechnic Institute – RPI', 'Rhodes College', 'Ripon College', 'Rockford University', 'Rose-Hulman Institute of Technology', 'Rowan University', "Saint John's University – Minnesota", 'Saint Vincent College – Pennsylvania', 'Salisbury University', 'Salve Regina University', 'Sewanee – The University of the South', 'Shenandoah University', 'Simpson College', 'Southern Virginia University', 'Southwestern University', 'Springfield College', 'St. John Fisher College', 'St. Lawrence University', 'St. Norbert College', 'St. Olaf College', 'Stevenson University', 'Sul Ross State University', 'SUNY Buffalo State College', 'SUNY College at Brockport', 'SUNY Cortland', 'SUNY Maritime College', 'SUNY Morrisville', 'Susquehanna University', 'Texas Lutheran University', 'The College of New Jersey', 'The College of St. Scholastica', 'Thiel College', 'Trine University', 'Trinity College – Connecticut', 'Trinity University – Texas', 'Tufts University', 'Union College – New York', 'United States Coast Guard Academy', 'United States Merchant Marine Academy', 'University of Chicago', 'University of Dubuque', 'University of La Verne', 'University of Mary Hardin-Baylor', 'University of Massachusetts – Dartmouth', 'University of Minnesota – Morris', 'University of Mount Union', 'University of New England', 'University of Northwestern – St. Paul', 'University of Puget Sound', 'University of Redlands', 'University of Rochester', 'University of Wisconsin – Eau Claire', 'University of Wisconsin – La Crosse', 'University of Wisconsin – Oshkosh', 'University of Wisconsin – Platteville', 'University of Wisconsin – River Falls', 'University of Wisconsin – Stevens Point', 'University of Wisconsin – Stout', 'University of Wisconsin – Whitewater', 'Ursinus College', 'Utica College', 'Wabash College', 'Wartburg College', 'Washington & Jefferson College', 'Washington & Lee University', 'Washington University in St. Louis', 'Waynesburg University', 'Wesleyan University', 'Western Connecticut State University', 'Western New England University', 'Westfield State University', 'Westminster College – Missouri', 'Westminster College – Pennsylvania', 'Wheaton College – Illinois', 'Whittier College', 'Whitworth University', 'Widener University', 'Wilkes University', 'Willamette University', 'William Paterson University of New Jersey', 'Williams College', 'Wilmington College', 'Wittenberg University', 'Worcester Polytechnic Institute', 'Worcester State University']
 
+#football numbers
+qb_k_p_number_bounds_list = [1,19]
+wr_te_number_bounds_list = [80,89]
+ol_dl_number_bounds_list = [60,79]
+rb_fb_cb_sf_number_bounds_list = [20, 49]
+lb_number_bounds_list = [90,99]
+sto_std_number_bounds_list = [50,59]
+
+position_to_number_bounds_list_dict = {"qb":qb_k_p_number_bounds_list, "rb":rb_fb_cb_sf_number_bounds_list, "fb":rb_fb_cb_sf_number_bounds_list,
+                                      "wr":wr_te_number_bounds_list, "te":wr_te_number_bounds_list, "k":qb_k_p_number_bounds_list, "p":qb_k_p_number_bounds_list,
+                                      "ol":ol_dl_number_bounds_list, "dl":ol_dl_number_bounds_list, "lb":lb_number_bounds_list, "cb":rb_fb_cb_sf_number_bounds_list,
+                                      "sf":rb_fb_cb_sf_number_bounds_list, "sto":sto_std_number_bounds_list, "std":sto_std_number_bounds_list}
 
 #player ability normal distribution for most players and abilities
 player_ability_norm_dist_obj = get_truncated_normal(mean=80, sd=6.7, low=50, upp=100)
@@ -74,11 +86,21 @@ pk_age_norm_dist_obj = get_truncated_normal(mean=35, sd=6.7, low=19, upp=50)
 rb_age_norm_dist_obj = get_truncated_normal(mean=27, sd=6.7, low=19, upp=40)
 
 #age normal distribution for all other player positions
-otherpos_age_norm_dist_obj = get_truncated_normal(mean=30, sd=6.7, low=19, upp=46)
+otherpos_age_norm_dist_obj = get_truncated_normal(mean=30, sd=4.5, low=19, upp=46)
 
 #height dists
-six_feet_tall_inches_norm_dist_obj = get_truncated_normal(mean=3, sd=3, low=0, upp=11)
-five_feet_tall_inches_norm_dist_obj = get_truncated_normal(mean=10, sd=3, low=5, upp=11)
+six_feet_tall_inches_norm_dist_obj = get_truncated_normal(mean=3, sd=2.5, low=0, upp=11)
+five_feet_tall_inches_norm_dist_obj = get_truncated_normal(mean=10, sd=2.5, low=5, upp=11)
+
+#weight dists
+low_5_ft_lb_weight_dist = get_truncated_normal(mean=225, sd=20, low=200, upp=250)
+high_5_ft_lb_weight_dist = get_truncated_normal(mean=265, sd=20, low=235, upp=285)
+low_6_ft_lb_weight_dist = get_truncated_normal(mean=300, sd=20, low=275, upp=325)
+high_6_ft_lb_weight_dist = get_truncated_normal(mean=340, sd=20, low=315, upp=365)
+low_5_ft_nlb_weight_dist = get_truncated_normal(mean=160, sd=10, low=140, upp=180)
+high_5_ft_nlb_weight_dist = get_truncated_normal(mean=190, sd=20, low=170, upp=210)
+low_6_ft_nlb_weight_dist = get_truncated_normal(mean=220, sd=20, low=190, upp=250)
+high_6_ft_nlb_weight_dist = get_truncated_normal(mean=275, sd=20, low=250, upp=300)
 
 C = Censusname()
 
@@ -89,7 +111,7 @@ player_name_to_combined_attr_score_dict = {}
 
 team_to_player_list_dict = {}
 
-#create list of player positions that will represent the number of players to create for each team (55)
+#create list of player positions that will represent the number of players to create for each team
 roster_position_count_list = []
 roster_position_count_qb_list = ["qb"] * 2
 roster_position_count_rb_list = ["rb"] * 2
@@ -111,10 +133,12 @@ roster_position_count_list = roster_position_count_qb_list + roster_position_cou
 for this_team in team_list:
     
     team_to_player_list_dict[this_team] = []
+    team_numbers_used = set()
     
     for player_position in roster_position_count_list:
         
         player_name_uniqueness_verified = False
+        player_number_uniqueness_verified = False
         
         #age is dependent on the player_position
         player_age = -1
@@ -126,6 +150,23 @@ for this_team in team_list:
         else:
             player_age = round(float(otherpos_age_norm_dist_obj.rvs()))
         
+        #secondary position will be chosen at random
+        secondary_position_list = [this_position for this_position in player_position_list if this_position != player_position]
+        
+        secondary_position_random_value = random.randint(0, len(secondary_position_list) - 1)
+        secondary_position = secondary_position_list[secondary_position_random_value]
+        
+        #assign number based on position
+        
+        while player_number_uniqueness_verified == False:
+        
+            this_position_number_bounds_list = position_to_number_bounds_list_dict[player_position]
+            player_number = random.randint(this_position_number_bounds_list[0], this_position_number_bounds_list[1])
+            
+            if player_number not in team_numbers_used:
+                team_numbers_used.add(player_number)
+                player_number_uniqueness_verified = True
+        
         #height in inches is determined via a normal dist
         
         height_feet = -1
@@ -133,7 +174,7 @@ for this_team in team_list:
 
         height_feet_random_value = random.randint(0,9)
         
-        if height_feet_random_value <= 7:
+        if height_feet_random_value <= 7 or player_position in ['ol','dl']:
             height_feet = 6
             height_inches = round(float(six_feet_tall_inches_norm_dist_obj.rvs()))
         else:
@@ -143,51 +184,22 @@ for this_team in team_list:
         #weight in lbs is position dependent - ols and dls have one dist, everyone else has another
         #it is also height dependent - the taller the player, the more the player is likely to weigh
         
-        mean_lb_weight = -1
-        low_lb_weight = -1
-        high_lb_weight = -1
-        mean_nlb_weight = -1
-        low_nlb_weight = -1
-        high_nlb_weight = -1
-        
-        if height_feet == 5 and height_inches <= 8:
-            mean_lb_weight = 225
-            low_lb_weight = 200
-            high_lb_weight = 250
-            mean_nlb_weight = 160
-            low_nlb_weight = 140
-            high_nlb_weight = 180
-        elif height_feet == 5 and height_inches > 8:
-            mean_lb_weight = 265
-            low_lb_weight = 235
-            high_lb_weight = 285
-            mean_nlb_weight = 190
-            low_nlb_weight = 170
-            high_nlb_weight = 210
-        elif height_feet == 6 and height_inches <= 6:
-            mean_lb_weight = 300
-            low_lb_weight = 275
-            high_lb_weight = 325
-            mean_nlb_weight = 220
-            low_nlb_weight = 190
-            high_nlb_weight = 250
-        elif height_feet == 6 and height_inches > 6:
-            mean_lb_weight = 340
-            low_lb_weight = 315
-            high_lb_weight = 365
-            mean_nlb_weight = 275
-            low_nlb_weight = 250
-            high_nlb_weight = 300
-        
-        linebacker_weight_norm_dist_obj = get_truncated_normal(mean=mean_lb_weight, sd=20, low=low_lb_weight, upp=high_lb_weight)
-        non_linebacker_weight_norm_dist_obj = get_truncated_normal(mean=mean_nlb_weight, sd=25, low=low_nlb_weight, upp=high_nlb_weight)
-        
-        weight_lbs = -1
-        
-        if player_position in ['dl','ol']:
-            weight_lbs = round(linebacker_weight_norm_dist_obj.rvs())
-        else:
-            weight_lbs = round(non_linebacker_weight_norm_dist_obj.rvs())
+        if height_feet == 5 and height_inches <= 8 and player_position in ['dl','ol']:
+            weight_lbs = round(low_5_ft_lb_weight_dist.rvs())
+        elif height_feet == 5 and height_inches <= 8 and player_position not in ['dl','ol']:
+            weight_lbs = round(low_5_ft_nlb_weight_dist.rvs())
+        elif height_feet == 5 and height_inches > 8 and player_position in ['dl','ol']:
+            weight_lbs = round(high_5_ft_lb_weight_dist.rvs())
+        elif height_feet == 5 and height_inches > 8 and player_position not in ['dl','ol']:
+            weight_lbs = round(high_5_ft_nlb_weight_dist.rvs())
+        elif height_feet == 6 and height_inches <= 6 and player_position in ['dl','ol']:
+            weight_lbs = round(low_6_ft_lb_weight_dist.rvs())
+        elif height_feet == 6 and height_inches <= 6 and player_position not in ['dl','ol']:
+            weight_lbs = round(low_6_ft_nlb_weight_dist.rvs())
+        elif height_feet == 6 and height_inches > 6 and player_position in ['dl','ol']:
+            weight_lbs = round(high_6_ft_lb_weight_dist.rvs())
+        elif height_feet == 6 and height_inches > 6 and player_position not in ['dl','ol']:
+            weight_lbs = round(high_6_ft_nlb_weight_dist.rvs())
         
         while player_name_uniqueness_verified == False:
         
@@ -263,8 +275,10 @@ for this_team in team_list:
         
         player_name_to_info_dict_dict[player_name] = {}
         player_name_to_info_dict_dict[player_name]["player_name"] = player_name
+        player_name_to_info_dict_dict[player_name]["number"] = player_number
         player_name_to_info_dict_dict[player_name]["age"] = player_age
         player_name_to_info_dict_dict[player_name]["position"] = player_position
+        player_name_to_info_dict_dict[player_name]["secondary_position"] = secondary_position
         player_name_to_info_dict_dict[player_name]["height"] = str(height_feet) + "'" + str(height_inches)
         player_name_to_info_dict_dict[player_name]["weight"] = str(weight_lbs) + " pounds"
         player_name_to_info_dict_dict[player_name]["school"] = school_name
@@ -285,19 +299,19 @@ print("The best player in the league is: " + best_player_name)
 print("***************")
 print(player_name_to_info_dict_dict[best_player_name])
         
-    #print("------------------------------------")
+print("------------------------------------")
 
 #print(len(player_name_to_info_dict_dict.keys()))
 
 #print(team_to_player_list_dict)
 
-#ny_player_names_list = team_to_player_list_dict["New York"]
+ny_player_names_list = team_to_player_list_dict["New York"]
 #print(ny_player_names_list)
 
-#for this_player_name in ny_player_names_list:
-#    this_player_info_list = player_name_to_info_dict_dict[this_player_name]
-#    print(this_player_info_list)
-#    print('------------------------')
+for this_player_name in ny_player_names_list:
+    this_player_info_list = player_name_to_info_dict_dict[this_player_name]
+    print(this_player_info_list)
+    print('------------------------')
 
 #qb_list = player_position_to_name_list_dict["qb"]
 
