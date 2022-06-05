@@ -136,7 +136,8 @@ CREATE TABLE public.draft (
     id integer NOT NULL,
     host_city_id integer NOT NULL,
     season_id integer NOT NULL,
-    num_rounds integer NOT NULL
+    num_rounds integer NOT NULL,
+    league_id integer
 );
 
 
@@ -183,6 +184,28 @@ CREATE TABLE public.game (
 ALTER TABLE public.game OWNER TO postgres;
 
 --
+-- Name: game_cb_stats; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.game_cb_stats (
+    id integer NOT NULL,
+    game_id integer NOT NULL,
+    player_id integer NOT NULL,
+    num_receptions_allowed integer NOT NULL,
+    num_challenges integer NOT NULL,
+    num_interceptions integer NOT NULL,
+    int_return_yards integer NOT NULL,
+    int_return_tds integer NOT NULL,
+    num_fumbles_recovered integer NOT NULL,
+    fumble_return_yards integer NOT NULL,
+    num_tackles integer NOT NULL,
+    num_forced_fumbles integer NOT NULL
+);
+
+
+ALTER TABLE public.game_cb_stats OWNER TO postgres;
+
+--
 -- Name: game_dl_stats; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -209,6 +232,33 @@ CREATE TABLE public.game_dl_stats (
 ALTER TABLE public.game_dl_stats OWNER TO postgres;
 
 --
+-- Name: game_fb_stats; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.game_fb_stats (
+    id integer NOT NULL,
+    game_id integer NOT NULL,
+    player_id integer NOT NULL,
+    rushing_yards integer NOT NULL,
+    rushing_attempts integer NOT NULL,
+    receiving_yards integer NOT NULL,
+    rushing_tds integer NOT NULL,
+    receiving_tds integer NOT NULL,
+    rushing_2_point_conversions integer NOT NULL,
+    receiving_2_point_conversions integer NOT NULL,
+    num_fumbles integer NOT NULL,
+    num_block_wins integer NOT NULL,
+    num_block_losses integer NOT NULL,
+    num_block_draws integer NOT NULL,
+    passing_yards integer NOT NULL,
+    passing_tds integer NOT NULL,
+    passing_attempts integer NOT NULL
+);
+
+
+ALTER TABLE public.game_fb_stats OWNER TO postgres;
+
+--
 -- Name: game_k_stats; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -230,6 +280,28 @@ CREATE TABLE public.game_k_stats (
 
 
 ALTER TABLE public.game_k_stats OWNER TO postgres;
+
+--
+-- Name: game_lb_stats; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.game_lb_stats (
+    id integer NOT NULL,
+    game_id integer NOT NULL,
+    player_id integer NOT NULL,
+    num_receptions_allowed integer NOT NULL,
+    num_challenges integer NOT NULL,
+    num_interceptions integer NOT NULL,
+    int_return_yards integer NOT NULL,
+    int_return_tds integer NOT NULL,
+    num_fumbles_recovered integer NOT NULL,
+    fumble_return_yards integer NOT NULL,
+    num_tackles integer NOT NULL,
+    num_forced_fumbles integer NOT NULL
+);
+
+
+ALTER TABLE public.game_lb_stats OWNER TO postgres;
 
 --
 -- Name: game_ol_stats; Type: TABLE; Schema: public; Owner: postgres
@@ -358,10 +430,10 @@ CREATE TABLE public.game_rb_stats (
 ALTER TABLE public.game_rb_stats OWNER TO postgres;
 
 --
--- Name: game_sec_stats; Type: TABLE; Schema: public; Owner: postgres
+-- Name: game_sf_stats; Type: TABLE; Schema: public; Owner: postgres
 --
 
-CREATE TABLE public.game_sec_stats (
+CREATE TABLE public.game_sf_stats (
     id integer NOT NULL,
     game_id integer NOT NULL,
     player_id integer NOT NULL,
@@ -377,7 +449,7 @@ CREATE TABLE public.game_sec_stats (
 );
 
 
-ALTER TABLE public.game_sec_stats OWNER TO postgres;
+ALTER TABLE public.game_sf_stats OWNER TO postgres;
 
 --
 -- Name: game_std_stats; Type: TABLE; Schema: public; Owner: postgres
@@ -604,6 +676,26 @@ CREATE TABLE public.player_pool (
 ALTER TABLE public.player_pool OWNER TO postgres;
 
 --
+-- Name: player_specs_cb; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.player_specs_cb (
+    id integer NOT NULL,
+    player_id integer NOT NULL,
+    speed_rating integer NOT NULL,
+    route_rating integer NOT NULL,
+    pass_defense_rating integer NOT NULL,
+    interception_rating integer NOT NULL,
+    fumble_inducement_rating integer NOT NULL,
+    tackle_rating integer NOT NULL,
+    penalty_avoidance_rating integer NOT NULL,
+    career_arc_dict json NOT NULL
+);
+
+
+ALTER TABLE public.player_specs_cb OWNER TO postgres;
+
+--
 -- Name: player_specs_dl; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -625,6 +717,25 @@ CREATE TABLE public.player_specs_dl (
 ALTER TABLE public.player_specs_dl OWNER TO postgres;
 
 --
+-- Name: player_specs_fb; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.player_specs_fb (
+    id integer NOT NULL,
+    player_id integer NOT NULL,
+    speed_rating integer NOT NULL,
+    elusiveness_rating integer NOT NULL,
+    strength_rating integer NOT NULL,
+    ball_protection_rating integer NOT NULL,
+    catching_rating integer NOT NULL,
+    stamina_rating integer NOT NULL,
+    career_arc_dict json NOT NULL
+);
+
+
+ALTER TABLE public.player_specs_fb OWNER TO postgres;
+
+--
 -- Name: player_specs_k; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -641,6 +752,26 @@ CREATE TABLE public.player_specs_k (
 
 
 ALTER TABLE public.player_specs_k OWNER TO postgres;
+
+--
+-- Name: player_specs_lb; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.player_specs_lb (
+    id integer NOT NULL,
+    player_id integer NOT NULL,
+    speed_rating integer NOT NULL,
+    route_rating integer NOT NULL,
+    pass_defense_rating integer NOT NULL,
+    interception_rating integer NOT NULL,
+    fumble_inducement_rating integer NOT NULL,
+    tackle_rating integer NOT NULL,
+    penalty_avoidance_rating integer NOT NULL,
+    career_arc_dict json NOT NULL
+);
+
+
+ALTER TABLE public.player_specs_lb OWNER TO postgres;
 
 --
 -- Name: player_specs_ol; Type: TABLE; Schema: public; Owner: postgres
@@ -717,10 +848,10 @@ CREATE TABLE public.player_specs_rb (
 ALTER TABLE public.player_specs_rb OWNER TO postgres;
 
 --
--- Name: player_specs_sec; Type: TABLE; Schema: public; Owner: postgres
+-- Name: player_specs_sf; Type: TABLE; Schema: public; Owner: postgres
 --
 
-CREATE TABLE public.player_specs_sec (
+CREATE TABLE public.player_specs_sf (
     id integer NOT NULL,
     player_id integer NOT NULL,
     speed_rating integer NOT NULL,
@@ -734,7 +865,7 @@ CREATE TABLE public.player_specs_sec (
 );
 
 
-ALTER TABLE public.player_specs_sec OWNER TO postgres;
+ALTER TABLE public.player_specs_sf OWNER TO postgres;
 
 --
 -- Name: player_specs_std; Type: TABLE; Schema: public; Owner: postgres
@@ -865,10 +996,10 @@ CREATE TABLE public.team (
     first_season_id integer NOT NULL,
     current_season_wins integer NOT NULL,
     current_season_losses integer NOT NULL,
-    stadium_id integer NOT NULL,
-    conference_id integer NOT NULL,
-    division_id integer NOT NULL,
-    league_id integer NOT NULL
+    stadium_id integer,
+    conference_id integer,
+    division_id integer,
+    league_id integer
 );
 
 
@@ -949,6 +1080,24 @@ INSERT INTO public.city VALUES (24, 'Las Vegas', 1);
 -- Data for Name: conference; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
+INSERT INTO public.conference VALUES (1, 'Eastern', 1, NULL);
+INSERT INTO public.conference VALUES (2, 'Western', 1, NULL);
+INSERT INTO public.conference VALUES (3, 'Eastern', 2, NULL);
+INSERT INTO public.conference VALUES (4, 'Western', 2, NULL);
+INSERT INTO public.conference VALUES (5, 'Eastern', 3, NULL);
+INSERT INTO public.conference VALUES (6, 'Western', 3, NULL);
+INSERT INTO public.conference VALUES (7, 'Eastern', 4, NULL);
+INSERT INTO public.conference VALUES (8, 'Western', 4, NULL);
+INSERT INTO public.conference VALUES (9, 'Eastern', 5, NULL);
+INSERT INTO public.conference VALUES (10, 'Western', 5, NULL);
+INSERT INTO public.conference VALUES (11, 'Eastern', 6, NULL);
+INSERT INTO public.conference VALUES (12, 'Western', 6, NULL);
+INSERT INTO public.conference VALUES (13, 'Eastern', 7, NULL);
+INSERT INTO public.conference VALUES (14, 'Western', 7, NULL);
+INSERT INTO public.conference VALUES (15, 'Eastern', 8, NULL);
+INSERT INTO public.conference VALUES (16, 'Western', 8, NULL);
+INSERT INTO public.conference VALUES (17, 'Eastern', 9, NULL);
+INSERT INTO public.conference VALUES (18, 'Western', 9, NULL);
 
 
 --
@@ -985,6 +1134,42 @@ INSERT INTO public.default_teams VALUES (24, 24, 'Rollers', 'las_vegas_rollers.p
 -- Data for Name: division; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
+INSERT INTO public.division VALUES (1, 'Eastern Division 1', 1, -1, 1);
+INSERT INTO public.division VALUES (2, 'Western Division 1', 2, -1, 1);
+INSERT INTO public.division VALUES (3, 'Eastern Division 2', 1, -1, 1);
+INSERT INTO public.division VALUES (4, 'Western Division 2', 2, -1, 1);
+INSERT INTO public.division VALUES (5, 'Eastern Division 1', 3, -1, 2);
+INSERT INTO public.division VALUES (6, 'Western Division 1', 4, -1, 2);
+INSERT INTO public.division VALUES (7, 'Eastern Division 2', 3, -1, 2);
+INSERT INTO public.division VALUES (8, 'Western Division 2', 4, -1, 2);
+INSERT INTO public.division VALUES (9, 'Eastern Division 1', 5, -1, 3);
+INSERT INTO public.division VALUES (10, 'Western Division 1', 6, -1, 3);
+INSERT INTO public.division VALUES (11, 'Eastern Division 2', 5, -1, 3);
+INSERT INTO public.division VALUES (12, 'Western Division 2', 6, -1, 3);
+INSERT INTO public.division VALUES (13, 'Eastern Division 1', 7, -1, 4);
+INSERT INTO public.division VALUES (14, 'Western Division 1', 8, -1, 4);
+INSERT INTO public.division VALUES (15, 'Eastern Division 2', 7, -1, 4);
+INSERT INTO public.division VALUES (16, 'Western Division 2', 8, -1, 4);
+INSERT INTO public.division VALUES (17, 'Eastern Division 1', 9, -1, 5);
+INSERT INTO public.division VALUES (18, 'Western Division 1', 10, -1, 5);
+INSERT INTO public.division VALUES (19, 'Eastern Division 2', 9, -1, 5);
+INSERT INTO public.division VALUES (20, 'Western Division 2', 10, -1, 5);
+INSERT INTO public.division VALUES (21, 'Eastern Division 1', 11, -1, 6);
+INSERT INTO public.division VALUES (22, 'Western Division 1', 12, -1, 6);
+INSERT INTO public.division VALUES (23, 'Eastern Division 2', 11, -1, 6);
+INSERT INTO public.division VALUES (24, 'Western Division 2', 12, -1, 6);
+INSERT INTO public.division VALUES (25, 'Eastern Division 1', 13, -1, 7);
+INSERT INTO public.division VALUES (26, 'Western Division 1', 14, -1, 7);
+INSERT INTO public.division VALUES (27, 'Eastern Division 2', 13, -1, 7);
+INSERT INTO public.division VALUES (28, 'Western Division 2', 14, -1, 7);
+INSERT INTO public.division VALUES (29, 'Eastern Division 1', 15, -1, 8);
+INSERT INTO public.division VALUES (30, 'Western Division 1', 16, -1, 8);
+INSERT INTO public.division VALUES (31, 'Eastern Division 2', 15, -1, 8);
+INSERT INTO public.division VALUES (32, 'Western Division 2', 16, -1, 8);
+INSERT INTO public.division VALUES (33, 'Eastern Division 1', 17, -1, 9);
+INSERT INTO public.division VALUES (34, 'Western Division 1', 18, -1, 9);
+INSERT INTO public.division VALUES (35, 'Eastern Division 2', 17, -1, 9);
+INSERT INTO public.division VALUES (36, 'Western Division 2', 18, -1, 9);
 
 
 --
@@ -1012,13 +1197,31 @@ INSERT INTO public.default_teams VALUES (24, 24, 'Rollers', 'las_vegas_rollers.p
 
 
 --
+-- Data for Name: game_cb_stats; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+
+
+--
 -- Data for Name: game_dl_stats; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
 
 
 --
+-- Data for Name: game_fb_stats; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+
+
+--
 -- Data for Name: game_k_stats; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+
+
+--
+-- Data for Name: game_lb_stats; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
 
@@ -1060,7 +1263,7 @@ INSERT INTO public.default_teams VALUES (24, 24, 'Rollers', 'las_vegas_rollers.p
 
 
 --
--- Data for Name: game_sec_stats; Type: TABLE DATA; Schema: public; Owner: postgres
+-- Data for Name: game_sf_stats; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
 
@@ -1105,6 +1308,15 @@ INSERT INTO public.default_teams VALUES (24, 24, 'Rollers', 'las_vegas_rollers.p
 -- Data for Name: league; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
+INSERT INTO public.league VALUES (1, 'Jeff Football League', 'JFL', true, true, true);
+INSERT INTO public.league VALUES (2, 'Jeffy Football League', 'JFL', true, true, true);
+INSERT INTO public.league VALUES (3, 'Jeffy Football League', 'JFL', true, true, true);
+INSERT INTO public.league VALUES (4, 'Jeffy Football League', 'JFL', true, true, true);
+INSERT INTO public.league VALUES (5, 'Jeffy Football League', 'JFL', true, true, true);
+INSERT INTO public.league VALUES (6, 'Jeffy Football League', 'JFL', true, true, true);
+INSERT INTO public.league VALUES (7, 'sasdadas sdaads League', 'SSL', true, true, true);
+INSERT INTO public.league VALUES (8, 'adsdsa dsasad LwfSD', 'ADL', true, true, true);
+INSERT INTO public.league VALUES (9, 'adsdsa dsasad LwfSD', 'ADL', true, true, true);
 
 
 --
@@ -1126,13 +1338,31 @@ INSERT INTO public.default_teams VALUES (24, 24, 'Rollers', 'las_vegas_rollers.p
 
 
 --
+-- Data for Name: player_specs_cb; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+
+
+--
 -- Data for Name: player_specs_dl; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
 
 
 --
+-- Data for Name: player_specs_fb; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+
+
+--
 -- Data for Name: player_specs_k; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+
+
+--
+-- Data for Name: player_specs_lb; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
 
@@ -1162,7 +1392,7 @@ INSERT INTO public.default_teams VALUES (24, 24, 'Rollers', 'las_vegas_rollers.p
 
 
 --
--- Data for Name: player_specs_sec; Type: TABLE DATA; Schema: public; Owner: postgres
+-- Data for Name: player_specs_sf; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
 
@@ -1230,19 +1460,312 @@ INSERT INTO public.stadium VALUES (20, 'Golden Gate Field', 79830, 20, false);
 INSERT INTO public.stadium VALUES (21, 'Thunderdome', 84675, 21, false);
 INSERT INTO public.stadium VALUES (22, 'Ocean Beach Field', 81290, 22, false);
 INSERT INTO public.stadium VALUES (23, 'Grand Canyon Field', 86250, 23, false);
-INSERT INTO public.stadium VALUES (24, 'Caesars Stadium', 84350, 24, false);
+INSERT INTO public.stadium VALUES (24, 'Caesars Castle', 84350, 24, false);
+INSERT INTO public.stadium VALUES (25, 'Aurora Borealis Field', 69800, 25, false);
+INSERT INTO public.stadium VALUES (26, 'Queen Elizabeth Stadium', 102000, 26, false);
+INSERT INTO public.stadium VALUES (27, 'Chennai Stadium', 115000, 27, false);
+INSERT INTO public.stadium VALUES (28, 'Rumble in the Jungle Field', 80000, 28, false);
+INSERT INTO public.stadium VALUES (29, 'some stadium', 100000, 29, false);
 
 
 --
 -- Data for Name: team; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
+INSERT INTO public.team VALUES (1, 'Titans', -1, 0, 0, 1, 1, 1, 1);
+INSERT INTO public.team VALUES (2, 'Swordfish', -1, 0, 0, 2, 1, 1, 1);
+INSERT INTO public.team VALUES (3, 'Talons', -1, 0, 0, 3, 1, 1, 1);
+INSERT INTO public.team VALUES (4, 'Bison', -1, 0, 0, 4, 1, 1, 1);
+INSERT INTO public.team VALUES (5, 'Melody', -1, 0, 0, 11, 2, 2, 1);
+INSERT INTO public.team VALUES (6, 'Steel', -1, 0, 0, 9, 2, 2, 1);
+INSERT INTO public.team VALUES (7, 'Cheeseheads', -1, 0, 0, 10, 2, 2, 1);
+INSERT INTO public.team VALUES (8, 'Inferno', -1, 0, 0, 12, 2, 2, 1);
+INSERT INTO public.team VALUES (9, 'Fascists', -1, 0, 0, 5, 1, 3, 1);
+INSERT INTO public.team VALUES (10, 'Vermin', -1, 0, 0, 6, 1, 3, 1);
+INSERT INTO public.team VALUES (11, 'Soldiers', -1, 0, 0, 7, 1, 3, 1);
+INSERT INTO public.team VALUES (12, 'Autos', -1, 0, 0, 8, 1, 3, 1);
+INSERT INTO public.team VALUES (13, 'Lone Stars', -1, 0, 0, 13, 2, 4, 1);
+INSERT INTO public.team VALUES (14, 'Nordics', -1, 0, 0, 14, 2, 4, 1);
+INSERT INTO public.team VALUES (15, 'Tomahawks', -1, 0, 0, 15, 2, 4, 1);
+INSERT INTO public.team VALUES (16, '14ers', -1, 0, 0, 16, 2, 4, 1);
+INSERT INTO public.team VALUES (17, 'Titans', -1, 0, 0, 1, 3, 5, 2);
+INSERT INTO public.team VALUES (18, 'Swordfish', -1, 0, 0, 2, 3, 5, 2);
+INSERT INTO public.team VALUES (19, 'Talons', -1, 0, 0, 3, 3, 5, 2);
+INSERT INTO public.team VALUES (20, 'Bison', -1, 0, 0, 4, 3, 5, 2);
+INSERT INTO public.team VALUES (21, 'Steel', -1, 0, 0, 9, 4, 6, 2);
+INSERT INTO public.team VALUES (22, 'Cheeseheads', -1, 0, 0, 10, 4, 6, 2);
+INSERT INTO public.team VALUES (23, 'Melody', -1, 0, 0, 11, 4, 6, 2);
+INSERT INTO public.team VALUES (24, 'Inferno', -1, 0, 0, 12, 4, 6, 2);
+INSERT INTO public.team VALUES (25, 'Fascists', -1, 0, 0, 5, 3, 7, 2);
+INSERT INTO public.team VALUES (26, 'Vermin', -1, 0, 0, 6, 3, 7, 2);
+INSERT INTO public.team VALUES (27, 'Soldiers', -1, 0, 0, 7, 3, 7, 2);
+INSERT INTO public.team VALUES (28, 'Autos', -1, 0, 0, 8, 3, 7, 2);
+INSERT INTO public.team VALUES (29, 'Lone Stars', -1, 0, 0, 13, 4, 8, 2);
+INSERT INTO public.team VALUES (30, 'Nordics', -1, 0, 0, 14, 4, 8, 2);
+INSERT INTO public.team VALUES (31, 'Tomahawks', -1, 0, 0, 15, 4, 8, 2);
+INSERT INTO public.team VALUES (32, '14ers', -1, 0, 0, 16, 4, 8, 2);
+INSERT INTO public.team VALUES (33, 'Titans', -1, 0, 0, 1, 5, 9, 3);
+INSERT INTO public.team VALUES (34, 'Swordfish', -1, 0, 0, 2, 5, 9, 3);
+INSERT INTO public.team VALUES (35, 'Talons', -1, 0, 0, 3, 5, 9, 3);
+INSERT INTO public.team VALUES (36, 'Bison', -1, 0, 0, 4, 5, 9, 3);
+INSERT INTO public.team VALUES (37, 'Steel', -1, 0, 0, 9, 6, 10, 3);
+INSERT INTO public.team VALUES (38, 'Cheeseheads', -1, 0, 0, 10, 6, 10, 3);
+INSERT INTO public.team VALUES (39, 'Melody', -1, 0, 0, 11, 6, 10, 3);
+INSERT INTO public.team VALUES (40, 'Inferno', -1, 0, 0, 12, 6, 10, 3);
+INSERT INTO public.team VALUES (41, 'Fascists', -1, 0, 0, 5, 5, 11, 3);
+INSERT INTO public.team VALUES (42, 'Vermin', -1, 0, 0, 6, 5, 11, 3);
+INSERT INTO public.team VALUES (43, 'Soldiers', -1, 0, 0, 7, 5, 11, 3);
+INSERT INTO public.team VALUES (44, 'Autos', -1, 0, 0, 8, 5, 11, 3);
+INSERT INTO public.team VALUES (45, 'Lone Stars', -1, 0, 0, 13, 6, 12, 3);
+INSERT INTO public.team VALUES (46, 'Nordics', -1, 0, 0, 14, 6, 12, 3);
+INSERT INTO public.team VALUES (47, 'Tomahawks', -1, 0, 0, 15, 6, 12, 3);
+INSERT INTO public.team VALUES (48, '14ers', -1, 0, 0, 16, 6, 12, 3);
+INSERT INTO public.team VALUES (49, 'Titans', -1, 0, 0, 1, 7, 13, 4);
+INSERT INTO public.team VALUES (50, 'Swordfish', -1, 0, 0, 2, 7, 13, 4);
+INSERT INTO public.team VALUES (51, 'Talons', -1, 0, 0, 3, 7, 13, 4);
+INSERT INTO public.team VALUES (52, 'Bison', -1, 0, 0, 4, 7, 13, 4);
+INSERT INTO public.team VALUES (53, 'Steel', -1, 0, 0, 9, 8, 14, 4);
+INSERT INTO public.team VALUES (54, 'Cheeseheads', -1, 0, 0, 10, 8, 14, 4);
+INSERT INTO public.team VALUES (55, 'Melody', -1, 0, 0, 11, 8, 14, 4);
+INSERT INTO public.team VALUES (56, 'Inferno', -1, 0, 0, 12, 8, 14, 4);
+INSERT INTO public.team VALUES (57, 'Fascists', -1, 0, 0, 5, 7, 15, 4);
+INSERT INTO public.team VALUES (58, 'Vermin', -1, 0, 0, 6, 7, 15, 4);
+INSERT INTO public.team VALUES (59, 'Soldiers', -1, 0, 0, 7, 7, 15, 4);
+INSERT INTO public.team VALUES (60, 'Autos', -1, 0, 0, 8, 7, 15, 4);
+INSERT INTO public.team VALUES (61, 'Lone Stars', -1, 0, 0, 13, 8, 16, 4);
+INSERT INTO public.team VALUES (62, 'Nordics', -1, 0, 0, 14, 8, 16, 4);
+INSERT INTO public.team VALUES (63, 'Tomahawks', -1, 0, 0, 15, 8, 16, 4);
+INSERT INTO public.team VALUES (64, '14ers', -1, 0, 0, 16, 8, 16, 4);
+INSERT INTO public.team VALUES (65, 'Titans', -1, 0, 0, 1, 9, 17, 5);
+INSERT INTO public.team VALUES (66, 'Swordfish', -1, 0, 0, 2, 9, 17, 5);
+INSERT INTO public.team VALUES (67, 'Talons', -1, 0, 0, 3, 9, 17, 5);
+INSERT INTO public.team VALUES (68, 'Bison', -1, 0, 0, 4, 9, 17, 5);
+INSERT INTO public.team VALUES (69, 'Steel', -1, 0, 0, 9, 10, 18, 5);
+INSERT INTO public.team VALUES (70, 'Cheeseheads', -1, 0, 0, 10, 10, 18, 5);
+INSERT INTO public.team VALUES (71, 'Melody', -1, 0, 0, 11, 10, 18, 5);
+INSERT INTO public.team VALUES (72, 'Inferno', -1, 0, 0, 12, 10, 18, 5);
+INSERT INTO public.team VALUES (73, 'Fascists', -1, 0, 0, 5, 9, 19, 5);
+INSERT INTO public.team VALUES (74, 'Vermin', -1, 0, 0, 6, 9, 19, 5);
+INSERT INTO public.team VALUES (75, 'Soldiers', -1, 0, 0, 7, 9, 19, 5);
+INSERT INTO public.team VALUES (76, 'Autos', -1, 0, 0, 8, 9, 19, 5);
+INSERT INTO public.team VALUES (77, 'Lone Stars', -1, 0, 0, 13, 10, 20, 5);
+INSERT INTO public.team VALUES (78, 'Nordics', -1, 0, 0, 14, 10, 20, 5);
+INSERT INTO public.team VALUES (79, 'Tomahawks', -1, 0, 0, 15, 10, 20, 5);
+INSERT INTO public.team VALUES (80, '14ers', -1, 0, 0, 16, 10, 20, 5);
+INSERT INTO public.team VALUES (81, 'Titans', -1, 0, 0, 1, 11, 21, 6);
+INSERT INTO public.team VALUES (82, 'Swordfish', -1, 0, 0, 2, 11, 21, 6);
+INSERT INTO public.team VALUES (83, 'Talons', -1, 0, 0, 3, 11, 21, 6);
+INSERT INTO public.team VALUES (84, 'Bison', -1, 0, 0, 4, 11, 21, 6);
+INSERT INTO public.team VALUES (85, 'Steel', -1, 0, 0, 9, 12, 22, 6);
+INSERT INTO public.team VALUES (86, 'Cheeseheads', -1, 0, 0, 10, 12, 22, 6);
+INSERT INTO public.team VALUES (87, 'Melody', -1, 0, 0, 11, 12, 22, 6);
+INSERT INTO public.team VALUES (88, 'Inferno', -1, 0, 0, 12, 12, 22, 6);
+INSERT INTO public.team VALUES (89, 'Fascists', -1, 0, 0, 5, 11, 23, 6);
+INSERT INTO public.team VALUES (90, 'Vermin', -1, 0, 0, 6, 11, 23, 6);
+INSERT INTO public.team VALUES (91, 'Soldiers', -1, 0, 0, 7, 11, 23, 6);
+INSERT INTO public.team VALUES (92, 'Autos', -1, 0, 0, 8, 11, 23, 6);
+INSERT INTO public.team VALUES (93, 'Lone Stars', -1, 0, 0, 13, 12, 24, 6);
+INSERT INTO public.team VALUES (94, 'Nordics', -1, 0, 0, 14, 12, 24, 6);
+INSERT INTO public.team VALUES (95, 'Tomahawks', -1, 0, 0, 15, 12, 24, 6);
+INSERT INTO public.team VALUES (96, '14ers', -1, 0, 0, 16, 12, 24, 6);
+INSERT INTO public.team VALUES (97, 'Titans', -1, 0, 0, 1, 13, 25, 7);
+INSERT INTO public.team VALUES (98, 'Swordfish', -1, 0, 0, 2, 13, 25, 7);
+INSERT INTO public.team VALUES (99, 'Talons', -1, 0, 0, 3, 13, 25, 7);
+INSERT INTO public.team VALUES (100, 'Bison', -1, 0, 0, 4, 13, 25, 7);
+INSERT INTO public.team VALUES (101, 'Steel', -1, 0, 0, 9, 14, 26, 7);
+INSERT INTO public.team VALUES (102, 'Cheeseheads', -1, 0, 0, 10, 14, 26, 7);
+INSERT INTO public.team VALUES (103, 'Melody', -1, 0, 0, 11, 14, 26, 7);
+INSERT INTO public.team VALUES (104, 'Inferno', -1, 0, 0, 12, 14, 26, 7);
+INSERT INTO public.team VALUES (105, 'Fascists', -1, 0, 0, 5, 13, 27, 7);
+INSERT INTO public.team VALUES (106, 'Vermin', -1, 0, 0, 6, 13, 27, 7);
+INSERT INTO public.team VALUES (107, 'Soldiers', -1, 0, 0, 7, 13, 27, 7);
+INSERT INTO public.team VALUES (108, 'Autos', -1, 0, 0, 8, 13, 27, 7);
+INSERT INTO public.team VALUES (109, 'Lone Stars', -1, 0, 0, 13, 14, 28, 7);
+INSERT INTO public.team VALUES (110, 'Nordics', -1, 0, 0, 14, 14, 28, 7);
+INSERT INTO public.team VALUES (111, 'Tomahawks', -1, 0, 0, 15, 14, 28, 7);
+INSERT INTO public.team VALUES (112, '14ers', -1, 0, 0, 16, 14, 28, 7);
+INSERT INTO public.team VALUES (113, 'Titans', -1, 0, 0, 1, 15, 29, 8);
+INSERT INTO public.team VALUES (114, 'Swordfish', -1, 0, 0, 2, 15, 29, 8);
+INSERT INTO public.team VALUES (115, 'Talons', -1, 0, 0, 3, 15, 29, 8);
+INSERT INTO public.team VALUES (116, 'Bison', -1, 0, 0, 4, 15, 29, 8);
+INSERT INTO public.team VALUES (117, 'Steel', -1, 0, 0, 9, 16, 30, 8);
+INSERT INTO public.team VALUES (118, 'Cheeseheads', -1, 0, 0, 10, 16, 30, 8);
+INSERT INTO public.team VALUES (119, 'Melody', -1, 0, 0, 11, 16, 30, 8);
+INSERT INTO public.team VALUES (120, 'Inferno', -1, 0, 0, 12, 16, 30, 8);
+INSERT INTO public.team VALUES (121, 'Fascists', -1, 0, 0, 5, 15, 31, 8);
+INSERT INTO public.team VALUES (122, 'Vermin', -1, 0, 0, 6, 15, 31, 8);
+INSERT INTO public.team VALUES (123, 'Soldiers', -1, 0, 0, 7, 15, 31, 8);
+INSERT INTO public.team VALUES (124, 'Autos', -1, 0, 0, 8, 15, 31, 8);
+INSERT INTO public.team VALUES (125, 'Lone Stars', -1, 0, 0, 13, 16, 32, 8);
+INSERT INTO public.team VALUES (126, 'Nordics', -1, 0, 0, 14, 16, 32, 8);
+INSERT INTO public.team VALUES (127, 'Tomahawks', -1, 0, 0, 15, 16, 32, 8);
+INSERT INTO public.team VALUES (128, '14ers', -1, 0, 0, 16, 16, 32, 8);
+INSERT INTO public.team VALUES (129, 'Titans', -1, 0, 0, 1, 17, 33, 9);
+INSERT INTO public.team VALUES (130, 'Swordfish', -1, 0, 0, 2, 17, 33, 9);
+INSERT INTO public.team VALUES (131, 'Talons', -1, 0, 0, 3, 17, 33, 9);
+INSERT INTO public.team VALUES (132, 'Bison', -1, 0, 0, 4, 17, 33, 9);
+INSERT INTO public.team VALUES (133, 'Steel', -1, 0, 0, 9, 18, 34, 9);
+INSERT INTO public.team VALUES (134, 'Cheeseheads', -1, 0, 0, 10, 18, 34, 9);
+INSERT INTO public.team VALUES (135, 'Melody', -1, 0, 0, 11, 18, 34, 9);
+INSERT INTO public.team VALUES (136, 'Inferno', -1, 0, 0, 12, 18, 34, 9);
+INSERT INTO public.team VALUES (137, 'Fascists', -1, 0, 0, 5, 17, 35, 9);
+INSERT INTO public.team VALUES (138, 'Vermin', -1, 0, 0, 6, 17, 35, 9);
+INSERT INTO public.team VALUES (139, 'Soldiers', -1, 0, 0, 7, 17, 35, 9);
+INSERT INTO public.team VALUES (140, 'Autos', -1, 0, 0, 8, 17, 35, 9);
+INSERT INTO public.team VALUES (141, 'Lone Stars', -1, 0, 0, 13, 18, 36, 9);
+INSERT INTO public.team VALUES (142, 'Nordics', -1, 0, 0, 14, 18, 36, 9);
+INSERT INTO public.team VALUES (143, 'Tomahawks', -1, 0, 0, 15, 18, 36, 9);
+INSERT INTO public.team VALUES (144, '14ers', -1, 0, 0, 16, 18, 36, 9);
 
 
 --
 -- Data for Name: team_city; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
+INSERT INTO public.team_city VALUES (1, 1, 1, -1, 1);
+INSERT INTO public.team_city VALUES (2, 2, 2, -1, 2);
+INSERT INTO public.team_city VALUES (3, 3, 3, -1, 3);
+INSERT INTO public.team_city VALUES (4, 4, 4, -1, 4);
+INSERT INTO public.team_city VALUES (5, 5, 11, -1, 11);
+INSERT INTO public.team_city VALUES (6, 6, 9, -1, 9);
+INSERT INTO public.team_city VALUES (7, 7, 10, -1, 10);
+INSERT INTO public.team_city VALUES (8, 8, 12, -1, 12);
+INSERT INTO public.team_city VALUES (9, 9, 5, -1, 5);
+INSERT INTO public.team_city VALUES (10, 10, 6, -1, 6);
+INSERT INTO public.team_city VALUES (11, 11, 7, -1, 7);
+INSERT INTO public.team_city VALUES (12, 12, 8, -1, 8);
+INSERT INTO public.team_city VALUES (13, 13, 13, -1, 13);
+INSERT INTO public.team_city VALUES (14, 14, 14, -1, 14);
+INSERT INTO public.team_city VALUES (15, 15, 15, -1, 15);
+INSERT INTO public.team_city VALUES (16, 16, 16, -1, 16);
+INSERT INTO public.team_city VALUES (17, 17, 1, -1, 1);
+INSERT INTO public.team_city VALUES (18, 18, 2, -1, 2);
+INSERT INTO public.team_city VALUES (19, 19, 3, -1, 3);
+INSERT INTO public.team_city VALUES (20, 20, 4, -1, 4);
+INSERT INTO public.team_city VALUES (21, 21, 9, -1, 9);
+INSERT INTO public.team_city VALUES (22, 22, 10, -1, 10);
+INSERT INTO public.team_city VALUES (23, 23, 11, -1, 11);
+INSERT INTO public.team_city VALUES (24, 24, 12, -1, 12);
+INSERT INTO public.team_city VALUES (25, 25, 5, -1, 5);
+INSERT INTO public.team_city VALUES (26, 26, 6, -1, 6);
+INSERT INTO public.team_city VALUES (27, 27, 7, -1, 7);
+INSERT INTO public.team_city VALUES (28, 28, 8, -1, 8);
+INSERT INTO public.team_city VALUES (29, 29, 13, -1, 13);
+INSERT INTO public.team_city VALUES (30, 30, 14, -1, 14);
+INSERT INTO public.team_city VALUES (31, 31, 15, -1, 15);
+INSERT INTO public.team_city VALUES (32, 32, 16, -1, 16);
+INSERT INTO public.team_city VALUES (33, 33, 1, -1, 1);
+INSERT INTO public.team_city VALUES (34, 34, 2, -1, 2);
+INSERT INTO public.team_city VALUES (35, 35, 3, -1, 3);
+INSERT INTO public.team_city VALUES (36, 36, 4, -1, 4);
+INSERT INTO public.team_city VALUES (37, 37, 9, -1, 9);
+INSERT INTO public.team_city VALUES (38, 38, 10, -1, 10);
+INSERT INTO public.team_city VALUES (39, 39, 11, -1, 11);
+INSERT INTO public.team_city VALUES (40, 40, 12, -1, 12);
+INSERT INTO public.team_city VALUES (41, 41, 5, -1, 5);
+INSERT INTO public.team_city VALUES (42, 42, 6, -1, 6);
+INSERT INTO public.team_city VALUES (43, 43, 7, -1, 7);
+INSERT INTO public.team_city VALUES (44, 44, 8, -1, 8);
+INSERT INTO public.team_city VALUES (45, 45, 13, -1, 13);
+INSERT INTO public.team_city VALUES (46, 46, 14, -1, 14);
+INSERT INTO public.team_city VALUES (47, 47, 15, -1, 15);
+INSERT INTO public.team_city VALUES (48, 48, 16, -1, 16);
+INSERT INTO public.team_city VALUES (49, 49, 1, -1, 1);
+INSERT INTO public.team_city VALUES (50, 50, 2, -1, 2);
+INSERT INTO public.team_city VALUES (51, 51, 3, -1, 3);
+INSERT INTO public.team_city VALUES (52, 52, 4, -1, 4);
+INSERT INTO public.team_city VALUES (53, 53, 9, -1, 9);
+INSERT INTO public.team_city VALUES (54, 54, 10, -1, 10);
+INSERT INTO public.team_city VALUES (55, 55, 11, -1, 11);
+INSERT INTO public.team_city VALUES (56, 56, 12, -1, 12);
+INSERT INTO public.team_city VALUES (57, 57, 5, -1, 5);
+INSERT INTO public.team_city VALUES (58, 58, 6, -1, 6);
+INSERT INTO public.team_city VALUES (59, 59, 7, -1, 7);
+INSERT INTO public.team_city VALUES (60, 60, 8, -1, 8);
+INSERT INTO public.team_city VALUES (61, 61, 13, -1, 13);
+INSERT INTO public.team_city VALUES (62, 62, 14, -1, 14);
+INSERT INTO public.team_city VALUES (63, 63, 15, -1, 15);
+INSERT INTO public.team_city VALUES (64, 64, 16, -1, 16);
+INSERT INTO public.team_city VALUES (65, 65, 1, -1, 1);
+INSERT INTO public.team_city VALUES (66, 66, 2, -1, 2);
+INSERT INTO public.team_city VALUES (67, 67, 3, -1, 3);
+INSERT INTO public.team_city VALUES (68, 68, 4, -1, 4);
+INSERT INTO public.team_city VALUES (69, 69, 9, -1, 9);
+INSERT INTO public.team_city VALUES (70, 70, 10, -1, 10);
+INSERT INTO public.team_city VALUES (71, 71, 11, -1, 11);
+INSERT INTO public.team_city VALUES (72, 72, 12, -1, 12);
+INSERT INTO public.team_city VALUES (73, 73, 5, -1, 5);
+INSERT INTO public.team_city VALUES (74, 74, 6, -1, 6);
+INSERT INTO public.team_city VALUES (75, 75, 7, -1, 7);
+INSERT INTO public.team_city VALUES (76, 76, 8, -1, 8);
+INSERT INTO public.team_city VALUES (77, 77, 13, -1, 13);
+INSERT INTO public.team_city VALUES (78, 78, 14, -1, 14);
+INSERT INTO public.team_city VALUES (79, 79, 15, -1, 15);
+INSERT INTO public.team_city VALUES (80, 80, 16, -1, 16);
+INSERT INTO public.team_city VALUES (81, 81, 1, -1, 1);
+INSERT INTO public.team_city VALUES (82, 82, 2, -1, 2);
+INSERT INTO public.team_city VALUES (83, 83, 3, -1, 3);
+INSERT INTO public.team_city VALUES (84, 84, 4, -1, 4);
+INSERT INTO public.team_city VALUES (85, 85, 9, -1, 9);
+INSERT INTO public.team_city VALUES (86, 86, 10, -1, 10);
+INSERT INTO public.team_city VALUES (87, 87, 11, -1, 11);
+INSERT INTO public.team_city VALUES (88, 88, 12, -1, 12);
+INSERT INTO public.team_city VALUES (89, 89, 5, -1, 5);
+INSERT INTO public.team_city VALUES (90, 90, 6, -1, 6);
+INSERT INTO public.team_city VALUES (91, 91, 7, -1, 7);
+INSERT INTO public.team_city VALUES (92, 92, 8, -1, 8);
+INSERT INTO public.team_city VALUES (93, 93, 13, -1, 13);
+INSERT INTO public.team_city VALUES (94, 94, 14, -1, 14);
+INSERT INTO public.team_city VALUES (95, 95, 15, -1, 15);
+INSERT INTO public.team_city VALUES (96, 96, 16, -1, 16);
+INSERT INTO public.team_city VALUES (97, 97, 1, -1, 1);
+INSERT INTO public.team_city VALUES (98, 98, 2, -1, 2);
+INSERT INTO public.team_city VALUES (99, 99, 3, -1, 3);
+INSERT INTO public.team_city VALUES (100, 100, 4, -1, 4);
+INSERT INTO public.team_city VALUES (101, 101, 9, -1, 9);
+INSERT INTO public.team_city VALUES (102, 102, 10, -1, 10);
+INSERT INTO public.team_city VALUES (103, 103, 11, -1, 11);
+INSERT INTO public.team_city VALUES (104, 104, 12, -1, 12);
+INSERT INTO public.team_city VALUES (105, 105, 5, -1, 5);
+INSERT INTO public.team_city VALUES (106, 106, 6, -1, 6);
+INSERT INTO public.team_city VALUES (107, 107, 7, -1, 7);
+INSERT INTO public.team_city VALUES (108, 108, 8, -1, 8);
+INSERT INTO public.team_city VALUES (109, 109, 13, -1, 13);
+INSERT INTO public.team_city VALUES (110, 110, 14, -1, 14);
+INSERT INTO public.team_city VALUES (111, 111, 15, -1, 15);
+INSERT INTO public.team_city VALUES (112, 112, 16, -1, 16);
+INSERT INTO public.team_city VALUES (113, 113, 1, -1, 1);
+INSERT INTO public.team_city VALUES (114, 114, 2, -1, 2);
+INSERT INTO public.team_city VALUES (115, 115, 3, -1, 3);
+INSERT INTO public.team_city VALUES (116, 116, 4, -1, 4);
+INSERT INTO public.team_city VALUES (117, 117, 9, -1, 9);
+INSERT INTO public.team_city VALUES (118, 118, 10, -1, 10);
+INSERT INTO public.team_city VALUES (119, 119, 11, -1, 11);
+INSERT INTO public.team_city VALUES (120, 120, 12, -1, 12);
+INSERT INTO public.team_city VALUES (121, 121, 5, -1, 5);
+INSERT INTO public.team_city VALUES (122, 122, 6, -1, 6);
+INSERT INTO public.team_city VALUES (123, 123, 7, -1, 7);
+INSERT INTO public.team_city VALUES (124, 124, 8, -1, 8);
+INSERT INTO public.team_city VALUES (125, 125, 13, -1, 13);
+INSERT INTO public.team_city VALUES (126, 126, 14, -1, 14);
+INSERT INTO public.team_city VALUES (127, 127, 15, -1, 15);
+INSERT INTO public.team_city VALUES (128, 128, 16, -1, 16);
+INSERT INTO public.team_city VALUES (129, 129, 1, -1, 1);
+INSERT INTO public.team_city VALUES (130, 130, 2, -1, 2);
+INSERT INTO public.team_city VALUES (131, 131, 3, -1, 3);
+INSERT INTO public.team_city VALUES (132, 132, 4, -1, 4);
+INSERT INTO public.team_city VALUES (133, 133, 9, -1, 9);
+INSERT INTO public.team_city VALUES (134, 134, 10, -1, 10);
+INSERT INTO public.team_city VALUES (135, 135, 11, -1, 11);
+INSERT INTO public.team_city VALUES (136, 136, 12, -1, 12);
+INSERT INTO public.team_city VALUES (137, 137, 5, -1, 5);
+INSERT INTO public.team_city VALUES (138, 138, 6, -1, 6);
+INSERT INTO public.team_city VALUES (139, 139, 7, -1, 7);
+INSERT INTO public.team_city VALUES (140, 140, 8, -1, 8);
+INSERT INTO public.team_city VALUES (141, 141, 13, -1, 13);
+INSERT INTO public.team_city VALUES (142, 142, 14, -1, 14);
+INSERT INTO public.team_city VALUES (143, 143, 15, -1, 15);
+INSERT INTO public.team_city VALUES (144, 144, 16, -1, 16);
 
 
 --
@@ -1323,6 +1846,14 @@ ALTER TABLE ONLY public.draft
 
 
 --
+-- Name: game_cb_stats game_cb_stats_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.game_cb_stats
+    ADD CONSTRAINT game_cb_stats_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: game_dl_stats game_dl_stats_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -1331,11 +1862,27 @@ ALTER TABLE ONLY public.game_dl_stats
 
 
 --
+-- Name: game_fb_stats game_fb_stats_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.game_fb_stats
+    ADD CONSTRAINT game_fb_stats_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: game_k_stats game_k_stats_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.game_k_stats
     ADD CONSTRAINT game_k_stats_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: game_lb_stats game_lb_stats_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.game_lb_stats
+    ADD CONSTRAINT game_lb_stats_pkey PRIMARY KEY (id);
 
 
 --
@@ -1395,11 +1942,11 @@ ALTER TABLE ONLY public.game_rb_stats
 
 
 --
--- Name: game_sec_stats game_sec_stats_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+-- Name: game_sf_stats game_sf_stats_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
-ALTER TABLE ONLY public.game_sec_stats
-    ADD CONSTRAINT game_sec_stats_pkey PRIMARY KEY (id);
+ALTER TABLE ONLY public.game_sf_stats
+    ADD CONSTRAINT game_sf_stats_pkey PRIMARY KEY (id);
 
 
 --
@@ -1491,6 +2038,14 @@ ALTER TABLE ONLY public.player_pool
 
 
 --
+-- Name: player_specs_cb player_specs_cb_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.player_specs_cb
+    ADD CONSTRAINT player_specs_cb_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: player_specs_dl player_specs_dl_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -1499,11 +2054,27 @@ ALTER TABLE ONLY public.player_specs_dl
 
 
 --
+-- Name: player_specs_fb player_specs_fb_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.player_specs_fb
+    ADD CONSTRAINT player_specs_fb_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: player_specs_k player_specs_k_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.player_specs_k
     ADD CONSTRAINT player_specs_k_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: player_specs_lb player_specs_lb_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.player_specs_lb
+    ADD CONSTRAINT player_specs_lb_pkey PRIMARY KEY (id);
 
 
 --
@@ -1531,11 +2102,11 @@ ALTER TABLE ONLY public.player_specs_rb
 
 
 --
--- Name: player_specs_sec player_specs_sec_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+-- Name: player_specs_sf player_specs_sf_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
-ALTER TABLE ONLY public.player_specs_sec
-    ADD CONSTRAINT player_specs_sec_pkey PRIMARY KEY (id);
+ALTER TABLE ONLY public.player_specs_sf
+    ADD CONSTRAINT player_specs_sf_pkey PRIMARY KEY (id);
 
 
 --
