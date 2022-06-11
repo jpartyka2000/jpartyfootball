@@ -17,8 +17,6 @@ def get_truncated_normal(mean=0, sd=1, low=0, upp=10):
     return truncnorm(
         (low - mean) / sd, (upp - mean) / sd, loc=mean, scale=sd)
 
-
-
 team_list = ["New York", "Miami", "Atlanta", "Washington", "Buffalo","Philadelphia",
              "Chicago","Detroit","Green Bay","Pittsburgh","New Orleans","Cincinnati",
              "Minnesota","Dallas","Kansas City","St. Louis","Denver","Houston",
@@ -130,10 +128,192 @@ roster_position_count_list = roster_position_count_qb_list + roster_position_cou
                              roster_position_count_wr_list + roster_position_count_ol_list + roster_position_count_k_list + roster_position_count_p_list + \
                              roster_position_count_dl_list + roster_position_count_lb_list + roster_position_count_cb_list + roster_position_count_sf_list
 
+
+#store player career arc data here
+player_name_to_career_arc_list_dict = {}
+
+#player arcs differ based on position and age
+#a player will improve from their rookie year to their peak, then they will regress until the end of their career
+#the rate at which this improvement and degradation occur depends on the position and randomness
+#for simplicity, I will broadly define an improvement period (rookie year to near peak), a peak period, and then a slow decline until retirement
+#for most positions, the peak period will be in the midpoint of a career. Exception is running back and wide receiver, which has a peak about 1/4 into the career
+
+rb_rookie_to_peak_growth_number = 3
+rb_peak_growth_number = 4
+rb_peak_to_eoc_number = 3
+
+wr_rookie_to_peak_growth_number = 2.5
+wr_peak_growth_number = 3
+wr_peak_to_eoc_number = 2.5
+
+pk_rookie_to_peak_growth_number = 1.5
+pk_peak_growth_number = 2
+pk_peak_to_eoc_number = 1.5
+
+qb_rookie_to_peak_growth_number = 2
+qb_peak_growth_number = 2.5
+qb_peak_to_eoc_number = 2
+
+other_pos_rookie_to_peak_growth_number = 2
+other_pos_peak_growth_number = 2.5
+other_pos_peak_to_eoc_number = 2
+
+rb_peak_age_interval = [23,26]
+wr_peak_age_interval = [24,28]
+pk_peak_age_interval = [30,34]
+qb_peak_age_interval = [28,32]
+other_pos_peak_age_interval = [26,30]
+
+rb_last_year_interval = [33,38]
+wr_last_year_interval = [33,40]
+pk_last_year_interval = [38,48]
+qb_last_year_interval = [37,45]
+other_players_last_year_interval = [35, 42]
+
+
+def create_player_career_arc(player_position, player_age, player_name, combined_attr_score_dict):
+    
+    if player_position == 'rb':
+        this_player_last_year_interval = rb_last_year_interval
+    elif player_position == 'wr':
+        this_player_last_year_interval = wr_last_year_interval
+    elif player_position in ['p', 'k']:
+        this_player_last_year_interval = pk_last_year_interval
+    elif player_position == 'qb':
+        this_player_last_year_interval = qb_last_year_interval
+    else:
+        this_player_last_year_interval = other_players_last_year_interval
+    
+    
+    #account for if the player's age is already in or exceeding the last year interval
+    if player_age > this_player_last_year_interval[0] and player_age < this_player_last_year_interval[1]:
+        this_player_last_year_interval = [player_age, this_player_last_year_interval[1]]
+    
+    #in the situation where the generated age exceeds the last year interval, then make the interval the last year
+    if player_age > this_player_last_year_interval[1]:
+        this_player_last_year_interval = [player_age, player_age + 1]
+    
+    #we need to determine the last year for a given player
+    #as we go deeper into the player's last_year interval, the less likely they will be still playing
+    
+    this_player_last_year = -1
+    all_players_yoy_retirement_growth_pct = 100.0 / (this_player_last_year_interval[1] - this_player_last_year_interval[0])
+    
+    this_player_retirement_pct = 0
+    
+    for this_last_year_candidate in range(this_player_last_year_interval[0], this_player_last_year_interval[1] + 1):
+        
+        if this_last_year_candidate == this_player_last_year_interval[1]:
+            
+            #this is the player's final season
+            this_player_last_year = this_last_year_candidate
+            break
+        
+        if this_last_year_candidate < this_player_last_year_interval[1]:
+            this_player_retirement_pct += all_players_yoy_retirement_growth_pct
+        
+        retire_this_year_randgen = random.randint(1, 100)
+        
+        if retire_this_year_randgen >= (100 - this_player_retirement_pct):
+            this_player_last_year = this_last_year_candidate
+            break
+    
+    #now create the career arc from player_age to this_player_last_year
+    combined_attr_score_career_arc_list_dict = [combined_attr_score_dict]
+    
+    #print(player_position)
+    #print(player_age)
+    #print(this_player_last_year)
+    #print(this_player_last_year_interval)
+    #print('--------')
+    
+    for this_age in range(player_age, this_player_last_year + 1):
+        
+        #we will assign this year's ability numbers based on last year's ability numbers
+        previous_year_combined_attr_score_dict = combined_attr_score_career_arc_list_dict[-1]
+        
+        #sign that indicates whether a player is on the rise or on the decline
+        #by default it is upside
+        this_age_upside_downside_sign = 1
+        
+        this_age_combined_attr_score_dict = {}
+        
+        this_age_attribute_change_interval = 0
+    
+        #the player_age and player_position will determine which growth numbers we use
+        if player_position == 'rb':
+
+            if this_age < rb_peak_age_interval[0]:
+                this_age_attribute_change_interval = rb_rookie_to_peak_growth_number
+            elif this_age >= rb_peak_age_interval[0] and this_age <= rb_peak_age_interval[1]:
+                this_age_attribute_change_interval = rb_peak_growth_number
+            elif this_age > rb_peak_age_interval[1]:
+                this_age_attribute_change_interval = rb_peak_to_eoc_number
+                this_age_upside_downside_sign = -1
+
+        elif player_position == 'wr':
+            
+            if this_age < wr_peak_age_interval[0]:
+                this_age_attribute_change_interval = wr_rookie_to_peak_growth_number
+            elif this_age >= wr_peak_age_interval[0] and this_age <= wr_peak_age_interval[1]:
+                this_age_attribute_change_interval = wr_peak_growth_number
+            elif this_age > wr_peak_age_interval[1]:
+                this_age_attribute_change_interval = wr_peak_to_eoc_number
+                this_age_upside_downside_sign = -1
+
+        elif player_position in ['p','k']:
+            
+            if this_age < pk_peak_age_interval[0]:
+                this_age_attribute_change_interval = pk_rookie_to_peak_growth_number
+            elif this_age >= pk_peak_age_interval[0] and this_age <= pk_peak_age_interval[1]:
+                this_age_attribute_change_interval = pk_peak_growth_number
+            elif this_age > pk_peak_age_interval[1]:
+                this_age_attribute_change_interval = pk_peak_to_eoc_number
+                this_age_upside_downside_sign = -1
+            
+        elif player_position == 'qb':
+            
+            if this_age < qb_peak_age_interval[0]:
+                this_age_attribute_change_interval = qb_rookie_to_peak_growth_number
+            elif this_age >= qb_peak_age_interval[0] and this_age <= qb_peak_age_interval[1]:
+                this_age_attribute_change_interval = qb_peak_growth_number
+            elif this_age > qb_peak_age_interval[1]:
+                this_age_attribute_change_interval = qb_peak_to_eoc_number
+                this_age_upside_downside_sign = -1
+
+        else:
+        
+            if this_age < other_pos_peak_age_interval[0]:
+                this_age_attribute_change_interval = other_pos_rookie_to_peak_growth_number
+            elif this_age >= other_pos_peak_age_interval[0] and this_age <= other_pos_peak_age_interval[1]:
+                this_age_attribute_change_interval = other_pos_peak_growth_number
+            elif this_age > other_pos_peak_age_interval[1]:
+                this_age_attribute_change_interval = other_pos_peak_to_eoc_number
+                this_age_upside_downside_sign = -1
+
+        #create this year attribute dict for this player
+        for this_attribute in combined_attr_score_dict.keys():
+            
+            if this_attribute == 'intelligence_rating' and this_age_upside_downside_sign == -1:
+                this_age_attribute_change = 0
+            else:
+                this_age_attribute_change = round((1 + random.randint(0, this_age_attribute_change_interval * 100)) / 100.0, 2) * this_age_upside_downside_sign
+                #print("this_age_attribute_change: " + str(this_age_attribute_change))
+            
+            this_age_combined_attr_score_dict[this_attribute] = round(previous_year_combined_attr_score_dict[this_attribute] + this_age_attribute_change, 2)
+    
+        #finally, assign this_age_combined_attr_score_dict as the latest entry in combined_attr_score_career_arc_list_dict
+        combined_attr_score_career_arc_list_dict.append(this_age_combined_attr_score_dict)
+    
+    return combined_attr_score_career_arc_list_dict
+
+
 for this_team in team_list:
     
     team_to_player_list_dict[this_team] = []
     team_numbers_used = set()
+    
+    some_counter = 0
     
     for player_position in roster_position_count_list:
         
@@ -285,12 +465,19 @@ for this_team in team_list:
         player_name_to_info_dict_dict[player_name]["attributes"] = this_player_attribute_value_dict
         player_name_to_info_dict_dict[player_name]["team"] = this_team
         
+        #create player career arc
+        this_player_career_arc_list_dict = create_player_career_arc(player_position, player_age, player_name, this_player_attribute_value_dict)
+        
+        player_name_to_career_arc_list_dict[player_name] = this_player_career_arc_list_dict
+        
         if player_position not in player_position_to_name_list_dict:
             player_position_to_name_list_dict[player_position] = []
         
         player_position_to_name_list_dict[player_position].append(player_name)
         
         team_to_player_list_dict[this_team].append(player_name)
+        
+        some_counter += 1
         
 
 best_player_name = max(player_name_to_combined_attr_score_dict, key=player_name_to_combined_attr_score_dict.get)
@@ -301,17 +488,22 @@ print(player_name_to_info_dict_dict[best_player_name])
         
 print("------------------------------------")
 
+print("Career arc is as follows: ")
+print()
+print()
+print(player_name_to_career_arc_list_dict[best_player_name])
+
 #print(len(player_name_to_info_dict_dict.keys()))
 
 #print(team_to_player_list_dict)
 
-ny_player_names_list = team_to_player_list_dict["New York"]
+#ny_player_names_list = team_to_player_list_dict["New York"]
 #print(ny_player_names_list)
 
-for this_player_name in ny_player_names_list:
-    this_player_info_list = player_name_to_info_dict_dict[this_player_name]
-    print(this_player_info_list)
-    print('------------------------')
+#for this_player_name in ny_player_names_list:
+#    this_player_info_list = player_name_to_info_dict_dict[this_player_name]
+#    print(this_player_info_list)
+#    print('------------------------')
 
 #qb_list = player_position_to_name_list_dict["qb"]
 
