@@ -490,7 +490,7 @@ class League(models.Model):
 class Player(models.Model):
     id = models.IntegerField(primary_key=True)
     first_name = models.CharField(max_length=30)
-    middle_initial = models.CharField(max_length=1, blank=True, null=True)
+    middle_initial = models.CharField(max_length=3, blank=True, null=True)
     last_name = models.CharField(max_length=45)
     number = models.IntegerField()
     age = models.IntegerField()
@@ -498,8 +498,8 @@ class Player(models.Model):
     last_season_id = models.IntegerField()
     injury_status = models.IntegerField()
     alma_mater = models.CharField(max_length=75)
-    primary_position = models.IntegerField()
-    secondary_position = models.IntegerField(blank=True, null=True)
+    primary_position = models.CharField(max_length=3)
+    secondary_position = models.CharField(blank=True, null=True, max_length=3)
     draft_position = models.CharField(max_length=5, blank=True, null=True)
     salary = models.IntegerField()
     height = models.CharField(max_length=4)
@@ -696,7 +696,7 @@ class PlayerSpecsStd(models.Model):
     speed_rating = models.IntegerField()
     agility_rating = models.IntegerField()
     tackle_rating = models.IntegerField()
-    fumble_inducment_rating = models.IntegerField()
+    fumble_inducement_rating = models.IntegerField()
     career_arc_dict = models.TextField()  # This field type is a guess.
 
     class Meta:
