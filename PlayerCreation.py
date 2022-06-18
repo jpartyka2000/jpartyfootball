@@ -2,6 +2,9 @@
 
 from scipy.stats import truncnorm
 import random
+import names
+
+from jpartyfb.models import *
 
 class PlayerCreation():
 
@@ -334,10 +337,14 @@ class PlayerCreation():
     roster_position_count_lb_list = ["lb"] * 3
     roster_position_count_cb_list = ["cb"] * 3
     roster_position_count_sf_list = ["sf"] * 3
+    roster_position_count_sto_list = ["sto"] * 2
+    roster_position_count_std_list = ["std"] * 2
+
 
     roster_position_count_list = roster_position_count_qb_list + roster_position_count_rb_list + roster_position_count_te_list + roster_position_count_fb_list + \
                                  roster_position_count_wr_list + roster_position_count_ol_list + roster_position_count_k_list + roster_position_count_p_list + \
-                                 roster_position_count_dl_list + roster_position_count_lb_list + roster_position_count_cb_list + roster_position_count_sf_list
+                                 roster_position_count_dl_list + roster_position_count_lb_list + roster_position_count_cb_list + roster_position_count_sf_list + \
+                                 roster_position_count_sto_list + roster_position_count_std_list
 
     #store player career arc data here
     player_name_to_career_arc_list_dict = {}
@@ -505,3 +512,377 @@ def create_player_career_arc(player_position, player_age, player_name, combined_
         combined_attr_score_career_arc_list_dict.append(this_age_combined_attr_score_dict)
 
     return combined_attr_score_career_arc_list_dict
+
+
+def initialize_spec_db_table_ids(player_position_list):
+
+    player_position_to_db_id_dict = {}
+
+    for this_position in player_position_list:
+        player_position_to_db_id_dict[this_position] = -1
+
+    # get initial db table ids for all position spec db tables
+    try:
+        player_specs_dl_id = int(
+            PlayerSpecsDl.objects.using('xactly_dev').latest('id').id) + 1
+    except Exception:
+        player_specs_dl_id = 1
+
+    player_position_to_db_id_dict['dl'] = player_specs_dl_id
+
+    try:
+        player_specs_cb_id = int(
+            PlayerSpecsCb.objects.using('xactly_dev').latest('id').id) + 1
+    except Exception:
+        player_specs_cb_id = 1
+
+    player_position_to_db_id_dict['cb'] = player_specs_cb_id
+
+    try:
+        player_specs_fb_id = int(
+            PlayerSpecsFb.objects.using('xactly_dev').latest('id').id) + 1
+    except Exception:
+        player_specs_fb_id = 1
+
+    player_position_to_db_id_dict['fb'] = player_specs_fb_id
+
+    try:
+        player_specs_k_id = int(
+            PlayerSpecsK.objects.using('xactly_dev').latest('id').id) + 1
+    except Exception:
+        player_specs_k_id = 1
+
+    player_position_to_db_id_dict['k'] = player_specs_k_id
+
+    try:
+        player_specs_lb_id = int(
+            PlayerSpecsLb.objects.using('xactly_dev').latest('id').id) + 1
+    except Exception:
+        player_specs_lb_id = 1
+
+    player_position_to_db_id_dict['lb'] = player_specs_lb_id
+
+    try:
+        player_specs_ol_id = int(
+            PlayerSpecsOl.objects.using('xactly_dev').latest('id').id) + 1
+    except Exception:
+        player_specs_ol_id = 1
+
+    player_position_to_db_id_dict['ol'] = player_specs_ol_id
+
+    try:
+        player_specs_p_id = int(
+            PlayerSpecsP.objects.using('xactly_dev').latest('id').id) + 1
+    except Exception:
+        player_specs_p_id = 1
+
+    player_position_to_db_id_dict['p'] = player_specs_p_id
+
+    try:
+        player_specs_qb_id = int(
+            PlayerSpecsQb.objects.using('xactly_dev').latest('id').id) + 1
+    except Exception:
+        player_specs_qb_id = 1
+
+    player_position_to_db_id_dict['qb'] = player_specs_qb_id
+
+    try:
+        player_specs_rb_id = int(
+            PlayerSpecsRb.objects.using('xactly_dev').latest('id').id) + 1
+    except Exception:
+        player_specs_rb_id = 1
+
+    player_position_to_db_id_dict['rb'] = player_specs_rb_id
+
+    try:
+        player_specs_sf_id = int(
+            PlayerSpecsSf.objects.using('xactly_dev').latest('id').id) + 1
+    except Exception:
+        player_specs_sf_id = 1
+
+    player_position_to_db_id_dict['sf'] = player_specs_sf_id
+
+    try:
+        player_specs_std_id = int(
+            PlayerSpecsStd.objects.using('xactly_dev').latest('id').id) + 1
+    except Exception:
+        player_specs_std_id = 1
+
+    player_position_to_db_id_dict['std'] = player_specs_std_id
+
+    try:
+        player_specs_sto_id = int(
+            PlayerSpecsSto.objects.using('xactly_dev').latest('id').id) + 1
+    except Exception:
+        player_specs_sto_id = 1
+
+    player_position_to_db_id_dict['sto'] = player_specs_sto_id
+
+    try:
+        player_specs_te_id = int(
+            PlayerSpecsTe.objects.using('xactly_dev').latest('id').id) + 1
+    except Exception:
+        player_specs_te_id = 1
+
+    player_position_to_db_id_dict['te'] = player_specs_te_id
+
+    try:
+        player_specs_wr_id = int(
+            PlayerSpecsWr.objects.using('xactly_dev').latest('id').id) + 1
+    except Exception:
+        player_specs_wr_id = 1
+
+    player_position_to_db_id_dict['wr'] = player_specs_wr_id
+
+    return player_position_to_db_id_dict
+
+
+def create_players(team_name_list, team_name_to_team_id_dict, league_id, female_setting):
+
+    # get latest id value of player
+    try:
+        player_id = int(Player.objects.using('xactly_dev').latest('id').id) + 1
+    except Exception:
+        player_id = 1
+
+    try:
+        player_team_id = int(PlayerTeam.objects.using('xactly_dev').latest('player_team_id').player_team_id) + 1
+    except Exception:
+        player_team_id = 1
+
+    player_name_to_info_dict_dict = {}
+    player_name_to_combined_attr_score_dict = {}
+
+    player_position_to_db_id_dict = initialize_spec_db_table_ids(PlayerCreation.player_position_list)
+
+    for this_team_name in team_name_list:
+
+        this_team_id = team_name_to_team_id_dict[this_team_name]
+        team_numbers_used = set()
+
+        for player_position in PlayerCreation.roster_position_count_list:
+
+            player_name_uniqueness_verified = False
+            player_number_uniqueness_verified = False
+
+            # age is dependent on the player_position
+            player_age = -1
+
+            if player_position in ['p', 'k']:
+                player_age = round(float(PlayerCreation.pk_age_norm_dist_obj.rvs()))
+            elif player_position == 'rb':
+                player_age = round(float(PlayerCreation.rb_age_norm_dist_obj.rvs()))
+            else:
+                player_age = round(float(PlayerCreation.otherpos_age_norm_dist_obj.rvs()))
+
+            #secondary position will be chosen at random
+            secondary_position_list = [this_position for this_position in PlayerCreation.player_position_list if
+                                       this_position != player_position]
+
+            secondary_position_random_value = random.randint(0, len(secondary_position_list) - 1)
+            secondary_position = secondary_position_list[secondary_position_random_value]
+
+            #assign number based on position
+            while player_number_uniqueness_verified == False:
+
+                this_position_number_bounds_list = PlayerCreation.position_to_number_bounds_list_dict[player_position]
+                player_number = random.randint(this_position_number_bounds_list[0],
+                                               this_position_number_bounds_list[1])
+
+                if player_number not in team_numbers_used:
+                    team_numbers_used.add(player_number)
+                    player_number_uniqueness_verified = True
+
+            #height in inches is determined via a normal dist
+
+            height_feet = -1
+            height_inches = -1
+
+            height_feet_random_value = random.randint(0, 9)
+
+            if height_feet_random_value <= 7 or player_position in ['ol', 'dl']:
+                height_feet = 6
+                height_inches = round(float(PlayerCreation.six_feet_tall_inches_norm_dist_obj.rvs()))
+            else:
+                height_feet = 5
+                height_inches = round(float(PlayerCreation.five_feet_tall_inches_norm_dist_obj.rvs()))
+
+            # weight in lbs is position dependent - ols and dls have one dist, everyone else has another
+            # it is also height dependent - the taller the player, the more the player is likely to weigh
+
+            if height_feet == 5 and height_inches <= 8 and player_position in ['dl', 'ol']:
+                weight_lbs = round(PlayerCreation.low_5_ft_lb_weight_dist.rvs())
+            elif height_feet == 5 and height_inches <= 8 and player_position not in ['dl', 'ol']:
+                weight_lbs = round(PlayerCreation.low_5_ft_nlb_weight_dist.rvs())
+            elif height_feet == 5 and height_inches > 8 and player_position in ['dl', 'ol']:
+                weight_lbs = round(PlayerCreation.high_5_ft_lb_weight_dist.rvs())
+            elif height_feet == 5 and height_inches > 8 and player_position not in ['dl', 'ol']:
+                weight_lbs = round(PlayerCreation.high_5_ft_nlb_weight_dist.rvs())
+            elif height_feet == 6 and height_inches <= 6 and player_position in ['dl', 'ol']:
+                weight_lbs = round(PlayerCreation.low_6_ft_lb_weight_dist.rvs())
+            elif height_feet == 6 and height_inches <= 6 and player_position not in ['dl', 'ol']:
+                weight_lbs = round(PlayerCreation.low_6_ft_nlb_weight_dist.rvs())
+            elif height_feet == 6 and height_inches > 6 and player_position in ['dl', 'ol']:
+                weight_lbs = round(PlayerCreation.high_6_ft_lb_weight_dist.rvs())
+            elif height_feet == 6 and height_inches > 6 and player_position not in ['dl', 'ol']:
+                weight_lbs = round(PlayerCreation.high_6_ft_nlb_weight_dist.rvs())
+
+            while player_name_uniqueness_verified == False:
+
+                if female_setting == "on":
+                    gender_value = random.randint(0, 1)
+                else:
+                    gender_value = 0
+
+                if gender_value == 0:
+                    given_gender = "male"
+                else:
+                    given_gender = "female"
+
+                # let's say that 1 out of every 50 players uses a middle initial
+                using_middle_initial_value = random.randint(0, 49)
+
+                if using_middle_initial_value == 25:
+                    middle_initial_letter_idx = random.randint(0, 25)
+                    middle_initial = chr(ord('A') + middle_initial_letter_idx) + ". "
+                else:
+                    middle_initial = ""
+
+                player_name = names.get_full_name(gender=given_gender)
+
+                if middle_initial != "":
+                    player_name_parts = player_name.split()
+                    player_name = player_name_parts[0] + ' ' + middle_initial + player_name_parts[1]
+
+                if player_name not in list(player_name_to_info_dict_dict.keys()):
+                    player_name_uniqueness_verified = True
+
+            player_name_parts = player_name.split()
+            player_first_name = player_name_parts[0]
+            player_last_name = player_name_parts[-1]
+
+            # alma mater
+            school_random_value = random.randint(0, 99)
+            fbs_random_value = random.randint(0, len(PlayerCreation.fbs_school_list) - 1)
+            fcs_random_value = random.randint(0, len(PlayerCreation.fcs_school_list) - 1)
+            d2_random_value = random.randint(0, len(PlayerCreation.d2_school_list) - 1)
+            d3_random_value = random.randint(0, len(PlayerCreation.d3_school_list) - 1)
+
+            school_name = ""
+            school_value = -1
+
+            if school_value <= 74:
+                school_name = PlayerCreation.fbs_school_list[fbs_random_value]
+            elif school_value > 74 and school_value <= 92:
+                school_name = PlayerCreation.fcs_school_list[fcs_random_value]
+            elif school_value > 92 and school_value < 99:
+                school_name = PlayerCreation.d2_school_list[d2_random_value]
+            else:
+                school_name = PlayerCreation.d3_school_list[d3_random_value]
+
+            this_player_attribute_list = []
+            this_player_attribute_list = PlayerCreation.position_to_player_attribute_list_dict[player_position]
+            this_player_attribute_value_dict = {}
+
+            player_name_to_combined_attr_score_dict[player_name] = -1
+
+            for this_attribute in this_player_attribute_list:
+
+                # check for customized distributions
+                if player_position == "fb" and this_attribute in ['speed_rating', 'elusiveness_rating']:
+                    this_player_attribute_value_dict[this_attribute] = round(float(PlayerCreation.fb_speed_elusiveness_norm_dist_obj.rvs()), 2)
+                elif player_position == "fb" and this_attribute == 'strength_rating':
+                    this_player_attribute_value_dict[this_attribute] = round(float(PlayerCreation.fb_strength_norm_dist_obj.rvs()), 2)
+                elif player_position == "te" and this_attribute == 'speed_rating':
+                    this_player_attribute_value_dict[this_attribute] = round(float(PlayerCreation.te_speed_norm_dist_obj.rvs()), 2)
+                elif player_position == "te" and this_attribute in ['strength_rating', 'block_power_rating']:
+                    this_player_attribute_value_dict[this_attribute] = round(float(PlayerCreation.te_strength_bpwr_dist_obj.rvs()), 2)
+                elif player_position == "wr" and this_attribute == "speed_rating":
+                    this_player_attribute_value_dict[this_attribute] = round(float(PlayerCreation.wr_speed_norm_dist_obj.rvs()), 2)
+                elif player_position == "sf" and this_attribute == "speed_rating":
+                    this_player_attribute_value_dict[this_attribute] = round(float(PlayerCreation.sf_speed_norm_dist_obj.rvs()), 2)
+                elif player_position == "sf" and this_attribute == "tackle_rating":
+                    this_player_attribute_value_dict[this_attribute] = round(float(PlayerCreation.lb_tackle_norm_dist_obj.rvs()), 2)
+                else:
+                    this_player_attribute_value_dict[this_attribute] = round(float(PlayerCreation.player_ability_norm_dist_obj.rvs()),2)
+
+                player_name_to_combined_attr_score_dict[player_name] += this_player_attribute_value_dict[this_attribute]
+
+            #create player career arc
+            this_player_career_arc_list_dict = create_player_career_arc(player_position, player_age, player_name, this_player_attribute_value_dict)
+
+            #first, create and save Player db object
+            this_player_dict = {}
+            this_player_dict["id"] = player_id
+            this_player_dict["first_name"] = player_first_name
+            this_player_dict["middle_initial"] = middle_initial
+            this_player_dict["last_name"] = player_last_name
+            this_player_dict["number"] = player_number
+            this_player_dict["age"] = int(player_age)
+            this_player_dict["first_season_id"] = 1
+            this_player_dict["last_season_id"] = -1
+            this_player_dict["injury_status"] = 0
+            this_player_dict["alma_mater"] = school_name
+            this_player_dict["primary_position"] = player_position
+            this_player_dict["secondary_position"] = secondary_position
+            this_player_dict["draft_position"] = "0.0"
+            this_player_dict["salary"] = 0
+            this_player_dict["height"] = str(int(height_feet)) + "'" + str(int(height_inches))
+            this_player_dict["weight"] = weight_lbs
+            this_player_dict["league_id"] = league_id
+
+            #create Player db object
+            this_player_db_obj = Player(**this_player_dict)
+            this_player_db_obj.save(using="xactly_dev")
+
+            #Create PlayerTeam db object
+            this_player_team_db_obj = PlayerTeam(player_team_id=player_team_id, player_id=player_id, team_id=this_team_id, season_id=1)
+            this_player_team_db_obj.save(using="xactly_dev")
+
+            #Create specs object for this player_position
+            this_player_position_specs_db_obj = None
+
+            player_specs_db_obj = None
+            exception_str = ""
+
+            try:
+
+                if player_position == 'qb':
+                    player_specs_db_obj = PlayerSpecsQb(id=player_position_to_db_id_dict[player_position], player_id=player_id, career_arc_dict=str(this_player_career_arc_list_dict), **this_player_attribute_value_dict)
+                elif player_position == 'rb':
+                    player_specs_db_obj = PlayerSpecsRb(id=player_position_to_db_id_dict[player_position], player_id=player_id, career_arc_dict=str(this_player_career_arc_list_dict), **this_player_attribute_value_dict)
+                elif player_position == 'fb':
+                    player_specs_db_obj = PlayerSpecsFb(id=player_position_to_db_id_dict[player_position], player_id=player_id, career_arc_dict=str(this_player_career_arc_list_dict), **this_player_attribute_value_dict)
+                elif player_position == 'wr':
+                    player_specs_db_obj = PlayerSpecsWr(id=player_position_to_db_id_dict[player_position], player_id=player_id, career_arc_dict=str(this_player_career_arc_list_dict), **this_player_attribute_value_dict)
+                elif player_position == 'te':
+                    player_specs_db_obj = PlayerSpecsTe(id=player_position_to_db_id_dict[player_position], player_id=player_id, career_arc_dict=str(this_player_career_arc_list_dict), **this_player_attribute_value_dict)
+                elif player_position == 'k':
+                    player_specs_db_obj = PlayerSpecsK(id=player_position_to_db_id_dict[player_position], player_id=player_id, career_arc_dict=str(this_player_career_arc_list_dict), **this_player_attribute_value_dict)
+                elif player_position == 'lb':
+                    player_specs_db_obj = PlayerSpecsLb(id=player_position_to_db_id_dict[player_position], player_id=player_id, career_arc_dict=str(this_player_career_arc_list_dict), **this_player_attribute_value_dict)
+                elif player_position == 'ol':
+                    player_specs_db_obj = PlayerSpecsOl(id=player_position_to_db_id_dict[player_position], player_id=player_id, career_arc_dict=str(this_player_career_arc_list_dict), **this_player_attribute_value_dict)
+                elif player_position == 'p':
+                    player_specs_db_obj = PlayerSpecsP(id=player_position_to_db_id_dict[player_position], player_id=player_id, career_arc_dict=str(this_player_career_arc_list_dict), **this_player_attribute_value_dict)
+                elif player_position == 'cb':
+                    player_specs_db_obj = PlayerSpecsCb(id=player_position_to_db_id_dict[player_position], player_id=player_id, career_arc_dict=str(this_player_career_arc_list_dict), **this_player_attribute_value_dict)
+                elif player_position == 'dl':
+                    player_specs_db_obj = PlayerSpecsDl(id=player_position_to_db_id_dict[player_position], player_id=player_id, career_arc_dict=str(this_player_career_arc_list_dict), **this_player_attribute_value_dict)
+                elif player_position == 'sf':
+                    player_specs_db_obj = PlayerSpecsSf(id=player_position_to_db_id_dict[player_position], player_id=player_id, career_arc_dict=str(this_player_career_arc_list_dict), **this_player_attribute_value_dict)
+                elif player_position == 'sto':
+                    player_specs_db_obj = PlayerSpecsSto(id=player_position_to_db_id_dict[player_position], player_id=player_id, career_arc_dict=str(this_player_career_arc_list_dict), **this_player_attribute_value_dict)
+                elif player_position == 'std':
+                    player_specs_db_obj = PlayerSpecsStd(id=player_position_to_db_id_dict[player_position], player_id=player_id, career_arc_dict=str(this_player_career_arc_list_dict), **this_player_attribute_value_dict)
+
+                player_specs_db_obj.save(using="xactly_dev")
+
+            except Exception as e:
+                exception_str = str(e)
+                return HttpResponse(e)
+
+            player_position_to_db_id_dict[player_position] += 1
+
+            player_id += 1
+            player_team_id += 1
