@@ -535,14 +535,14 @@ class PlayerPool(models.Model):
 class PlayerSpecsDl(models.Model):
     id = models.IntegerField(primary_key=True)
     player = models.ForeignKey(Player)
-    block_power_rating = models.IntegerField()
-    block_agility_rating = models.IntegerField()
-    speed_rating = models.IntegerField()
-    pass_knockdown_rating = models.IntegerField()
-    penalty_avoidance_rating = models.IntegerField()
-    tackle_rating = models.IntegerField()
-    fumble_inducement_rating = models.IntegerField()
-    fumble_recovery_rating = models.IntegerField()
+    block_power_rating = models.DecimalField(max_digits=5, decimal_places=2)
+    block_agility_rating = models.DecimalField(max_digits=5, decimal_places=2)
+    speed_rating = models.DecimalField(max_digits=5, decimal_places=2)
+    pass_knockdown_rating = models.DecimalField(max_digits=5, decimal_places=2)
+    penalty_avoidance_rating = models.DecimalField(max_digits=5, decimal_places=2)
+    tackle_rating = models.DecimalField(max_digits=5, decimal_places=2)
+    fumble_inducement_rating = models.DecimalField(max_digits=5, decimal_places=2)
+    fumble_recovery_rating = models.DecimalField(max_digits=5, decimal_places=2)
     career_arc_dict = models.TextField()  # This field type is a guess.
 
     class Meta:
@@ -553,11 +553,11 @@ class PlayerSpecsDl(models.Model):
 class PlayerSpecsK(models.Model):
     id = models.IntegerField(primary_key=True)
     player = models.ForeignKey(Player)
-    leg_rating = models.IntegerField()
-    accuracy_rating = models.IntegerField()
-    adjustment_rating = models.IntegerField()
-    onside_kick_rating = models.IntegerField()
-    directionality_rating = models.IntegerField()
+    leg_rating = models.DecimalField(max_digits=5, decimal_places=2)
+    accuracy_rating = models.DecimalField(max_digits=5, decimal_places=2)
+    adjustment_rating = models.DecimalField(max_digits=5, decimal_places=2)
+    onside_kick_rating = models.DecimalField(max_digits=5, decimal_places=2)
+    directionality_rating = models.DecimalField(max_digits=5, decimal_places=2)
     career_arc_dict = models.TextField()  # This field type is a guess.
 
     class Meta:
@@ -568,10 +568,10 @@ class PlayerSpecsK(models.Model):
 class PlayerSpecsOl(models.Model):
     id = models.IntegerField(primary_key=True)
     player = models.ForeignKey(Player)
-    block_power_rating = models.IntegerField()
-    block_agility_rating = models.IntegerField()
-    penalty_avoidance_rating = models.IntegerField()
-    fumble_recovery_rating = models.IntegerField()
+    block_power_rating = models.DecimalField(max_digits=5, decimal_places=2)
+    block_agility_rating = models.DecimalField(max_digits=5, decimal_places=2)
+    penalty_avoidance_rating = models.DecimalField(max_digits=5, decimal_places=2)
+    fumble_recovery_rating = models.DecimalField(max_digits=5, decimal_places=2)
     career_arc_dict = models.TextField()  # This field type is a guess.
 
     class Meta:
@@ -582,12 +582,12 @@ class PlayerSpecsOl(models.Model):
 class PlayerSpecsP(models.Model):
     id = models.IntegerField(primary_key=True)
     player = models.ForeignKey(Player)
-    leg_rating = models.IntegerField()
-    directionality_rating = models.IntegerField()
-    hangtime_rating = models.IntegerField()
-    precision_rating = models.IntegerField()
-    consistency_rating = models.IntegerField()
-    surehands_rating = models.IntegerField()
+    leg_rating = models.DecimalField(max_digits=5, decimal_places=2)
+    directionality_rating = models.DecimalField(max_digits=5, decimal_places=2)
+    hangtime_rating = models.DecimalField(max_digits=5, decimal_places=2)
+    precision_rating = models.DecimalField(max_digits=5, decimal_places=2)
+    consistency_rating = models.DecimalField(max_digits=5, decimal_places=2)
+    surehands_rating = models.DecimalField(max_digits=5, decimal_places=2)
     career_arc_dict = models.TextField()  # This field type is a guess.
 
     class Meta:
@@ -598,12 +598,12 @@ class PlayerSpecsP(models.Model):
 class PlayerSpecsQb(models.Model):
     id = models.IntegerField(primary_key=True)
     player = models.ForeignKey(Player)
-    arm_strength_rating = models.IntegerField()
-    arm_accuracy_rating = models.IntegerField()
-    intelligence_rating = models.IntegerField()
-    speed_rating = models.IntegerField()
-    elusiveness_rating = models.IntegerField()
-    stamina_rating = models.IntegerField()
+    arm_strength_rating = models.DecimalField(max_digits=5, decimal_places=2)
+    arm_accuracy_rating = models.DecimalField(max_digits=5, decimal_places=2)
+    intelligence_rating = models.DecimalField(max_digits=5, decimal_places=2)
+    speed_rating = models.DecimalField(max_digits=5, decimal_places=2)
+    elusiveness_rating = models.DecimalField(max_digits=5, decimal_places=2)
+    stamina_rating = models.DecimalField(max_digits=5, decimal_places=2)
     career_arc_dict = models.TextField()  # This field type is a guess.
 
     class Meta:
@@ -614,12 +614,12 @@ class PlayerSpecsQb(models.Model):
 class PlayerSpecsRb(models.Model):
     id = models.IntegerField(primary_key=True)
     player = models.ForeignKey(Player)
-    speed_rating = models.IntegerField()
-    elusiveness_rating = models.IntegerField()
-    strength_rating = models.IntegerField()
-    ball_protection_rating = models.IntegerField()
-    catching_rating = models.IntegerField()
-    stamina_rating = models.IntegerField()
+    speed_rating = models.DecimalField(max_digits=5, decimal_places=2)
+    elusiveness_rating = models.DecimalField(max_digits=5, decimal_places=2)
+    strength_rating = models.DecimalField(max_digits=5, decimal_places=2)
+    ball_protection_rating = models.DecimalField(max_digits=5, decimal_places=2)
+    catching_rating = models.DecimalField(max_digits=5, decimal_places=2)
+    stamina_rating = models.DecimalField(max_digits=5, decimal_places=2)
     career_arc_dict = models.TextField()  # This field type is a guess.
 
     class Meta:
@@ -629,12 +629,12 @@ class PlayerSpecsRb(models.Model):
 class PlayerSpecsFb(models.Model):
     id = models.IntegerField(primary_key=True)
     player = models.ForeignKey(Player)
-    speed_rating = models.IntegerField()
-    elusiveness_rating = models.IntegerField()
-    strength_rating = models.IntegerField()
-    ball_protection_rating = models.IntegerField()
-    catching_rating = models.IntegerField()
-    stamina_rating = models.IntegerField()
+    speed_rating = models.DecimalField(max_digits=5, decimal_places=2)
+    elusiveness_rating = models.DecimalField(max_digits=5, decimal_places=2)
+    strength_rating = models.DecimalField(max_digits=5, decimal_places=2)
+    ball_protection_rating = models.DecimalField(max_digits=5, decimal_places=2)
+    catching_rating = models.DecimalField(max_digits=5, decimal_places=2)
+    stamina_rating = models.DecimalField(max_digits=5, decimal_places=2)
     career_arc_dict = models.TextField()  # This field type is a guess.
 
     class Meta:
@@ -645,13 +645,13 @@ class PlayerSpecsFb(models.Model):
 class PlayerSpecsLb(models.Model):
     id = models.IntegerField(primary_key=True)
     player = models.ForeignKey(Player)
-    speed_rating = models.IntegerField()
-    route_rating = models.IntegerField()
-    pass_defense_rating = models.IntegerField()
-    interception_rating = models.IntegerField()
-    fumble_inducement_rating = models.IntegerField()
-    tackle_rating = models.IntegerField()
-    penalty_avoidance_rating = models.IntegerField()
+    speed_rating = models.DecimalField(max_digits=5, decimal_places=2)
+    route_rating = models.DecimalField(max_digits=5, decimal_places=2)
+    pass_defense_rating = models.DecimalField(max_digits=5, decimal_places=2)
+    interception_rating = models.DecimalField(max_digits=5, decimal_places=2)
+    fumble_inducement_rating = models.DecimalField(max_digits=5, decimal_places=2)
+    tackle_rating = models.DecimalField(max_digits=5, decimal_places=2)
+    penalty_avoidance_rating = models.DecimalField(max_digits=5, decimal_places=2)
     career_arc_dict = models.TextField()  # This field type is a guess.
 
     class Meta:
@@ -661,13 +661,13 @@ class PlayerSpecsLb(models.Model):
 class PlayerSpecsCb(models.Model):
     id = models.IntegerField(primary_key=True)
     player = models.ForeignKey(Player)
-    speed_rating = models.IntegerField()
-    route_rating = models.IntegerField()
-    pass_defense_rating = models.IntegerField()
-    interception_rating = models.IntegerField()
-    fumble_inducement_rating = models.IntegerField()
-    tackle_rating = models.IntegerField()
-    penalty_avoidance_rating = models.IntegerField()
+    speed_rating = models.DecimalField(max_digits=5, decimal_places=2)
+    route_rating = models.DecimalField(max_digits=5, decimal_places=2)
+    pass_defense_rating = models.DecimalField(max_digits=5, decimal_places=2)
+    interception_rating = models.DecimalField(max_digits=5, decimal_places=2)
+    fumble_inducement_rating = models.DecimalField(max_digits=5, decimal_places=2)
+    tackle_rating = models.DecimalField(max_digits=5, decimal_places=2)
+    penalty_avoidance_rating = models.DecimalField(max_digits=5, decimal_places=2)
     career_arc_dict = models.TextField()  # This field type is a guess.
 
     class Meta:
@@ -677,13 +677,13 @@ class PlayerSpecsCb(models.Model):
 class PlayerSpecsSf(models.Model):
     id = models.IntegerField(primary_key=True)
     player = models.ForeignKey(Player)
-    speed_rating = models.IntegerField()
-    route_rating = models.IntegerField()
-    pass_defense_rating = models.IntegerField()
-    interception_rating = models.IntegerField()
-    fumble_inducement_rating = models.IntegerField()
-    tackle_rating = models.IntegerField()
-    penalty_avoidance_rating = models.IntegerField()
+    speed_rating = models.DecimalField(max_digits=5, decimal_places=2)
+    route_rating = models.DecimalField(max_digits=5, decimal_places=2)
+    pass_defense_rating = models.DecimalField(max_digits=5, decimal_places=2)
+    interception_rating = models.DecimalField(max_digits=5, decimal_places=2)
+    fumble_inducement_rating = models.DecimalField(max_digits=5, decimal_places=2)
+    tackle_rating = models.DecimalField(max_digits=5, decimal_places=2)
+    penalty_avoidance_rating = models.DecimalField(max_digits=5, decimal_places=2)
     career_arc_dict = models.TextField()  # This field type is a guess.
 
     class Meta:
@@ -693,10 +693,10 @@ class PlayerSpecsSf(models.Model):
 class PlayerSpecsStd(models.Model):
     id = models.IntegerField(primary_key=True)
     player = models.ForeignKey(Player)
-    speed_rating = models.IntegerField()
-    agility_rating = models.IntegerField()
-    tackle_rating = models.IntegerField()
-    fumble_inducement_rating = models.IntegerField()
+    speed_rating = models.DecimalField(max_digits=5, decimal_places=2)
+    agility_rating = models.DecimalField(max_digits=5, decimal_places=2)
+    tackle_rating = models.DecimalField(max_digits=5, decimal_places=2)
+    fumble_inducement_rating = models.DecimalField(max_digits=5, decimal_places=2)
     career_arc_dict = models.TextField()  # This field type is a guess.
 
     class Meta:
@@ -707,10 +707,10 @@ class PlayerSpecsStd(models.Model):
 class PlayerSpecsSto(models.Model):
     id = models.IntegerField(primary_key=True)
     player = models.ForeignKey(Player)
-    speed_rating = models.IntegerField()
-    elusiveness_rating = models.IntegerField()
-    strength_rating = models.IntegerField()
-    ball_protection_rating = models.IntegerField()
+    speed_rating = models.DecimalField(max_digits=5, decimal_places=2)
+    elusiveness_rating = models.DecimalField(max_digits=5, decimal_places=2)
+    strength_rating = models.DecimalField(max_digits=5, decimal_places=2)
+    ball_protection_rating = models.DecimalField(max_digits=5, decimal_places=2)
     career_arc_dict = models.TextField()  # This field type is a guess.
 
     class Meta:
@@ -721,14 +721,14 @@ class PlayerSpecsSto(models.Model):
 class PlayerSpecsTe(models.Model):
     id = models.IntegerField(primary_key=True)
     player = models.ForeignKey(Player)
-    catching_rating = models.IntegerField()
-    route_rating = models.IntegerField()
-    speed_rating = models.IntegerField()
-    ball_protection_rating = models.IntegerField()
-    strength_rating = models.IntegerField()
-    stamina_rating = models.IntegerField()
-    block_power_rating = models.IntegerField()
-    block_agility_rating = models.IntegerField()
+    catching_rating = models.DecimalField(max_digits=5, decimal_places=2)
+    route_rating = models.DecimalField(max_digits=5, decimal_places=2)
+    speed_rating = models.DecimalField(max_digits=5, decimal_places=2)
+    ball_protection_rating = models.DecimalField(max_digits=5, decimal_places=2)
+    strength_rating = models.DecimalField(max_digits=5, decimal_places=2)
+    stamina_rating = models.DecimalField(max_digits=5, decimal_places=2)
+    block_power_rating = models.DecimalField(max_digits=5, decimal_places=2)
+    block_agility_rating = models.DecimalField(max_digits=5, decimal_places=2)
     career_arc_dict = models.TextField()  # This field type is a guess.
 
     class Meta:
@@ -739,13 +739,13 @@ class PlayerSpecsTe(models.Model):
 class PlayerSpecsWr(models.Model):
     id = models.IntegerField(primary_key=True)
     player = models.ForeignKey(Player)
-    catching_rating = models.IntegerField()
-    route_rating = models.IntegerField()
-    jumping_rating = models.IntegerField()
-    speed_rating = models.IntegerField()
-    ball_protection_rating = models.IntegerField()
-    stamina_rating = models.IntegerField()
-    penalty_avoidance_rating = models.IntegerField()
+    catching_rating = models.DecimalField(max_digits=5, decimal_places=2)
+    route_rating = models.DecimalField(max_digits=5, decimal_places=2)
+    jumping_rating = models.DecimalField(max_digits=5, decimal_places=2)
+    speed_rating = models.DecimalField(max_digits=5, decimal_places=2)
+    ball_protection_rating = models.DecimalField(max_digits=5, decimal_places=2)
+    stamina_rating = models.DecimalField(max_digits=5, decimal_places=2)
+    penalty_avoidance_rating = models.DecimalField(max_digits=5, decimal_places=2)
     career_arc_dict = models.TextField()  # This field type is a guess.
 
     class Meta:
