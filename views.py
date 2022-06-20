@@ -135,6 +135,76 @@ def build_choose_teams_html(number_of_divisions_select, number_of_teams_conf_sel
 
     return team_html_str, city_nickname_to_city_id_dict
 
+def retract_prior_db_commits(db_commit_to_delete_id_dict):
+
+    #retract commits going backwards, since the dbs with rows inserted later may depend on rows submitted earlier
+    if "PlayerSpec" in db_commit_to_delete_id_dict:
+
+        for player_position, first_player_position_id in db_commit_to_delete_id_dict["PlayerSpec"].items():
+
+            if player_position == 'qb':
+                PlayerSpecsQb.objects.using("xactly_dev").filter(id__gte=first_player_position_id).delete()
+            elif player_position == 'rb':
+                PlayerSpecsRb.objects.using("xactly_dev").filter(id__gte=first_player_position_id).delete()
+            elif player_position == 'fb':
+                PlayerSpecsFb.objects.using("xactly_dev").filter(id__gte=first_player_position_id).delete()
+            elif player_position == 'wr':
+                PlayerSpecsWr.objects.using("xactly_dev").filter(id__gte=first_player_position_id).delete()
+            elif player_position == 'te':
+                PlayerSpecsTe.objects.using("xactly_dev").filter(id__gte=first_player_position_id).delete()
+            elif player_position == 'k':
+                PlayerSpecsK.objects.using("xactly_dev").filter(id__gte=first_player_position_id).delete()
+            elif player_position == 'lb':
+                PlayerSpecsLb.objects.using("xactly_dev").filter(id__gte=first_player_position_id).delete()
+            elif player_position == 'ol':
+                PlayerSpecsOl.objects.using("xactly_dev").filter(id__gte=first_player_position_id).delete()
+            elif player_position == 'p':
+                PlayerSpecsP.objects.using("xactly_dev").filter(id__gte=first_player_position_id).delete()
+            elif player_position == 'cb':
+                PlayerSpecsCb.objects.using("xactly_dev").filter(id__gte=first_player_position_id).delete()
+            elif player_position == 'dl':
+                PlayerSpecsDl.objects.using("xactly_dev").filter(id__gte=first_player_position_id).delete()
+            elif player_position == 'sf':
+                PlayerSpecsSf.objects.using("xactly_dev").filter(id__gte=first_player_position_id).delete()
+            elif player_position == 'sto':
+                PlayerSpecsSto.objects.using("xactly_dev").filter(id__gte=first_player_position_id).delete()
+            elif player_position == 'std':
+                PlayerSpecsStd.objects.using("xactly_dev").filter(id__gte=first_player_position_id).delete()
+
+    if "PlayerTeam" in db_commit_to_delete_id_dict:
+        first_player_team_id = db_commit_to_delete_id_dict["PlayerTeam"]
+        PlayerTeam.objects.using("xactly_dev").filter(player_team_id__gte=first_player_team_id).delete()
+
+    if "Player" in db_commit_to_delete_id_dict:
+        first_player_id = db_commit_to_delete_id_dict["Player"]
+        Player.objects.using("xactly_dev").filter(id__gte=first_player_id).delete()
+
+    if "TeamCity" in db_commit_to_delete_id_dict:
+
+        first_team_city_id = db_commit_to_delete_id_dict["TeamCity"]
+        TeamCity.objects.using("xactly_dev").filter(team_city_id__gte=first_team_city_id).delete()
+
+    if "Team" in db_commit_to_delete_id_dict:
+
+        first_team_id = db_commit_to_delete_id_dict["Team"]
+        Team.objects.using("xactly_dev").filter(id__gte=first_team_id).delete()
+
+    if "Division" in db_commit_to_delete_id_dict:
+
+        first_division_id = db_commit_to_delete_id_dict["Division"]
+        Division.objects.using("xactly_dev").filter(id__gte=first_division_id).delete()
+
+    if "Conference" in db_commit_to_delete_id_dict:
+
+        first_conference_id = db_commit_to_delete_id_dict["Conference"]
+        Conference.objects.using("xactly_dev").filter(id__gte=first_conference_id).delete()
+
+    if "League" in db_commit_to_delete_id_dict:
+
+        first_league_id = db_commit_to_delete_id_dict["League"]
+        League.objects.using("xactly_dev").filter(id__gte=first_league_id).delete()
+
+
 @ensure_csrf_cookie
 def index(request):
 
@@ -226,6 +296,11 @@ def process_create_league_form_1(request):
     except Exception:
         female_checkbox = 'off'
 
+    try:
+        neutral_site_checkbox = request.POST['neutral_site_checkbox']
+    except Exception:
+        neutral_site_checkbox = 'off'
+
     number_of_playoff_teams_select = int(request.POST['number_of_playoff_teams_select'])
     number_of_weeks_select = int(request.POST['number_of_weeks_select'])
     number_of_teams_conf_select = int(request.POST['number_of_teams_conf_select'])
@@ -242,6 +317,7 @@ def process_create_league_form_1(request):
     context['injury_mode'] = injury_checkbox
     context['weather_mode'] = weather_checkbox
     context['female_mode'] = female_checkbox
+    context['neutral_site_mode'] = neutral_site_checkbox
     context['welcome_message'] = welcome_message
     context['number_of_playoff_teams'] = number_of_playoff_teams_select
     context['number_of_weeks'] = number_of_weeks_select
@@ -262,6 +338,7 @@ def process_create_league_form_final(request):
     injury_setting = request.POST['injury_hidden']
     weather_setting = request.POST['weather_hidden']
     female_setting = request.POST['female_hidden']
+    neutral_site_setting = request.POST['neutral_site_hidden']
     number_of_weeks_setting = request.POST['number_of_weeks_hidden']
     number_of_playoff_teams_setting = request.POST['number_of_playoff_teams_hidden']
     number_of_teams_conf_setting = request.POST['number_of_teams_conf_hidden']
@@ -308,6 +385,11 @@ def process_create_league_form_final(request):
 
     league_name_abbrev_str =  league_name_abbrev_str.upper()
 
+    #this is a dict that will keep track of which db insertions have taken place, and the starting id of the commit
+    #I will use this to retract prior db commits if an error occurs at some point
+
+    db_commit_to_delete_id_dict = {}
+
     #start inserting form data into database tables
     #get latest League row
     try:
@@ -317,7 +399,8 @@ def process_create_league_form_final(request):
         league_id = 1
 
     try:
-        League.objects.using("xactly_dev").create(id=league_id, name=league_name, abbreviation=league_name_abbrev_str, weather_setting=weather_setting, injury_setting=injury_setting, female_setting=female_setting)
+        League.objects.using("xactly_dev").create(id=league_id, name=league_name, abbreviation=league_name_abbrev_str, weather_setting=weather_setting, injury_setting=injury_setting, female_setting=female_setting, neutral_site_setting=neutral_site_setting)
+        db_commit_to_delete_id_dict['League'] = league_id
     except Exception:
         return HttpResponse(-1)
 
@@ -327,6 +410,8 @@ def process_create_league_form_final(request):
             Conference.objects.using('xactly_dev').latest('id').id) + 1
     except Exception:
         conference_id = 1
+
+    first_conference_id = conference_id
 
     #we need this for proper insertions into the Division table
     conference_name_to_id_dict = {}
@@ -338,8 +423,10 @@ def process_create_league_form_final(request):
         try:
             Conference.objects.using("xactly_dev").create(id=conference_id, conference_name=this_conference_name,
                                                           league_id=league_id)
-
+            db_commit_to_delete_id_dict['Conference'] = first_conference_id
         except Exception:
+
+            retract_prior_db_commits(db_commit_to_delete_id_dict)
             return HttpResponse(-2)
 
         conference_id += 1
@@ -350,6 +437,8 @@ def process_create_league_form_final(request):
             Division.objects.using('xactly_dev').latest('id').id) + 1
     except Exception:
         division_id = 1
+
+    first_division_id = division_id
 
     #we need this for proper insertions into the Team table
     division_name_to_id_dict = {}
@@ -364,7 +453,9 @@ def process_create_league_form_final(request):
             Division.objects.using("xactly_dev").create(id=division_id, division_name=this_division_name,
                                                           conference_id=this_conference_id, first_season_id=-1, league_id=league_id)
 
+            db_commit_to_delete_id_dict['Division'] = first_division_id
         except Exception:
+            retract_prior_db_commits(db_commit_to_delete_id_dict)
             return HttpResponse(-3)
 
         division_id += 1
@@ -376,12 +467,16 @@ def process_create_league_form_final(request):
     except Exception:
         team_id = 1
 
+    first_team_id = team_id
+
     #also insert team_city rows for this league
     try:
         team_city_id = int(
             TeamCity.objects.using('xactly_dev').latest('team_city_id').team_city_id) + 1
     except Exception:
         team_city_id = 1
+
+    first_team_city_id = team_city_id
 
     team_id_to_city_stadium_id_list_dict = {}
 
@@ -418,20 +513,29 @@ def process_create_league_form_final(request):
                                                     first_season_id=-1, current_season_wins=0, current_season_losses=0,
                                                     stadium_id=this_team_stadium_id, conference_id=this_team_conference_id,
                                                     division_id=this_team_division_id,league_id=league_id)
+
+            db_commit_to_delete_id_dict['Team'] = first_team_id
         except Exception:
+            retract_prior_db_commits(db_commit_to_delete_id_dict)
             return HttpResponse(-4)
 
         try:
             TeamCity.objects.using("xactly_dev").create(team_city_id=team_city_id, team_id=team_id,
                                                     city_id=this_team_city_id,
                                                     first_season_id=-1,stadium_id=this_team_stadium_id)
+
+            db_commit_to_delete_id_dict['TeamCity'] = first_team_city_id
         except Exception:
+            retract_prior_db_commits(db_commit_to_delete_id_dict)
             return HttpResponse(-5)
 
         team_id += 1
         team_city_id += 1
 
     #create all player info, including career arcs
-    create_players(team_name_list, team_name_to_team_id_dict, league_id, female_setting)
+    status_code, exception_str, db_commit_to_delete_id_dict = create_players(team_name_list, team_name_to_team_id_dict, league_id, female_setting, db_commit_to_delete_id_dict)
 
-    return HttpResponse(1)
+    if exception_str != "":
+        retract_prior_db_commits(db_commit_to_delete_id_dict)
+
+    return HttpResponse(status_code)
