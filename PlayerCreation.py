@@ -3,6 +3,7 @@
 from scipy.stats import truncnorm
 import random
 import names
+import copy
 
 from jpartyfb.models import *
 
@@ -461,42 +462,46 @@ def create_player_career_arc(player_position, player_age, player_name, combined_
             elif this_age > PlayerCreation.rb_peak_age_interval[1]:
                 this_age_attribute_change_interval = PlayerCreation.rb_peak_to_eoc_number
                 this_age_upside_downside_sign = -1
-            elif player_position == 'wr':
 
-                if this_age < PlayerCreation.wr_peak_age_interval[0]:
-                    this_age_attribute_change_interval = PlayerCreation.wr_rookie_to_peak_growth_number
-                elif this_age >= PlayerCreation.wr_peak_age_interval[0] and this_age <= PlayerCreation.wr_peak_age_interval[1]:
-                    this_age_attribute_change_interval = PlayerCreation.wr_peak_growth_number
-                elif this_age > PlayerCreation.wr_peak_age_interval[1]:
-                    this_age_attribute_change_interval = PlayerCreation.wr_peak_to_eoc_number
-                    this_age_upside_downside_sign = -1
-            elif player_position in ['p', 'k']:
+        elif player_position == 'wr':
 
-                if this_age < PlayerCreation.pk_peak_age_interval[0]:
-                    this_age_attribute_change_interval = PlayerCreation.pk_rookie_to_peak_growth_number
-                elif this_age >= PlayerCreation.pk_peak_age_interval[0] and this_age <= PlayerCreation.pk_peak_age_interval[1]:
-                    this_age_attribute_change_interval = PlayerCreation.pk_peak_growth_number
-                elif this_age > PlayerCreation.pk_peak_age_interval[1]:
-                    this_age_attribute_change_interval = PlayerCreation.pk_peak_to_eoc_number
-                    this_age_upside_downside_sign = -1
-            elif player_position == 'qb':
+            if this_age < PlayerCreation.wr_peak_age_interval[0]:
+                this_age_attribute_change_interval = PlayerCreation.wr_rookie_to_peak_growth_number
+            elif this_age >= PlayerCreation.wr_peak_age_interval[0] and this_age <= PlayerCreation.wr_peak_age_interval[1]:
+                this_age_attribute_change_interval = PlayerCreation.wr_peak_growth_number
+            elif this_age > PlayerCreation.wr_peak_age_interval[1]:
+                this_age_attribute_change_interval = PlayerCreation.wr_peak_to_eoc_number
+                this_age_upside_downside_sign = -1
 
-                if this_age < PlayerCreation.qb_peak_age_interval[0]:
-                    this_age_attribute_change_interval = PlayerCreation.qb_rookie_to_peak_growth_number
-                elif this_age >= PlayerCreation.qb_peak_age_interval[0] and this_age <= PlayerCreation.qb_peak_age_interval[1]:
-                    this_age_attribute_change_interval = PlayerCreation.qb_peak_growth_number
-                elif this_age > PlayerCreation.qb_peak_age_interval[1]:
-                    this_age_attribute_change_interval = PlayerCreation.qb_peak_to_eoc_number
-                    this_age_upside_downside_sign = -1
-            else:
+        elif player_position in ['p', 'k']:
 
-                if this_age < PlayerCreation.other_pos_peak_age_interval[0]:
-                    this_age_attribute_change_interval = PlayerCreation.other_pos_rookie_to_peak_growth_number
-                elif this_age >= PlayerCreation.other_pos_peak_age_interval[0] and this_age <= PlayerCreation.other_pos_peak_age_interval[1]:
-                    this_age_attribute_change_interval = PlayerCreation.other_pos_peak_growth_number
-                elif this_age > PlayerCreation.other_pos_peak_age_interval[1]:
-                    this_age_attribute_change_interval = PlayerCreation.other_pos_peak_to_eoc_number
-                    this_age_upside_downside_sign = -1
+            if this_age < PlayerCreation.pk_peak_age_interval[0]:
+                this_age_attribute_change_interval = PlayerCreation.pk_rookie_to_peak_growth_number
+            elif this_age >= PlayerCreation.pk_peak_age_interval[0] and this_age <= PlayerCreation.pk_peak_age_interval[1]:
+                this_age_attribute_change_interval = PlayerCreation.pk_peak_growth_number
+            elif this_age > PlayerCreation.pk_peak_age_interval[1]:
+                this_age_attribute_change_interval = PlayerCreation.pk_peak_to_eoc_number
+                this_age_upside_downside_sign = -1
+
+        elif player_position == 'qb':
+
+            if this_age < PlayerCreation.qb_peak_age_interval[0]:
+                this_age_attribute_change_interval = PlayerCreation.qb_rookie_to_peak_growth_number
+            elif this_age >= PlayerCreation.qb_peak_age_interval[0] and this_age <= PlayerCreation.qb_peak_age_interval[1]:
+                this_age_attribute_change_interval = PlayerCreation.qb_peak_growth_number
+            elif this_age > PlayerCreation.qb_peak_age_interval[1]:
+                this_age_attribute_change_interval = PlayerCreation.qb_peak_to_eoc_number
+                this_age_upside_downside_sign = -1
+
+        else:
+
+            if this_age < PlayerCreation.other_pos_peak_age_interval[0]:
+                this_age_attribute_change_interval = PlayerCreation.other_pos_rookie_to_peak_growth_number
+            elif this_age >= PlayerCreation.other_pos_peak_age_interval[0] and this_age <= PlayerCreation.other_pos_peak_age_interval[1]:
+                this_age_attribute_change_interval = PlayerCreation.other_pos_peak_growth_number
+            elif this_age > PlayerCreation.other_pos_peak_age_interval[1]:
+                this_age_attribute_change_interval = PlayerCreation.other_pos_peak_to_eoc_number
+                this_age_upside_downside_sign = -1
 
         # create this year attribute dict for this player
         for this_attribute in combined_attr_score_dict.keys():
@@ -637,7 +642,10 @@ def initialize_spec_db_table_ids(player_position_list):
     return player_position_to_db_id_dict
 
 
-def create_players(team_name_list, team_name_to_team_id_dict, league_id, female_setting):
+def create_players(team_name_list, team_name_to_team_id_dict, league_id, female_setting, db_commit_to_delete_id_dict):
+
+    exception_str = ""
+    status_code = 1
 
     # get latest id value of player
     try:
@@ -645,15 +653,21 @@ def create_players(team_name_list, team_name_to_team_id_dict, league_id, female_
     except Exception:
         player_id = 1
 
+    first_player_id = player_id
+
     try:
         player_team_id = int(PlayerTeam.objects.using('xactly_dev').latest('player_team_id').player_team_id) + 1
     except Exception:
         player_team_id = 1
 
+    first_player_team_id = player_team_id
+
     player_name_to_info_dict_dict = {}
     player_name_to_combined_attr_score_dict = {}
 
     player_position_to_db_id_dict = initialize_spec_db_table_ids(PlayerCreation.player_position_list)
+
+    first_ids_player_position_to_db_id_dict = copy.deepcopy(player_position_to_db_id_dict)
 
     for this_team_name in team_name_list:
 
@@ -832,12 +846,24 @@ def create_players(team_name_list, team_name_to_team_id_dict, league_id, female_
             this_player_dict["league_id"] = league_id
 
             #create Player db object
-            this_player_db_obj = Player(**this_player_dict)
-            this_player_db_obj.save(using="xactly_dev")
+            try:
+                this_player_db_obj = Player(**this_player_dict)
+                this_player_db_obj.save(using="xactly_dev")
+                db_commit_to_delete_id_dict["Player"] = first_player_id
+            except Exception as e:
+                exception_str = str(e)
+                status_code = -6
+                return status_code, exception_str, db_commit_to_delete_id_dict
 
             #Create PlayerTeam db object
-            this_player_team_db_obj = PlayerTeam(player_team_id=player_team_id, player_id=player_id, team_id=this_team_id, season_id=1)
-            this_player_team_db_obj.save(using="xactly_dev")
+            try:
+                this_player_team_db_obj = PlayerTeam(player_team_id=player_team_id, player_id=player_id, team_id=this_team_id, season_id=1)
+                this_player_team_db_obj.save(using="xactly_dev")
+                db_commit_to_delete_id_dict["PlayerTeam"] = first_player_team_id
+            except Exception as e:
+                exception_str = str(e)
+                status_code = -7
+                return status_code, exception_str, db_commit_to_delete_id_dict
 
             #Create specs object for this player_position
             this_player_position_specs_db_obj = None
@@ -877,12 +903,16 @@ def create_players(team_name_list, team_name_to_team_id_dict, league_id, female_
                     player_specs_db_obj = PlayerSpecsStd(id=player_position_to_db_id_dict[player_position], player_id=player_id, career_arc_dict=str(this_player_career_arc_list_dict), **this_player_attribute_value_dict)
 
                 player_specs_db_obj.save(using="xactly_dev")
+                db_commit_to_delete_id_dict["PlayerSpec"] = first_ids_player_position_to_db_id_dict
 
             except Exception as e:
                 exception_str = str(e)
-                return HttpResponse(e)
+                status_code = -8
+                return status_code, exception_str, db_commit_to_delete_id_dict
 
             player_position_to_db_id_dict[player_position] += 1
 
             player_id += 1
             player_team_id += 1
+
+    return status_code, exception_str, db_commit_to_delete_id_dict
