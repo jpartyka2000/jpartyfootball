@@ -481,6 +481,7 @@ class League(models.Model):
     weather_setting = models.BooleanField()
     injury_setting = models.BooleanField()
     female_setting = models.BooleanField()
+    neutral_site_setting = models.BooleanField()
 
     class Meta:
         managed = True
