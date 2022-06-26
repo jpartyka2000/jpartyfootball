@@ -482,6 +482,10 @@ class League(models.Model):
     injury_setting = models.BooleanField()
     female_setting = models.BooleanField()
     neutral_site_setting = models.BooleanField()
+    num_playoff_teams_per_conference = models.IntegerField()
+    num_weeks_regular_season = models.IntegerField()
+    num_teams_per_conference = models.IntegerField()
+    num_divisions_per_conference = models.IntegerField()
 
     class Meta:
         managed = True
