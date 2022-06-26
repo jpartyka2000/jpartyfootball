@@ -1,0 +1,54 @@
+{% extends "backendBase.html" %}
+
+{% load staticfiles %}
+{% load static %}
+
+{%block mainContent%}	
+	<div class="container" style="border:1px solid #C0C0C0;" align="center">
+          {% csrf_token %}
+		<div class='row' style='text-align:center;'>
+            <div style="float:left;">
+			</div>
+			<h1>{{ welcome_message }}</h1></div><br>
+
+
+    <table align="center">
+        <tr>
+            <img style="border-radius:1px;height:160px; width:160px;" src="{% static 'jpartyfb/images/league_logo.png' %}"/>
+        </tr>
+    </table>
+    <div style="height: 75px;"></div>
+
+    <form name="choose_league_form" action="{% url 'jpartyfb:league_redirect' %}" method="post">
+          <table>
+             <tr>
+                <td> Choose Your League:  </td>
+                 <td> <select name="choose_league_select" id="choose_league_select">
+                  {% for league in league_list %}
+
+                      <option value="{{ league.0 }}"> {{ league.1 }} </option>
+
+                  {% endfor %}
+                  </select>
+                  </td>
+             </tr>
+             <tr>
+                 <td><div style="height: 20px;"></div></td>
+             </tr>
+             <tr>
+                 <td align="center" colspan="2">
+                     <input type='submit' name='choose_league_submit' id='choose_league_submit' />
+                 </td>
+             </tr>
+          </table>
+
+        <input type='hidden' name='source_page_hidden' id='source_page_hidden' value='{{ source_page }}' />
+
+    </form>
+    <div style="height: 75px;"></div>
+</div>
+
+
+
+
+{% endblock%}
