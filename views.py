@@ -19,7 +19,7 @@ from jpartyfb.models import *
 from PlayerCreation import PlayerCreation
 from PlayerCreation import create_player_career_arc, create_players
 
-def build_choose_teams_html(number_of_divisions_select, number_of_teams_conf_select, number_of_teams_per_division):
+def build_choose_teams_html(number_of_divisions_select, number_of_teams_conf_select, number_of_teams_per_division, source_page):
 
     division_num_to_team_list_dict = {}
 
@@ -246,16 +246,67 @@ def view_stats(request):
     return render(request, 'jpartyfb/view_stats.html', context)
 
 @ensure_csrf_cookie
-def create_new_league(request):
+def show_league_form_1(request, source=None):
     context = {}
 
-    welcome_message = "Create New League"
+    if source is None:
+        source = 'els'
+
     form = CreateLeagueForm1()
 
+    if source == 'els':
+
+        #if we are editing league settings, we need to get the league_id whose settings we are editing
+        league_id = int(request.session['league_id'])
+
+        league_settings_dict = {}
+
+        try:
+            league_obj = League.objects.using("xactly_dev").filter(id=league_id)
+
+            league_name = league_obj[0].name
+            weather_setting = league_obj[0].weather_setting
+            injury_setting = league_obj[0].injury_setting
+            female_setting = league_obj[0].female_setting
+            neutral_site_setting = league_obj[0].neutral_site_setting
+
+            number_of_playoff_teams_select = league_obj[0].num_playoff_teams_per_conference
+            number_of_weeks_select = league_obj[0].num_weeks_regular_season
+            number_of_teams_conf_select = league_obj[0].num_teams_per_conference
+            number_of_divisions_select = league_obj[0].num_divisions_per_conference
+
+            league_settings_dict['weather_setting'] = "checked" if weather_setting == True else ""
+            league_settings_dict['injury_setting'] = "checked" if injury_setting == True else ""
+            league_settings_dict['female_setting'] = "checked" if female_setting == True else ""
+            league_settings_dict['neutral_site_setting'] = "checked" if neutral_site_setting == True else ""
+
+        except Exception:
+            league_settings_dict = {}
+
+        context['league_settings_dict'] = league_settings_dict
+
+        #set value of league name
+        form.fields["league_name"].initial = league_name
+
+        #set values of all select fields
+        form.fields["number_of_playoff_teams_select"].initial = number_of_playoff_teams_select
+        form.fields["number_of_weeks_select"].initial = number_of_weeks_select
+        form.fields["number_of_teams_conf_select"].initial = number_of_teams_conf_select
+        form.fields["number_of_divisions_select"].initial = number_of_divisions_select
+
+        context['source_page_title'] = 'Edit League Settings'
+        welcome_message = "League Settings: " + league_name
+
+    elif source == 'cnl':
+        context['source_page_title'] = 'Create New League'
+        welcome_message = "Create New League"
+
     context['form'] = form
+    context['source'] = source
+
     context['welcome_message'] = welcome_message
 
-    return render(request, 'jpartyfb/create_new_league.html', context)
+    return render(request, 'jpartyfb/show_league_form_1.html', context)
 
 @ensure_csrf_cookie
 def start_new_season(request):
@@ -268,17 +319,69 @@ def start_new_season(request):
 
 @ensure_csrf_cookie
 def edit_league_settings(request):
+
+    #use session variable to pass along parameter in HttpResponseRedirect
+    request.session['source_page'] = 'edit_league_settings'
+
+    #redirect to choose league page
+    return HttpResponseRedirect('/jpartyfb/choose_league/')
+
+@ensure_csrf_cookie
+def choose_league(request):
+
     context = {}
 
-    welcome_message = "Edit League Settings"
+    #get session variable and delete
+    context['source_page'] = request.session['source_page']
+
+    #delete session variable
+    try:
+        del request.session['source_page']
+    except KeyError:
+        pass
+
+    welcome_message = "Choose League"
     context['welcome_message'] = welcome_message
 
-    return render(request, 'jpartyfb/edit_league_settings.html', context)
+    # load all league ids and names
+    try:
+        league_obj_list = League.objects.using("xactly_dev").all().order_by("-id")
+    except Exception:
+        league_obj_list = []
+
+    league_select_list = []
+
+    for this_league_obj in league_obj_list:
+        league_id = this_league_obj.id
+        league_name = this_league_obj.name
+
+        league_select_list.append([league_id, league_name])
+
+    context['league_list'] = league_select_list
+
+    return render(request, 'jpartyfb/choose_league.html', context)
+
+
+@csrf_exempt
+def league_redirect(request):
+
+    league_id = request.POST['choose_league_select']
+    source_page = request.POST['source_page_hidden']
+
+    #depending on how we got to the choose league page, we will redirect to the proper location
+    if source_page == 'edit_league_settings':
+
+        #pass league_id in a session variable
+        request.session['league_id'] = league_id
+
+        return HttpResponseRedirect('/jpartyfb/show_league_form_1/els/')
+
 
 @csrf_exempt
 def process_create_league_form_1(request):
 
     league_name = request.POST['league_name']
+    source_page = request.POST['source_page_hidden']
 
     #extract form information and pass it into the choose_teams page
     try:
@@ -308,7 +411,7 @@ def process_create_league_form_1(request):
 
     number_of_teams_per_division = number_of_teams_conf_select / number_of_divisions_select
 
-    team_html_str, city_nickname_to_city_id_dict = build_choose_teams_html(number_of_divisions_select, number_of_teams_conf_select, number_of_teams_per_division)
+    team_html_str, city_nickname_to_city_id_dict = build_choose_teams_html(number_of_divisions_select, number_of_teams_conf_select, number_of_teams_per_division, source_page)
 
     context = {}
 
@@ -399,7 +502,11 @@ def process_create_league_form_final(request):
         league_id = 1
 
     try:
-        League.objects.using("xactly_dev").create(id=league_id, name=league_name, abbreviation=league_name_abbrev_str, weather_setting=weather_setting, injury_setting=injury_setting, female_setting=female_setting, neutral_site_setting=neutral_site_setting)
+        League.objects.using("xactly_dev").create(id=league_id, name=league_name, abbreviation=league_name_abbrev_str,
+                                                  weather_setting=weather_setting, injury_setting=injury_setting,
+                                                  female_setting=female_setting, neutral_site_setting=neutral_site_setting,
+                                                  num_playoff_teams_per_conference=number_of_playoff_teams_setting, num_weeks_regular_season=number_of_weeks_setting,
+                                                  num_teams_per_conference=number_of_teams_conf_setting, num_divisions_per_conference=number_of_divisions_conf_setting)
         db_commit_to_delete_id_dict['League'] = league_id
     except Exception:
         return HttpResponse(-1)
