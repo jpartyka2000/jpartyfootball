@@ -179,6 +179,10 @@ def retract_prior_db_commits(db_commit_to_delete_id_dict):
         first_player_id = db_commit_to_delete_id_dict["Player"]
         Player.objects.using("xactly_dev").filter(id__gte=first_player_id).delete()
 
+    if "Season" in db_commit_to_delete_id_dict:
+        first_season_id = db_commit_to_delete_id_dict["Season"]
+        Season.objects.using("xactly_dev").filter(id__gte=first_season_id).delete()
+
     if "TeamCity" in db_commit_to_delete_id_dict:
 
         first_team_city_id = db_commit_to_delete_id_dict["TeamCity"]
@@ -258,6 +262,7 @@ def show_league_form_1(request, source=None):
 
         #if we are editing league settings, we need to get the league_id whose settings we are editing
         league_id = int(request.session['league_id'])
+        context['league_id'] = league_id
 
         league_settings_dict = {}
 
@@ -299,6 +304,7 @@ def show_league_form_1(request, source=None):
 
     elif source == 'cnl':
         context['source_page_title'] = 'Create New League'
+        context['league_id'] = -1
         welcome_message = "Create New League"
 
     context['form'] = form
@@ -333,12 +339,6 @@ def choose_league(request):
 
     #get session variable and delete
     context['source_page'] = request.session['source_page']
-
-    #delete session variable
-    try:
-        del request.session['source_page']
-    except KeyError:
-        pass
 
     welcome_message = "Choose League"
     context['welcome_message'] = welcome_message
@@ -378,36 +378,60 @@ def league_redirect(request):
 
 
 @csrf_exempt
-def process_create_league_form_1(request):
+def process_create_league_form_1(request, edit_from_breadcrumb=None):
 
-    league_name = request.POST['league_name']
-    source_page = request.POST['source_page_hidden']
+    if edit_from_breadcrumb != 'True':
 
-    #extract form information and pass it into the choose_teams page
-    try:
-        injury_checkbox = request.POST['injury_checkbox']
-    except Exception:
-        injury_checkbox = 'off'
+        league_name = request.POST['league_name']
+        source_page = request.POST['source_page_hidden']
+        league_id = int(request.POST['league_id_hidden'])
 
-    try:
-        weather_checkbox = request.POST['weather_checkbox']
-    except Exception:
-        weather_checkbox = 'off'
+        #extract form information and pass it into the choose_teams page
+        try:
+            injury_checkbox = request.POST['injury_checkbox']
+        except Exception:
+            injury_checkbox = 'off'
 
-    try:
-        female_checkbox = request.POST['female_checkbox']
-    except Exception:
-        female_checkbox = 'off'
+        try:
+            weather_checkbox = request.POST['weather_checkbox']
+        except Exception:
+            weather_checkbox = 'off'
 
-    try:
-        neutral_site_checkbox = request.POST['neutral_site_checkbox']
-    except Exception:
-        neutral_site_checkbox = 'off'
+        try:
+            female_checkbox = request.POST['female_checkbox']
+        except Exception:
+            female_checkbox = 'off'
 
-    number_of_playoff_teams_select = int(request.POST['number_of_playoff_teams_select'])
-    number_of_weeks_select = int(request.POST['number_of_weeks_select'])
-    number_of_teams_conf_select = int(request.POST['number_of_teams_conf_select'])
-    number_of_divisions_select = int(request.POST['number_of_divisions_select'])
+        try:
+            neutral_site_checkbox = request.POST['neutral_site_checkbox']
+        except Exception:
+            neutral_site_checkbox = 'off'
+
+        number_of_playoff_teams_select = int(request.POST['number_of_playoff_teams_select'])
+        number_of_weeks_select = int(request.POST['number_of_weeks_select'])
+        number_of_teams_conf_select = int(request.POST['number_of_teams_conf_select'])
+        number_of_divisions_select = int(request.POST['number_of_divisions_select'])
+
+    if edit_from_breadcrumb == 'True':
+
+        league_id = request.GET['league_id']
+
+        #the league has already been created, so query for the information
+        try:
+            league_obj = League.objects.using("xactly_dev").filter(id=league_id)
+        except Exception:
+            league_obj = None
+
+        league_name = league_obj[0].name
+        injury_checkbox = league_obj[0].injury_setting
+        weather_checkbox = league_obj[0].weather_setting
+        female_checkbox = league_obj[0].female_setting
+        neutral_site_checkbox = league_obj[0].neutral_site_setting
+        number_of_playoff_teams_select = league_obj[0].num_playoff_teams_per_conference
+        number_of_weeks_select = league_obj[0].num_weeks_regular_season
+        number_of_teams_conf_select = league_obj[0].num_teams_per_conference
+        number_of_divisions_select = league_obj[0].num_divisions_per_conference
+        source_page = 'els'
 
     number_of_teams_per_division = number_of_teams_conf_select / number_of_divisions_select
 
@@ -416,12 +440,14 @@ def process_create_league_form_1(request):
     context = {}
 
     welcome_message = "Choose Your Teams"
+    context['league_id'] = league_id
     context['league_name'] = league_name
     context['injury_mode'] = injury_checkbox
     context['weather_mode'] = weather_checkbox
     context['female_mode'] = female_checkbox
     context['neutral_site_mode'] = neutral_site_checkbox
     context['welcome_message'] = welcome_message
+    context['source_page'] = source_page
     context['number_of_playoff_teams'] = number_of_playoff_teams_select
     context['number_of_weeks'] = number_of_weeks_select
     context['number_of_teams_conf'] = number_of_teams_conf_select
@@ -438,10 +464,20 @@ def process_create_league_form_final(request):
 
     #extract form information and pass it into the choose_teams page
     league_name = request.POST['league_name_hidden']
-    injury_setting = request.POST['injury_hidden']
-    weather_setting = request.POST['weather_hidden']
-    female_setting = request.POST['female_hidden']
-    neutral_site_setting = request.POST['neutral_site_hidden']
+
+    #checkboxes still have 'on' and 'off' values at this point - need to convert to booleans
+    injury_setting_raw = request.POST['injury_hidden']
+    injury_setting = True if injury_setting_raw == 'on' else False
+
+    weather_setting_raw = request.POST['weather_hidden']
+    weather_setting = True if weather_setting_raw == 'on' else False
+
+    female_setting_raw = request.POST['female_hidden']
+    female_setting = True if female_setting_raw == 'on' else False
+
+    neutral_site_setting_raw = request.POST['neutral_site_hidden']
+    neutral_site_setting = True if neutral_site_setting_raw == 'on' else False
+
     number_of_weeks_setting = request.POST['number_of_weeks_hidden']
     number_of_playoff_teams_setting = request.POST['number_of_playoff_teams_hidden']
     number_of_teams_conf_setting = request.POST['number_of_teams_conf_hidden']
@@ -638,6 +674,23 @@ def process_create_league_form_final(request):
 
         team_id += 1
         team_city_id += 1
+
+    #before creating players, I want to create the db row for season 1 of the new league. However, note that
+    #the season will be inactive until the draft occurs
+    try:
+        season_id = int(Season.objects.using('xactly_dev').latest('id').id) + 1
+    except Exception:
+        season_id = 1
+
+    try:
+        Season.objects.using("xactly_dev").create(id=season_id, start_time=None,
+                                                    end_time=None,
+                                                    season_year=1, league_id=league_id)
+
+        db_commit_to_delete_id_dict['Season'] = season_id
+
+    except Exception:
+        return HttpResponse(-9)
 
     #create all player info, including career arcs
     status_code, exception_str, db_commit_to_delete_id_dict = create_players(team_name_list, team_name_to_team_id_dict, league_id, female_setting, db_commit_to_delete_id_dict)
