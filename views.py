@@ -258,6 +258,8 @@ def show_league_form_1(request, source=None):
 
     form = CreateLeagueForm1()
 
+    is_league_season_active = True
+
     if source == 'els':
 
         #if we are editing league settings, we need to get the league_id whose settings we are editing
@@ -288,6 +290,17 @@ def show_league_form_1(request, source=None):
         except Exception:
             league_settings_dict = {}
 
+        #get latest season associated with this league_id and determine whether it is active or not
+
+        try:
+            season_obj = Season.objects.using("xactly_dev").filter(league_id=league_id).order_by("-id")
+
+            if season_obj[0].start_time is None:
+                is_league_season_active = False
+
+        except Exception:
+           pass
+
         context['league_settings_dict'] = league_settings_dict
 
         #set value of league name
@@ -309,6 +322,7 @@ def show_league_form_1(request, source=None):
 
     context['form'] = form
     context['source'] = source
+    context['season_active'] = is_league_season_active
 
     context['welcome_message'] = welcome_message
 
@@ -384,6 +398,7 @@ def process_create_league_form_1(request, edit_from_breadcrumb=None):
 
         league_name = request.POST['league_name']
         source_page = request.POST['source_page_hidden']
+        season_active = request.POST['season_active_hidden']
         league_id = int(request.POST['league_id_hidden'])
 
         #extract form information and pass it into the choose_teams page
@@ -433,6 +448,19 @@ def process_create_league_form_1(request, edit_from_breadcrumb=None):
         number_of_divisions_select = league_obj[0].num_divisions_per_conference
         source_page = 'els'
 
+        #determine if the season is active or not
+        try:
+            season_obj = Season.objects.using("xactly_dev").filter(league_id=league_id).order_by("-id")
+
+            if season_obj[0].start_time is None:
+                season_active = False
+            else:
+                season_active = True
+
+        except Exception:
+           pass
+
+
     number_of_teams_per_division = number_of_teams_conf_select / number_of_divisions_select
 
     team_html_str, city_nickname_to_city_id_dict = build_choose_teams_html(number_of_divisions_select, number_of_teams_conf_select, number_of_teams_per_division, source_page)
@@ -448,6 +476,7 @@ def process_create_league_form_1(request, edit_from_breadcrumb=None):
     context['neutral_site_mode'] = neutral_site_checkbox
     context['welcome_message'] = welcome_message
     context['source_page'] = source_page
+    context['season_active'] = season_active
     context['number_of_playoff_teams'] = number_of_playoff_teams_select
     context['number_of_weeks'] = number_of_weeks_select
     context['number_of_teams_conf'] = number_of_teams_conf_select
