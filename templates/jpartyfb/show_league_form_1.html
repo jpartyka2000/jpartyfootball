@@ -33,7 +33,7 @@
     </table>
 
     <div style="height: 75px;"></div>
-    <form name="create_league_form_1" action="{% url 'jpartyfb:process_create_league_form_1' %}" method="post">
+    <form name="create_league_form_1" action="{% url 'jpartyfb:process_create_league_form_1' edit_from_breadcrumb='False' %}" method="post">
 
          {% ifequal source 'els' %}
              <input type="checkbox" id="injury_checkbox" name="injury_checkbox" style="margin-left: -142px;" {{ league_settings_dict.injury_setting }} />
@@ -87,6 +87,9 @@
               </tr>
           </table>
          <input type="hidden" name="source_page_hidden" id="source_page_hidden" value="{{ source }}" />
+         <input type="hidden" name="league_id_hidden" id="league_id_hidden" value="{{ league_id }}" />
+         <input type="hidden" name="season_active_hidden" id="season_active_hidden" value="{{ season_active }}" />
+
     </form>
 </div>
 
@@ -102,6 +105,22 @@
         if (league_name == "") {
             alert("League must have a name")
             return
+        }
+
+        //if source page is els, then let user know that changing certain settings won't take effect
+        //until the season is over. If user does not accept, then do not submit
+
+        var source_page = $("#source_page_hidden").val()
+        var season_active = $("#season_active_hidden").val()
+
+        if (source_page == 'els' && season_active == 'False') {
+
+            if (!confirm("Since you are making changes to settings in a league with an ongoing season, some settings will not take effect until the season is over")) {
+
+                return
+
+            }
+
         }
 
         //check if the number of teams per conference is divisible by the number of divisions per conference
