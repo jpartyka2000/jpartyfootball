@@ -13,8 +13,14 @@
         <div class='breadcrumb' style='text-color: blue; background-color: white;'>
             <a href="{% url 'jpartyfb:index' %}">Home</a> >
             <a href="{% url 'jpartyfb:manage_leagues' %}">Manage Leagues</a> >
-            <a href="{% url 'jpartyfb:create_new_league' %}">Create New League</a> >
-            <a href="{% url 'jpartyfb:process_create_league_form_1' %}">Choose Teams</a>
+
+            {% ifequal source_page "els" %}
+                <a href="{% url 'jpartyfb:show_league_form_1' source='els' %}">Edit League</a> >
+                <a href="{% url 'jpartyfb:process_create_league_form_1' edit_from_breadcrumb='True' %}?league_id={{ league_id }}">Edit Teams</a>
+            {% else %}
+                <a href="{% url 'jpartyfb:show_league_form_1' source='cnl' %}">Create New League</a> >
+                Choose Teams
+            {% endifequal %}
 
         </div>
 
@@ -63,14 +69,17 @@
         </table>
 
        <!-- values from the first part of the create league form-->
+       <input type="hidden" id="league_id_hidden" name="league_id_hidden" value="{{ league_id }}" />
        <input type="hidden" id="league_name_hidden" name="league_name_hidden" value="{{ league_name }}" />
        <input type="hidden" id="injury_hidden" name="injury_hidden" value="{{ injury_mode }}" />
        <input type="hidden" id="weather_hidden" name="weather_hidden" value="{{ weather_mode }}" />
        <input type="hidden" id="female_hidden" name="female_hidden" value="{{ female_mode }}" />
+       <input type="hidden" id="neutral_site_hidden" name="neutral_site_hidden" value="{{ neutral_site_mode }}" />
        <input type="hidden" id="number_of_weeks_hidden" name="number_of_weeks_hidden" value="{{ number_of_weeks }}" />
        <input type="hidden" id="number_of_playoff_teams_hidden" name="number_of_playoff_teams_hidden" value="{{ number_of_playoff_teams }}" />
        <input type="hidden" id="number_of_teams_conf_hidden" name="number_of_teams_conf_hidden" value="{{ number_of_teams_conf }}" />
        <input type="hidden" id="number_of_divisions_conf_hidden" name="number_of_divisions_conf_hidden" value="{{ number_of_divisions_conf }}" />
+       <input type="hidden" id="source_page_hidden" name="source_page_hidden" value="{{ source_page }}" />
 
     </form>
     <div style="height: 35px;"></div>
@@ -230,6 +239,8 @@
         formData.append("injury_hidden", $("#injury_hidden").val())
         formData.append("weather_hidden", $("#weather_hidden").val())
         formData.append("female_hidden", $("#female_hidden").val())
+        formData.append("neutral_site_hidden", $("#neutral_site_hidden").val())
+
         formData.append("number_of_weeks_hidden", $("#number_of_weeks_hidden").val())
         formData.append("number_of_playoff_teams_hidden", $("#number_of_playoff_teams_hidden").val())
         formData.append("number_of_teams_conf_hidden", $("#number_of_teams_conf_hidden").val())
@@ -261,14 +272,7 @@
 
                //alert(JSON.stringify(data))
                $("#loading_image").hide()
-
-               //result = JSON.parse(data)
-               //var status = result[0]
-               //var variable_names = result[1]
-               //var unmatched_variables_dict = result[2]
-               //alert(JSON.stringify(unmatched_variables_dict))
                //return
-
 
                if (data == "-1") {
                    alert("Error in trying to save to League db table")
@@ -295,9 +299,29 @@
                    return
                }
 
+                if (data == "-6") {
+                   alert("Error in trying to save to Player db table")
+                   return
+               }
+
+                if (data == "-7") {
+                   alert("Error in trying to save to PlayerTeam db table")
+                   return
+                }
+
+                if (data == "-8") {
+                   alert("Error in trying to save to one of the player spec db tables")
+                   return
+                }
+
+                if (data == "-9") {
+                   alert("Error in trying to save to Season db table")
+                   return
+                }
+
                alert("League has been successfully created")
 
-               window.location.href = "/jpartyfb/"
+               //window.location.href = "/jpartyfb/"
 
            }
         })
