@@ -80,6 +80,7 @@
        <input type="hidden" id="number_of_teams_conf_hidden" name="number_of_teams_conf_hidden" value="{{ number_of_teams_conf }}" />
        <input type="hidden" id="number_of_divisions_conf_hidden" name="number_of_divisions_conf_hidden" value="{{ number_of_divisions_conf }}" />
        <input type="hidden" id="source_page_hidden" name="source_page_hidden" value="{{ source_page }}" />
+       <input type="hidden" id="season_active_hidden" name="season_active_hidden" value="{{ season_active }}" />
 
     </form>
     <div style="height: 35px;"></div>
@@ -329,6 +330,14 @@
     })
 
     $(".td_team").click(function() {
+
+        //if season is active, then we can't make changes to division/conference alignment; return immediately
+        var season_active = $("#season_active_hidden").val()
+
+        if (season_active == "True") {
+            alert("We can't make changes to division/conference alignment during an active season")
+            return
+        }
 
         this_clicked_td_id = $(this).attr('id')
 
