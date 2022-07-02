@@ -80,15 +80,24 @@
              </tr>
              {% endfor %}
               <tr><td><br></td></tr>
+             {% ifequal source 'els' %}
+              <tr>
+                <td colspan="2" align="center">
+                    <input type="button" id="save_and_leave_button" class='submit_button' value='Save Settings and Go Home' style="width: 215px;" />
+                </td>
+              </tr>
+             {% endifequal %}
+             <tr><td><div style="height: 25px;"></div></td></tr>
               <tr>
                   <td colspan="2" align="center">
-                      <input type="button" id="submit_button" value='Choose Teams' />
+                      <input type="button" id="choose_teams_button" class='submit_button' value='Choose Teams' />
                   </td>
               </tr>
           </table>
          <input type="hidden" name="source_page_hidden" id="source_page_hidden" value="{{ source }}" />
          <input type="hidden" name="league_id_hidden" id="league_id_hidden" value="{{ league_id }}" />
          <input type="hidden" name="season_active_hidden" id="season_active_hidden" value="{{ season_active }}" />
+         <input type="hidden" name="clicked_submit_button_hidden" id="clicked_submit_button_hidden" value="" />
 
     </form>
 </div>
@@ -97,7 +106,15 @@
 
 <script language="Javascript">
 
-    $("#submit_button").click(function() {
+    $(".submit_button").click(function() {
+
+        var clicked_button_id = $(this).attr('id')
+
+        if (clicked_button_id == "save_and_leave_button") {
+            $("#clicked_submit_button_hidden").val("save_and_leave_button")
+        } else {
+            $("#clicked_submit_button_hidden").val("choose_teams_button")
+        }
 
         //check if the league name is not blank
         var league_name = $("#id_league_name").val()
@@ -123,16 +140,20 @@
 
         }
 
-        //check if the number of teams per conference is divisible by the number of divisions per conference
-        //we need to make sure that all divisions have the same number of teams
+        if (clicked_button_id == "choose_teams_button") {
 
-        var num_teams_conference = $("#id_number_of_teams_conf_select").val()
-        var num_divisions_conference = $("#id_number_of_divisions_select").val()
+            //check if the number of teams per conference is divisible by the number of divisions per conference
+            //we need to make sure that all divisions have the same number of teams
 
-        if (num_teams_conference % num_divisions_conference != 0) {
-            alert("Please choose numbers that allow for an equal number of teams per division in each conference")
-            return
-        }
+            var num_teams_conference = $("#id_number_of_teams_conf_select").val()
+            var num_divisions_conference = $("#id_number_of_divisions_select").val()
+
+            if (num_teams_conference % num_divisions_conference != 0) {
+                alert("Please choose numbers that allow for an equal number of teams per division in each conference")
+                return
+            }
+
+        }//end if
 
         var the_form = document.forms[0];
         the_form.submit()
