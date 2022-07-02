@@ -13,7 +13,7 @@ import time
 import json
 import random
 
-from jpartyfb.forms import JPartyFBInputForm, CreateLeagueForm1
+from jpartyfb.forms import CreateLeagueForm1
 from jpartyfb.models import *
 
 from PlayerCreation import PlayerCreation
@@ -101,9 +101,7 @@ def index(request):
     context = {}
 
     welcome_message = "Welcome to JParty Football!"
-    form = JPartyFBInputForm()
     
-    context['form'] = form
     context['welcome_message'] = welcome_message
     return render(request, 'jpartyfb/index.html', context)
 
