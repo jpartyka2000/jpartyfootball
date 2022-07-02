@@ -813,6 +813,7 @@ class TeamCity(models.Model):
     city = models.ForeignKey(City)
     first_season_id = models.IntegerField()
     stadium = models.ForeignKey(Stadium)
+    league = models.ForeignKey(League)
 
     class Meta:
         managed = True
