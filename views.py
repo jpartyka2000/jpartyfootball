@@ -19,121 +19,7 @@ from jpartyfb.models import *
 from PlayerCreation import PlayerCreation
 from PlayerCreation import create_player_career_arc, create_players
 
-def build_choose_teams_html(number_of_divisions_select, number_of_teams_conf_select, number_of_teams_per_division, source_page):
-
-    division_num_to_team_list_dict = {}
-
-    for i in range(1, number_of_divisions_select * 2 + 1):
-        division_num_to_team_list_dict[i] = []
-
-    #if user wants 28, 30 or 32 teams, then we will need to provide dummy teams, since we only have 24 teams
-    #by default
-    if number_of_teams_conf_select == 14:
-        #add on teams to last division
-        division_num_to_team_list_dict[number_of_divisions_select * 2].append(["Add Team Name"] * 4)
-        division_num_to_team_list_dict[number_of_divisions_select * 2] = [item for sublist in division_num_to_team_list_dict[number_of_divisions_select * 2] for item in sublist]
-
-    if number_of_teams_conf_select == 15:
-        #add 6 new teams to last division
-        division_num_to_team_list_dict[number_of_divisions_select * 2].append(["Add Team Name"] * 6)
-        division_num_to_team_list_dict[number_of_divisions_select * 2] = [item for sublist in division_num_to_team_list_dict[number_of_divisions_select * 2] for item in sublist]
-
-    if number_of_teams_conf_select == 16:
-
-        if number_of_divisions_select == 2:
-            division_num_to_team_list_dict[number_of_divisions_select * 2].append(["Add Team Name"] * 8)
-            division_num_to_team_list_dict[number_of_divisions_select * 2] = [item for sublist in division_num_to_team_list_dict[number_of_divisions_select * 2] for item in sublist]
-
-        if number_of_divisions_select == 4:
-            division_num_to_team_list_dict[number_of_divisions_select * 2 - 1].append(["Add Team Name"] * 4)
-            division_num_to_team_list_dict[number_of_divisions_select * 2].append(["Add Team Name"] * 4)
-            division_num_to_team_list_dict[number_of_divisions_select * 2 - 1] = [item for sublist in division_num_to_team_list_dict[number_of_divisions_select * 2 - 1] for item in sublist]
-            division_num_to_team_list_dict[number_of_divisions_select * 2] = [item for sublist in division_num_to_team_list_dict[number_of_divisions_select * 2] for item in sublist]
-
-
-    division_counter = 1
-    city_nickname_to_city_id_dict = {}
-
-    for this_default_team in DefaultTeams.objects.using("xactly_dev").filter(id__lte=(number_of_teams_conf_select * 2)).order_by("id"):
-        this_default_team_nickname = this_default_team.nickname
-        this_default_team_city_name = this_default_team.city.city_name
-        this_default_team_city_id = this_default_team.city.city_id
-
-        city_nickname_to_city_id_dict[this_default_team_nickname] = this_default_team_city_id
-
-        division_num_to_team_list_dict[division_counter].append(this_default_team_city_name + " " + this_default_team_nickname)
-
-        if len(division_num_to_team_list_dict[division_counter]) == number_of_teams_per_division:
-            division_counter += 1
-
-    conf_division_name_list = []
-
-    for i in range(1, number_of_divisions_select + 1):
-        conf_division_name_list.append("Division " + str(i))
-
-    # create table html for show_teams.html here - it's too complex for django templating language
-    team_html_str = ""
-
-    color_to_rgb_list_dict = {'blue':['#CCE5FF','#99CCFF'], 'red':['#FFCCCC','#FFAAAA']}
-
-    for conf_division_idx, conf_division_name in enumerate(conf_division_name_list, 1):
-        team_html_str += "<table cellpadding='5' width='100%' border='1'><tr>"
-
-        # print out division header html - first easter division
-        team_html_str += "<td width='50%' align='center' style='background-color: blue;' id='td_division_eastern_" + str(conf_division_idx) + "' class='td_division'>"
-        team_html_str += "<input type='text' id='Eastern_division_" + str(
-            conf_division_idx) + "' name='eastern_division_" + str(
-            conf_division_idx) + "' class='division' maxlength='35' value='" + "Eastern " + conf_division_name + "' style='width: 220px; border: none; background: transparent; text-align:center; font-weight: bold; color: white;' />"
-        team_html_str += "</td>"
-
-        # now western division
-        team_html_str += "<td width='50%' align='center' style='background-color: red;' id='td_division_western_" + str(conf_division_idx) + "' class='td_division'>"
-        team_html_str += "<input type='text' id='Western_division_" + str(
-            conf_division_idx) + "' name='western_division_" + str(
-            conf_division_idx) + "' class='division' maxlength='35' value='" + "Western " + conf_division_name + "' style='width: 220px; border: none; background: transparent; text-align:center; font-weight: bold; color: white;' />"
-        team_html_str += "</td>"
-
-        # close division html row
-        team_html_str += "</tr>"
-
-        # open team html row - each row is a conference division of teams
-        color_key_str = ""
-        conference_str = ""
-
-        for actual_division_number, division_team_list in division_num_to_team_list_dict.items():
-
-            if actual_division_number == conf_division_idx or actual_division_number == conf_division_idx + number_of_divisions_select:
-
-                if actual_division_number < conf_division_idx * 2:
-                    team_html_str += "<tr>"
-                    color_list = color_to_rgb_list_dict["blue"]
-                    conference_str = "Eastern"
-                else:
-                    color_list = color_to_rgb_list_dict["red"]
-                    conference_str = "Western"
-
-                team_html_str += "<td><table align='center' style='background-color: white;' width='100%'>"
-                for this_team_div_idx, this_team_name in enumerate(division_team_list, 1):
-
-                    if this_team_div_idx % 2 == 1:
-                        this_team_row_color = color_list[0]
-                    else:
-                        this_team_row_color = color_list[1]
-
-                    team_html_str += "<tr style='background-color: " + this_team_row_color + ";'>"
-
-                    team_html_str += "<td width='50%' align='center' id='td_team_" + str(this_team_div_idx) + "_" + conference_str + "_division_" + str(conf_division_idx) + "' class='td_team'>"
-                    team_html_str += "<input type='text' id='" + conference_str + "_division_" + str(conf_division_idx) + "_team_" + str(this_team_div_idx) + "' name='" + conference_str + "_division_" + str(conf_division_idx) + "_team_" + str(this_team_div_idx) + "' class='team' maxlength='35' value='" + this_team_name + "' style='width: 220px; border: none; background: transparent; text-align:center; font-weight: bold;' />"
-                    team_html_str += "</td></tr>"
-
-                team_html_str += "</table></td>"
-
-                if conf_division_idx * 2 == actual_division_number:
-                    team_html_str += "</tr>"
-
-    team_html_str += "</table>"
-
-    return team_html_str, city_nickname_to_city_id_dict
+from LeagueLayout import build_choose_teams_html
 
 def retract_prior_db_commits(db_commit_to_delete_id_dict):
 
@@ -258,7 +144,7 @@ def show_league_form_1(request, source=None):
 
     form = CreateLeagueForm1()
 
-    is_league_season_active = True
+    is_league_season_active = False
 
     if source == 'els':
 
@@ -311,6 +197,65 @@ def show_league_form_1(request, source=None):
         form.fields["number_of_weeks_select"].initial = number_of_weeks_select
         form.fields["number_of_teams_conf_select"].initial = number_of_teams_conf_select
         form.fields["number_of_divisions_select"].initial = number_of_divisions_select
+
+        number_of_playoff_teams_del_value_list = []
+
+        #It is illegal to edit league settings to have fewer of a setting. I won't make those choices available
+        #except in the case of number of divisions
+
+        for this_choice_idx, this_choice_tuple in enumerate(form.fields['number_of_playoff_teams_select'].widget.choices):
+
+            this_tuple_value = int(this_choice_tuple[0])
+
+            if this_tuple_value == number_of_playoff_teams_select:
+                break
+
+            if this_tuple_value < number_of_playoff_teams_select:
+                number_of_playoff_teams_del_value_list.append(this_choice_tuple)
+
+        form.fields['number_of_playoff_teams_select'].widget.choices = [this_tuple for this_tuple in form.fields['number_of_playoff_teams_select'].widget.choices if this_tuple not in number_of_playoff_teams_del_value_list ]
+
+        number_of_weeks_del_value_list = []
+
+        for this_choice_idx, this_choice_tuple in enumerate(form.fields['number_of_weeks_select'].widget.choices):
+
+            this_tuple_value = int(this_choice_tuple[0])
+
+            if this_tuple_value == number_of_weeks_select:
+                break
+
+            if this_tuple_value < number_of_weeks_select:
+                number_of_weeks_del_value_list.append(this_choice_tuple)
+
+        form.fields['number_of_weeks_select'].widget.choices = [this_tuple for this_tuple in form.fields['number_of_weeks_select'].widget.choices if this_tuple not in number_of_weeks_del_value_list]
+
+        number_of_teams_conf_del_value_list = []
+
+        for this_choice_idx, this_choice_tuple in enumerate(form.fields['number_of_teams_conf_select'].widget.choices):
+
+            this_tuple_value = int(this_choice_tuple[0])
+
+            if this_tuple_value == number_of_teams_conf_select:
+                break
+
+            if this_tuple_value < number_of_teams_conf_select:
+                number_of_teams_conf_del_value_list.append(this_choice_tuple)
+
+        form.fields['number_of_teams_conf_select'].widget.choices = [this_tuple for this_tuple in form.fields['number_of_teams_conf_select'].widget.choices if this_tuple not in number_of_teams_conf_del_value_list]
+
+        # number_of_divisions_del_value_list = []
+        #
+        # for this_choice_idx, this_choice_tuple in enumerate(form.fields['number_of_divisions_select'].widget.choices):
+        #
+        #     this_tuple_value = int(this_choice_tuple[0])
+        #
+        #     if this_tuple_value == number_of_divisions_select:
+        #         break
+        #
+        #     if this_tuple_value < number_of_divisions_select:
+        #         number_of_divisions_del_value_list.append(this_choice_tuple)
+        #
+        # form.fields['number_of_divisions_select'].widget.choices = [this_tuple for this_tuple in form.fields['number_of_divisions_select'].widget.choices if this_tuple not in number_of_divisions_del_value_list]
 
         context['source_page_title'] = 'Edit League Settings'
         welcome_message = "League Settings: " + league_name
@@ -400,6 +345,7 @@ def process_create_league_form_1(request, edit_from_breadcrumb=None):
         source_page = request.POST['source_page_hidden']
         season_active = request.POST['season_active_hidden']
         league_id = int(request.POST['league_id_hidden'])
+        submit_button_clicked = request.POST['clicked_submit_button_hidden']
 
         #extract form information and pass it into the choose_teams page
         try:
@@ -426,6 +372,47 @@ def process_create_league_form_1(request, edit_from_breadcrumb=None):
         number_of_weeks_select = int(request.POST['number_of_weeks_select'])
         number_of_teams_conf_select = int(request.POST['number_of_teams_conf_select'])
         number_of_divisions_select = int(request.POST['number_of_divisions_select'])
+
+        if submit_button_clicked == "save_and_leave_button":
+
+            #save checkbox settings associated with League in db
+            injury_setting = True if injury_checkbox == 'on' else False
+            weather_setting = True if weather_checkbox == 'on' else False
+            female_setting = True if female_checkbox == 'on' else False
+            neutral_site_setting = True if neutral_site_checkbox == 'on' else False
+
+            league_obj = League.objects.using("xactly_dev").get(id=league_id)
+            league_obj.name = league_name
+
+            #create new abbreviation
+            league_name_parts_list = league_name.split()
+            league_name_abbrev_letter_list = []
+            league_name_abbrev_str = ""
+
+            if len(league_name_parts_list) >= 2:
+
+                for one_part in league_name_parts_list:
+                    league_name_abbrev_letter_list.append(one_part[0])
+
+                league_name_abbrev_str = ''.join(league_name_abbrev_letter_list)
+
+            else:
+
+                league_name_abbrev_str = league_name[:3]
+
+            league_name_abbrev_str = league_name_abbrev_str.upper()
+            league_obj.abbreviation = league_name_abbrev_str
+
+            #get checkbox settings
+            league_obj.weather_setting = weather_setting
+            league_obj.injury_setting = injury_setting
+            league_obj.female_setting = female_setting
+            league_obj.neutral_site_setting = neutral_site_setting
+
+            league_obj.save()
+
+            return HttpResponseRedirect('/jpartyfb/')
+
 
     if edit_from_breadcrumb == 'True':
 
@@ -463,13 +450,15 @@ def process_create_league_form_1(request, edit_from_breadcrumb=None):
 
     number_of_teams_per_division = number_of_teams_conf_select / number_of_divisions_select
 
-    team_html_str, city_nickname_to_city_id_dict = build_choose_teams_html(number_of_divisions_select, number_of_teams_conf_select, number_of_teams_per_division, source_page)
+    team_html_str, city_nickname_to_city_id_dict, conference_name_list = build_choose_teams_html(number_of_divisions_select, number_of_teams_conf_select, number_of_teams_per_division, source_page, league_id)
 
     context = {}
 
     welcome_message = "Choose Your Teams"
     context['league_id'] = league_id
     context['league_name'] = league_name
+    context['eastern_conference_name'] = conference_name_list[0]
+    context['western_conference_name'] = conference_name_list[1]
     context['injury_mode'] = injury_checkbox
     context['weather_mode'] = weather_checkbox
     context['female_mode'] = female_checkbox
@@ -694,10 +683,11 @@ def process_create_league_form_final(request):
         try:
             TeamCity.objects.using("xactly_dev").create(team_city_id=team_city_id, team_id=team_id,
                                                     city_id=this_team_city_id,
-                                                    first_season_id=-1,stadium_id=this_team_stadium_id)
+                                                    first_season_id=-1,stadium_id=this_team_stadium_id, league_id=league_id)
 
             db_commit_to_delete_id_dict['TeamCity'] = first_team_city_id
         except Exception:
+
             retract_prior_db_commits(db_commit_to_delete_id_dict)
             return HttpResponse(-5)
 
