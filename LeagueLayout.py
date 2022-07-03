@@ -988,8 +988,7 @@ def build_choose_teams_html(number_of_divisions_select, number_of_teams_conf_sel
             if this_team_division_id not in division_num_to_team_list_dict:
                 division_num_to_team_list_dict[this_team_division_id] = [this_team_city + " " + this_team_nickname]
             else:
-                division_num_to_team_list_dict[this_team_division_id].append(
-                    this_team_city + " " + this_team_nickname)
+                division_num_to_team_list_dict[this_team_division_id].append(this_team_city + " " + this_team_nickname)
 
             city_nickname_to_city_id_dict[this_team_nickname] = this_team_city_id
 
@@ -997,30 +996,23 @@ def build_choose_teams_html(number_of_divisions_select, number_of_teams_conf_sel
             conf_division_name_list.append("Division " + str(i))
 
         # get conference names ready for context
-        eastern_conference_name = conference_id_to_conference_name_dict[
-            min(conference_id_to_conference_name_dict.keys())]
-        western_conference_name = conference_id_to_conference_name_dict[
-            max(conference_id_to_conference_name_dict.keys())]
+        eastern_conference_name = conference_id_to_conference_name_dict[min(conference_id_to_conference_name_dict.keys())]
+        western_conference_name = conference_id_to_conference_name_dict[max(conference_id_to_conference_name_dict.keys())]
         conference_name_list = [eastern_conference_name, western_conference_name]
 
         # convert division ids to division nums
         smallest_division_id_value = min(division_num_to_team_list_dict.keys())
 
-        division_num_to_team_list_dict = {division_num - smallest_division_id_value + 1: team_list for
-                                          division_num, team_list in division_num_to_team_list_dict.items()}
+        division_num_to_team_list_dict = {division_num - smallest_division_id_value + 1: team_list for division_num, team_list in division_num_to_team_list_dict.items()}
 
         # do same for division_num_to_division_name_dict
-        division_num_to_division_name_dict = {division_num - smallest_division_id_value + 1: division_name for
-                                              division_num, division_name in
-                                              division_id_to_division_name_dict.items()}
+        division_num_to_division_name_dict = {division_num - smallest_division_id_value + 1: division_name for division_num, division_name in division_id_to_division_name_dict.items()}
 
         previous_num_divisions_per_conference = len(division_num_to_division_name_dict.keys()) / 2
         previous_num_teams_per_conference = len(team_city_obj_tuple) / 2
 
         # if we want to expand the number of divisions, we need to add dummy division names and teams to those divisions
-        division_num_to_division_name_dict, division_num_to_team_list_dict = add_new_divisions_and_teams(
-            division_num_to_division_name_dict, division_num_to_team_list_dict, number_of_divisions_select,
-            number_of_teams_conf_select, previous_num_divisions_per_conference, previous_num_teams_per_conference)
+        division_num_to_division_name_dict, division_num_to_team_list_dict = add_new_divisions_and_teams(division_num_to_division_name_dict, division_num_to_team_list_dict, number_of_divisions_select,number_of_teams_conf_select, previous_num_divisions_per_conference, previous_num_teams_per_conference)
 
         # package the division names into team_html_str below
         division_name_lol = []
@@ -1045,19 +1037,13 @@ def build_choose_teams_html(number_of_divisions_select, number_of_teams_conf_sel
             western_conference_division_name = conf_division_list[1]
 
             # print out division header html - first eastern division
-            team_html_str += "<td width='50%' align='center' style='background-color: blue;' id='td_division_eastern_" + str(
-                conf_division_idx) + "' class='td_division'>"
-            team_html_str += "<input type='text' id='Eastern_division_" + str(
-                conf_division_idx) + "' name='eastern_division_" + str(
-                conf_division_idx) + "' class='division' maxlength='35' value='" + eastern_conference_division_name + "' style='width: 220px; border: none; background: transparent; text-align:center; font-weight: bold; color: white;' />"
+            team_html_str += "<td width='50%' align='center' style='background-color: blue;' id='td_division_eastern_" + str(conf_division_idx) + "' class='td_division'>"
+            team_html_str += "<input type='text' id='Eastern_division_" + str(conf_division_idx) + "' name='eastern_division_" + str(conf_division_idx) + "' class='division' maxlength='35' value='" + eastern_conference_division_name + "' style='width: 220px; border: none; background: transparent; text-align:center; font-weight: bold; color: white;' />"
             team_html_str += "</td>"
 
             # now western division
-            team_html_str += "<td width='50%' align='center' style='background-color: red;' id='td_division_western_" + str(
-                conf_division_idx) + "' class='td_division'>"
-            team_html_str += "<input type='text' id='Western_division_" + str(
-                conf_division_idx) + "' name='western_division_" + str(
-                conf_division_idx) + "' class='division' maxlength='35' value='" + western_conference_division_name + "' style='width: 220px; border: none; background: transparent; text-align:center; font-weight: bold; color: white;' />"
+            team_html_str += "<td width='50%' align='center' style='background-color: red;' id='td_division_western_" + str(conf_division_idx) + "' class='td_division'>"
+            team_html_str += "<input type='text' id='Western_division_" + str(conf_division_idx) + "' name='western_division_" + str(conf_division_idx) + "' class='division' maxlength='35' value='" + western_conference_division_name + "' style='width: 220px; border: none; background: transparent; text-align:center; font-weight: bold; color: white;' />"
             team_html_str += "</td>"
 
             # close division html row
@@ -1089,14 +1075,8 @@ def build_choose_teams_html(number_of_divisions_select, number_of_teams_conf_sel
 
                         team_html_str += "<tr style='background-color: " + this_team_row_color + ";'>"
 
-                        team_html_str += "<td width='50%' align='center' id='td_team_" + str(
-                            this_team_div_idx) + "_" + conference_str + "_division_" + str(
-                            conf_division_idx) + "' class='td_team'>"
-                        team_html_str += "<input type='text' id='" + conference_str + "_division_" + str(
-                            conf_division_idx) + "_team_" + str(
-                            this_team_div_idx) + "' name='" + conference_str + "_division_" + str(
-                            conf_division_idx) + "_team_" + str(
-                            this_team_div_idx) + "' class='team' maxlength='35' value='" + this_team_name + "' style='width: 220px; border: none; background: transparent; text-align:center; font-weight: bold;' />"
+                        team_html_str += "<td width='50%' align='center' id='td_team_" + str(this_team_div_idx) + "_" + conference_str + "_division_" + str(conf_division_idx) + "' class='td_team'>"
+                        team_html_str += "<input type='text' id='" + conference_str + "_division_" + str(conf_division_idx) + "_team_" + str(this_team_div_idx) + "' name='" + conference_str + "_division_" + str(conf_division_idx) + "_team_" + str(this_team_div_idx) + "' class='team' maxlength='35' value='" + this_team_name + "' style='width: 220px; border: none; background: transparent; text-align:center; font-weight: bold;' />"
                         team_html_str += "</td></tr>"
 
                     team_html_str += "</table></td>"
@@ -1113,60 +1093,40 @@ def build_choose_teams_html(number_of_divisions_select, number_of_teams_conf_sel
 
         # if user wants 28, 30 or 32 teams, then we will need to provide dummy teams, since we only have 24 teams
         # by default
-        if number_of_teams_conf_select == 14:
-            # add on teams to last division
-            division_num_to_team_list_dict[number_of_divisions_select * 2].append(["Add Team Name"] * 4)
-            division_num_to_team_list_dict[number_of_divisions_select * 2] = [item for sublist in
-                                                                              division_num_to_team_list_dict[
-                                                                                  number_of_divisions_select * 2]
-                                                                              for item in sublist]
-
-        if number_of_teams_conf_select == 15:
-            # add 1 new team to second to last division and add 5 new teams to last division
-            division_num_to_team_list_dict[number_of_divisions_select * 2 - 1].append(["Add Team Name"])
-            division_num_to_team_list_dict[number_of_divisions_select * 2 - 1] = [item for sublist in
-                                                                                  division_num_to_team_list_dict[
-                                                                                      number_of_divisions_select * 2 - 1]
-                                                                                  for item in sublist]
-            division_num_to_team_list_dict[number_of_divisions_select * 2].append(["Add Team Name"] * 5)
-            division_num_to_team_list_dict[number_of_divisions_select * 2] = [item for sublist in
-                                                                              division_num_to_team_list_dict[
-                                                                                  number_of_divisions_select * 2]
-                                                                              for item in sublist]
-
-        if number_of_teams_conf_select == 16:
-
-            if number_of_divisions_select == 2:
-                division_num_to_team_list_dict[number_of_divisions_select * 2].append(["Add Team Name"] * 8)
-                division_num_to_team_list_dict[number_of_divisions_select * 2] = [item for sublist in
-                                                                                  division_num_to_team_list_dict[
-                                                                                      number_of_divisions_select * 2]
-                                                                                  for item in sublist]
-
-            if number_of_divisions_select == 4:
-                division_num_to_team_list_dict[number_of_divisions_select * 2 - 1].append(["Add Team Name"] * 4)
-                division_num_to_team_list_dict[number_of_divisions_select * 2].append(["Add Team Name"] * 4)
-                division_num_to_team_list_dict[number_of_divisions_select * 2 - 1] = [item for sublist in
-                                                                                      division_num_to_team_list_dict[
-                                                                                          number_of_divisions_select * 2 - 1]
-                                                                                      for item in sublist]
-                division_num_to_team_list_dict[number_of_divisions_select * 2] = [item for sublist in
-                                                                                  division_num_to_team_list_dict[
-                                                                                      number_of_divisions_select * 2]
-                                                                                  for item in sublist]
+        # if number_of_teams_conf_select == 14:
+        #     # add on teams to last division
+        #     division_num_to_team_list_dict[number_of_divisions_select * 2].append(["Add Team Name"] * 4)
+        #     division_num_to_team_list_dict[number_of_divisions_select * 2] = [item for sublist in division_num_to_team_list_dict[number_of_divisions_select * 2] for item in sublist]
+        #
+        # if number_of_teams_conf_select == 15:
+        #     # add 1 new team to second to last division and add 5 new teams to last division
+        #     division_num_to_team_list_dict[number_of_divisions_select * 2 - 1].append(["Add Team Name"])
+        #     division_num_to_team_list_dict[number_of_divisions_select * 2 - 1] = [item for sublist in division_num_to_team_list_dict[number_of_divisions_select * 2 - 1] for item in sublist]
+        #     division_num_to_team_list_dict[number_of_divisions_select * 2].append(["Add Team Name"] * 5)
+        #     division_num_to_team_list_dict[number_of_divisions_select * 2] = [item for sublist in division_num_to_team_list_dict[number_of_divisions_select * 2] for item in sublist]
+        #
+        # if number_of_teams_conf_select == 16:
+        #
+        #     if number_of_divisions_select == 2:
+        #         division_num_to_team_list_dict[number_of_divisions_select * 2].append(["Add Team Name"] * 8)
+        #         division_num_to_team_list_dict[number_of_divisions_select * 2] = [item for sublist in division_num_to_team_list_dict[number_of_divisions_select * 2] for item in sublist]
+        #
+        #     if number_of_divisions_select == 4:
+        #         division_num_to_team_list_dict[number_of_divisions_select * 2 - 1].append(["Add Team Name"] * 4)
+        #         division_num_to_team_list_dict[number_of_divisions_select * 2].append(["Add Team Name"] * 4)
+        #         division_num_to_team_list_dict[number_of_divisions_select * 2 - 1] = [item for sublist in division_num_to_team_list_dict[number_of_divisions_select * 2 - 1] for item in sublist]
+        #         division_num_to_team_list_dict[number_of_divisions_select * 2] = [item for sublist in division_num_to_team_list_dict[number_of_divisions_select * 2] for item in sublist]
 
         division_counter = 1
 
-        for this_default_team in DefaultTeams.objects.using("xactly_dev").filter(
-                id__lte=(number_of_teams_conf_select * 2)).order_by("id"):
+        for this_default_team in DefaultTeams.objects.using("xactly_dev").filter(id__lte=(number_of_teams_conf_select * 2)).order_by("id"):
             this_default_team_nickname = this_default_team.nickname
             this_default_team_city_name = this_default_team.city.city_name
             this_default_team_city_id = this_default_team.city.city_id
 
             city_nickname_to_city_id_dict[this_default_team_nickname] = this_default_team_city_id
 
-            division_num_to_team_list_dict[division_counter].append(
-                this_default_team_city_name + " " + this_default_team_nickname)
+            division_num_to_team_list_dict[division_counter].append(this_default_team_city_name + " " + this_default_team_nickname)
 
             if len(division_num_to_team_list_dict[division_counter]) == number_of_teams_per_division:
                 division_counter += 1
@@ -1184,19 +1144,13 @@ def build_choose_teams_html(number_of_divisions_select, number_of_teams_conf_sel
             team_html_str += "<table cellpadding='5' width='100%' border='1'><tr>"
 
             # print out division header html - first easter division
-            team_html_str += "<td width='50%' align='center' style='background-color: blue;' id='td_division_eastern_" + str(
-                conf_division_idx) + "' class='td_division'>"
-            team_html_str += "<input type='text' id='Eastern_division_" + str(
-                conf_division_idx) + "' name='eastern_division_" + str(
-                conf_division_idx) + "' class='division' maxlength='35' value='" + "Eastern " + conf_division_name + "' style='width: 220px; border: none; background: transparent; text-align:center; font-weight: bold; color: white;' />"
+            team_html_str += "<td width='50%' align='center' style='background-color: blue;' id='td_division_eastern_" + str(conf_division_idx) + "' class='td_division'>"
+            team_html_str += "<input type='text' id='Eastern_division_" + str(conf_division_idx) + "' name='eastern_division_" + str(conf_division_idx) + "' class='division' maxlength='35' value='" + "Eastern " + conf_division_name + "' style='width: 220px; border: none; background: transparent; text-align:center; font-weight: bold; color: white;' />"
             team_html_str += "</td>"
 
             # now western division
-            team_html_str += "<td width='50%' align='center' style='background-color: red;' id='td_division_western_" + str(
-                conf_division_idx) + "' class='td_division'>"
-            team_html_str += "<input type='text' id='Western_division_" + str(
-                conf_division_idx) + "' name='western_division_" + str(
-                conf_division_idx) + "' class='division' maxlength='35' value='" + "Western " + conf_division_name + "' style='width: 220px; border: none; background: transparent; text-align:center; font-weight: bold; color: white;' />"
+            team_html_str += "<td width='50%' align='center' style='background-color: red;' id='td_division_western_" + str(conf_division_idx) + "' class='td_division'>"
+            team_html_str += "<input type='text' id='Western_division_" + str(conf_division_idx) + "' name='western_division_" + str(conf_division_idx) + "' class='division' maxlength='35' value='" + "Western " + conf_division_name + "' style='width: 220px; border: none; background: transparent; text-align:center; font-weight: bold; color: white;' />"
             team_html_str += "</td>"
 
             # close division html row
@@ -1228,14 +1182,8 @@ def build_choose_teams_html(number_of_divisions_select, number_of_teams_conf_sel
 
                         team_html_str += "<tr style='background-color: " + this_team_row_color + ";'>"
 
-                        team_html_str += "<td width='50%' align='center' id='td_team_" + str(
-                            this_team_div_idx) + "_" + conference_str + "_division_" + str(
-                            conf_division_idx) + "' class='td_team'>"
-                        team_html_str += "<input type='text' id='" + conference_str + "_division_" + str(
-                            conf_division_idx) + "_team_" + str(
-                            this_team_div_idx) + "' name='" + conference_str + "_division_" + str(
-                            conf_division_idx) + "_team_" + str(
-                            this_team_div_idx) + "' class='team' maxlength='35' value='" + this_team_name + "' style='width: 220px; border: none; background: transparent; text-align:center; font-weight: bold;' />"
+                        team_html_str += "<td width='50%' align='center' id='td_team_" + str(this_team_div_idx) + "_" + conference_str + "_division_" + str(conf_division_idx) + "' class='td_team'>"
+                        team_html_str += "<input type='text' id='" + conference_str + "_division_" + str(conf_division_idx) + "_team_" + str(this_team_div_idx) + "' name='" + conference_str + "_division_" + str(conf_division_idx) + "_team_" + str(this_team_div_idx) + "' class='team' maxlength='35' value='" + this_team_name + "' style='width: 220px; border: none; background: transparent; text-align:center; font-weight: bold;' />"
                         team_html_str += "</td></tr>"
 
                     team_html_str += "</table></td>"
