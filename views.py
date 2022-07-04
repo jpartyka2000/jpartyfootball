@@ -241,20 +241,6 @@ def show_league_form_1(request, source=None):
 
         form.fields['number_of_teams_conf_select'].widget.choices = [this_tuple for this_tuple in form.fields['number_of_teams_conf_select'].widget.choices if this_tuple not in number_of_teams_conf_del_value_list]
 
-        # number_of_divisions_del_value_list = []
-        #
-        # for this_choice_idx, this_choice_tuple in enumerate(form.fields['number_of_divisions_select'].widget.choices):
-        #
-        #     this_tuple_value = int(this_choice_tuple[0])
-        #
-        #     if this_tuple_value == number_of_divisions_select:
-        #         break
-        #
-        #     if this_tuple_value < number_of_divisions_select:
-        #         number_of_divisions_del_value_list.append(this_choice_tuple)
-        #
-        # form.fields['number_of_divisions_select'].widget.choices = [this_tuple for this_tuple in form.fields['number_of_divisions_select'].widget.choices if this_tuple not in number_of_divisions_del_value_list]
-
         context['source_page_title'] = 'Edit League Settings'
         welcome_message = "League Settings: " + league_name
 
@@ -448,7 +434,7 @@ def process_create_league_form_1(request, edit_from_breadcrumb=None):
 
     number_of_teams_per_division = number_of_teams_conf_select / number_of_divisions_select
 
-    team_html_str, city_nickname_to_city_id_dict, conference_name_list = build_choose_teams_html(number_of_divisions_select, number_of_teams_conf_select, number_of_teams_per_division, source_page, league_id)
+    team_html_str, city_nickname_to_city_id_dict, conference_name_list, tdid_to_team_id_dict = build_choose_teams_html(number_of_divisions_select, number_of_teams_conf_select, number_of_teams_per_division, source_page, league_id)
 
     context = {}
 
@@ -470,6 +456,7 @@ def process_create_league_form_1(request, edit_from_breadcrumb=None):
     context['number_of_divisions_conf'] = number_of_divisions_select
     context['number_of_teams_per_division'] = number_of_teams_per_division
     context['city_nickname_to_city_id_dict'] = city_nickname_to_city_id_dict
+    context['tdid_to_team_id_dict'] = tdid_to_team_id_dict
     context['team_html_str'] = team_html_str
 
     return render(request, 'jpartyfb/choose_teams.html', context)
@@ -519,6 +506,19 @@ def process_create_league_form_final(request):
 
     city_nickname_to_city_id_dict_str = request.POST['city_nickname_to_city_id_dict']
     city_nickname_to_city_id_dict = json.loads(city_nickname_to_city_id_dict_str)
+
+    source_page_hidden = request.POST['source_page_hidden']
+    league_id_hidden = int(request.POST['league_id_hidden'])
+
+    #these are data structures used to update Team rows with the new division and conference id values
+    team_id_to_conference_name_dict_str = request.POST['team_id_to_conference_dict']
+    team_id_to_conference_name_dict = json.loads(team_id_to_conference_name_dict_str)
+
+    team_id_to_division_name_dict_str = request.POST['team_id_to_division_dict']
+    team_id_to_division_name_dict = json.loads(team_id_to_division_name_dict_str)
+
+    team_id_to_team_name_dict_str = request.POST['team_id_to_team_name_dict']
+    team_id_to_team_name_dict = json.loads(team_id_to_team_name_dict_str)
 
     #create league abbrevation. If the league has >= 2 words, then use the first letter of each word
     #if it has only one word, then use the first 3 letters of that word
@@ -619,100 +619,174 @@ def process_create_league_form_final(request):
 
         division_id += 1
 
-    # next insert team rows for this league
-    try:
-        team_id = int(
-            Team.objects.using('xactly_dev').latest('id').id) + 1
-    except Exception:
-        team_id = 1
+    #we will only create new rows for Team, TeamCity, and Season when creating a new league, otherwise we update rows
+    if source_page_hidden == 'cnl':
 
-    first_team_id = team_id
+        # next insert team rows for this league
+        try:
+            team_id = int(
+                Team.objects.using('xactly_dev').latest('id').id) + 1
+        except Exception:
+            team_id = 1
 
-    #also insert team_city rows for this league
-    try:
-        team_city_id = int(
-            TeamCity.objects.using('xactly_dev').latest('team_city_id').team_city_id) + 1
-    except Exception:
-        team_city_id = 1
+        first_team_id = team_id
 
-    first_team_city_id = team_city_id
+        #also insert team_city rows for this league
+        try:
+            team_city_id = int(
+                TeamCity.objects.using('xactly_dev').latest('team_city_id').team_city_id) + 1
+        except Exception:
+            team_city_id = 1
 
-    team_id_to_city_stadium_id_list_dict = {}
+        first_team_city_id = team_city_id
 
-    #we will need this for player table insertions below
-    team_name_to_team_id_dict = {}
+        team_id_to_city_stadium_id_list_dict = {}
 
-    player_name_to_combined_attr_score_dict = {}
+        #we will need this for player table insertions below
+        team_name_to_team_id_dict = {}
 
-    for team_idx, this_team_name in enumerate(team_name_list):
+        player_name_to_combined_attr_score_dict = {}
 
-        team_name_to_team_id_dict[this_team_name] = team_id
+        for team_idx, this_team_name in enumerate(team_name_list):
 
-        this_team_conference_name = team_to_conference_dict[this_team_name]
-        this_team_conference_id = conference_name_to_id_dict[this_team_conference_name]
-        this_team_division_name = team_to_division_dict[this_team_name]
-        this_team_division_id = division_name_to_id_dict[this_team_division_name]
+            team_name_to_team_id_dict[this_team_name] = team_id
 
-        this_team_name_parts_list = this_team_name.split()
+            this_team_conference_name = team_to_conference_dict[this_team_name]
+            this_team_conference_id = conference_name_to_id_dict[this_team_conference_name]
+            this_team_division_name = team_to_division_dict[this_team_name]
+            this_team_division_id = division_name_to_id_dict[this_team_division_name]
 
-        if this_team_name_parts_list[0] == "Dallas":
-            this_team_nickname = this_team_name_parts_list[1] + " " + this_team_name_parts_list[2]
-        else:
-            this_team_nickname = this_team_name_parts_list[-1]
+            this_team_name_parts_list = this_team_name.split()
 
-        this_team_city_id = city_nickname_to_city_id_dict[this_team_nickname]
+            if this_team_name_parts_list[0] == "Dallas":
+                this_team_nickname = this_team_name_parts_list[1] + " " + this_team_name_parts_list[2]
+            else:
+                this_team_nickname = this_team_name_parts_list[-1]
 
-        stadium_row = Stadium.objects.using("xactly_dev").get(city_id=this_team_city_id)
-        this_team_stadium_id = stadium_row.stadium_id
+            this_team_city_id = city_nickname_to_city_id_dict[this_team_nickname]
 
-        team_id_to_city_stadium_id_list_dict[team_id] = [this_team_city_id, this_team_stadium_id]
+            stadium_row = Stadium.objects.using("xactly_dev").get(city_id=this_team_city_id)
+            this_team_stadium_id = stadium_row.stadium_id
+
+            team_id_to_city_stadium_id_list_dict[team_id] = [this_team_city_id, this_team_stadium_id]
+
+            try:
+                Team.objects.using("xactly_dev").create(id=team_id, nickname=this_team_nickname,
+                                                        first_season_id=-1, current_season_wins=0, current_season_losses=0,
+                                                        stadium_id=this_team_stadium_id, conference_id=this_team_conference_id,
+                                                        division_id=this_team_division_id,league_id=league_id)
+
+                db_commit_to_delete_id_dict['Team'] = first_team_id
+            except Exception:
+                retract_prior_db_commits(db_commit_to_delete_id_dict)
+                return HttpResponse(-4)
+
+            try:
+                TeamCity.objects.using("xactly_dev").create(team_city_id=team_city_id, team_id=team_id,
+                                                        city_id=this_team_city_id,
+                                                        first_season_id=-1,stadium_id=this_team_stadium_id, league_id=league_id)
+
+                db_commit_to_delete_id_dict['TeamCity'] = first_team_city_id
+            except Exception:
+
+                retract_prior_db_commits(db_commit_to_delete_id_dict)
+                return HttpResponse(-5)
+
+            team_id += 1
+            team_city_id += 1
+
+        #before creating players, I want to create the db row for season 1 of the new league. However, note that
+        #the season will be inactive until the draft occurs
+        #we will only do this when creating a new league - we will update the season if editing the league
 
         try:
-            Team.objects.using("xactly_dev").create(id=team_id, nickname=this_team_nickname,
-                                                    first_season_id=-1, current_season_wins=0, current_season_losses=0,
-                                                    stadium_id=this_team_stadium_id, conference_id=this_team_conference_id,
-                                                    division_id=this_team_division_id,league_id=league_id)
-
-            db_commit_to_delete_id_dict['Team'] = first_team_id
+            season_id = int(Season.objects.using('xactly_dev').latest('id').id) + 1
         except Exception:
-            retract_prior_db_commits(db_commit_to_delete_id_dict)
-            return HttpResponse(-4)
+            season_id = 1
 
         try:
-            TeamCity.objects.using("xactly_dev").create(team_city_id=team_city_id, team_id=team_id,
-                                                    city_id=this_team_city_id,
-                                                    first_season_id=-1,stadium_id=this_team_stadium_id, league_id=league_id)
+            Season.objects.using("xactly_dev").create(id=season_id, start_time=None,
+                                                        end_time=None,
+                                                        season_year=1, league_id=league_id)
 
-            db_commit_to_delete_id_dict['TeamCity'] = first_team_city_id
+            db_commit_to_delete_id_dict['Season'] = season_id
+
         except Exception:
+            return HttpResponse(-9)
 
-            retract_prior_db_commits(db_commit_to_delete_id_dict)
-            return HttpResponse(-5)
+    #some rows will be deleted, others will be updated to support the new league id value
+    if source_page_hidden == 'els':
 
-        team_id += 1
-        team_city_id += 1
+        #update all TeamCity rows, the single Season row,
+        try:
+            TeamCity.objects.using("xactly_dev").filter(league_id=league_id_hidden).update(league_id=league_id)
+        except Exception:
+            pass
 
-    #before creating players, I want to create the db row for season 1 of the new league. However, note that
-    #the season will be inactive until the draft occurs
-    try:
-        season_id = int(Season.objects.using('xactly_dev').latest('id').id) + 1
-    except Exception:
-        season_id = 1
+        try:
+            Season.objects.using("xactly_dev").filter(league_id=league_id_hidden).update(league_id=league_id)
+        except Exception:
+            pass
 
-    try:
-        Season.objects.using("xactly_dev").create(id=season_id, start_time=None,
-                                                    end_time=None,
-                                                    season_year=1, league_id=league_id)
+        try:
 
-        db_commit_to_delete_id_dict['Season'] = season_id
+            #for Team, we have to update the division_id, conference_id and league_id.
+            for this_team_id, this_conference_name in team_id_to_conference_name_dict.items():
 
-    except Exception:
-        return HttpResponse(-9)
+                this_team_new_conference_id = conference_name_to_id_dict[this_conference_name]
+
+                this_team_division_name = team_id_to_division_name_dict[this_team_id]
+                this_team_new_division_id = division_name_to_id_dict[this_team_division_name]
+
+                #get new team nickname if any
+                this_team_new_name = team_id_to_team_name_dict[this_team_id]
+                this_team_name_parts_list = this_team_new_name.split()
+
+                if this_team_name_parts_list[0] == "Dallas":
+                    this_team_nickname = this_team_name_parts_list[1] + " " + this_team_name_parts_list[2]
+                else:
+                    this_team_nickname = this_team_name_parts_list[-1]
+
+                try:
+                    Team.objects.using("xactly_dev").filter(id=this_team_id).update(nickname=this_team_nickname, conference_id=this_team_new_conference_id, division_id=this_team_new_division_id, league_id=league_id)
+                except Exception as e:
+                    return HttpResponse(str(e))
+        except Exception as d:
+            return HttpResponse(str(d))
+
+        #return HttpResponse(1)
+
+        #we need to update Player with the new league_id value
+        try:
+            Player.objects.using("xactly_dev").filter(league_id=league_id_hidden).update(league_id=league_id)
+        except Exception:
+            pass
+
+        #we will go backwards from how these rows were originally committed into the db to avoid fk conflicts
+        #these are the old league, division and conference rows
+        try:
+            Division.objects.using("xactly_dev").filter(league_id=league_id_hidden).delete()
+        except Exception:
+            pass
+
+        try:
+            Conference.objects.using("xactly_dev").filter(league_id=league_id_hidden).delete()
+        except Exception:
+            pass
+
+        try:
+            League.objects.using("xactly_dev").filter(league_id=league_id_hidden).delete()
+        except Exception:
+            pass
+
 
     #create all player info, including career arcs
-    status_code, exception_str, db_commit_to_delete_id_dict = create_players(team_name_list, team_name_to_team_id_dict, league_id, female_setting, db_commit_to_delete_id_dict)
+    if source_page_hidden == 'cnl':
+        status_code, exception_str, db_commit_to_delete_id_dict = create_players(team_name_list, team_name_to_team_id_dict, league_id, female_setting, db_commit_to_delete_id_dict)
 
-    if exception_str != "":
-        retract_prior_db_commits(db_commit_to_delete_id_dict)
+        if exception_str != "":
+            retract_prior_db_commits(db_commit_to_delete_id_dict)
+    else:
+        status_code = 1
 
     return HttpResponse(status_code)
