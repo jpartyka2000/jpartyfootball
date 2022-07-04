@@ -99,6 +99,15 @@
 
      }
 
+     tdid_to_team_id_dict = {
+         {% for this_tdid, this_team_id in tdid_to_team_id_dict.items %}
+            {% if not forloop.first %}
+                 ,
+            {% endif %}
+            '{{ this_tdid }}':'{{ this_team_id }}'
+         {% endfor %}
+     }
+
     var clicked_team_td_id_str = ""
     var clicked_team_td_orig_color_str = ""
 
@@ -185,7 +194,10 @@
         var division_geoname_to_username_dict = {}
         var division_to_conference_dict = {}
         var team_to_division_dict = {}
+        var team_id_to_division_dict = {}
         var team_to_conference_dict = {}
+        var team_id_to_conference_dict = {}
+        var team_id_to_team_name_dict = {}
 
         for (var i = 0; i < conference_element_list.length; i++) {
             var this_conference_element = conference_element_list[i];
@@ -218,10 +230,10 @@
 
         for (var i = 0; i < team_element_list.length; i++) {
             var this_team_element = team_element_list[i];
-            var this_team_id = this_team_element.attr("id")
+            var this_team_tdid = this_team_element.attr("id")
             var this_team_name = this_team_element.val()
 
-            this_team_part_list = this_team_id.split("_")
+            this_team_part_list = this_team_tdid.split("_")
 
             this_team_conference_geoname = this_team_part_list[0]
             team_to_conference_dict[this_team_name] = conference_geoname_to_username_dict[this_team_conference_geoname]
@@ -230,13 +242,21 @@
 
             team_to_division_dict[this_team_name] = division_geoname_to_username_dict[this_team_division_geoname]
 
-        }//end for
+            //create team_id_to_division_dict and team_id_to_conference_dict mappings
+            var this_team_id = tdid_to_team_id_dict[this_team_tdid]
+            team_id_to_division_dict[this_team_id] = division_geoname_to_username_dict[this_team_division_geoname]
+            team_id_to_conference_dict[this_team_id] = conference_geoname_to_username_dict[this_team_conference_geoname]
 
+            team_id_to_team_name_dict[this_team_id] = this_team_name
+
+        }//end for
 
         //next, we will push the form data on this page to the backend via an ajax call
         var formData = new FormData()
 
         formData.append("league_name_hidden", $("#league_name_hidden").val())
+        formData.append("league_id_hidden", $("#league_id_hidden").val())
+        formData.append("source_page_hidden", $("#source_page_hidden").val())
         formData.append("injury_hidden", $("#injury_hidden").val())
         formData.append("weather_hidden", $("#weather_hidden").val())
         formData.append("female_hidden", $("#female_hidden").val())
@@ -251,12 +271,16 @@
         formData.append("division_name_list", JSON.stringify(division_name_list))
         formData.append("team_name_list", JSON.stringify(team_name_list))
 
+        formData.append("team_id_to_division_dict", JSON.stringify(team_id_to_division_dict))
+        formData.append("team_id_to_conference_dict", JSON.stringify(team_id_to_conference_dict))
+        formData.append("team_id_to_team_name_dict", JSON.stringify(team_id_to_team_name_dict))
+
         formData.append("division_to_conference_dict", JSON.stringify(division_to_conference_dict))
         formData.append("team_to_division_dict", JSON.stringify(team_to_division_dict))
         formData.append("team_to_conference_dict", JSON.stringify(team_to_conference_dict))
         formData.append("city_nickname_to_city_id_dict", JSON.stringify(city_nickname_to_city_id_dict))
 
-        //alert(JSON.stringify(city_nickname_to_city_id_dict))
+        //alert(JSON.stringify(team_id_to_team_name_dict))
         //return
 
         $("#loading_image").show()
@@ -271,9 +295,9 @@
             cache: false,
             success: function(data) {
 
-               //alert(JSON.stringify(data))
+               alert(JSON.stringify(data))
                $("#loading_image").hide()
-               //return
+               return
 
                if (data == "-1") {
                    alert("Error in trying to save to League db table")
@@ -364,6 +388,13 @@
 
                 //set original background color of first clicked td
                 $("#" + clicked_team_td_id_str).css("background-color", clicked_team_td_orig_color_str);
+
+                //get tdids of switched teams and switch their team_ids, but only if editing a league
+                if ($("#source_page_hidden").val() == "els") {
+                    var clicked_td_1_team_id = tdid_to_team_id_dict[clicked_team_td_id_str]
+                    tdid_to_team_id_dict[clicked_team_td_id_str] = tdid_to_team_id_dict[this_clicked_td_id]
+                    tdid_to_team_id_dict[this_clicked_td_id] = clicked_td_1_team_id
+                }
 
             }//end if
 
