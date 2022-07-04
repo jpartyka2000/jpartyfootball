@@ -952,8 +952,12 @@ def build_choose_teams_html(number_of_divisions_select, number_of_teams_conf_sel
                             source_page, league_id):
 
     division_num_to_team_list_dict = {}
+    division_num_to_teamid_list_dict = {}
     city_nickname_to_city_id_dict = {}
     conf_division_name_list = []
+
+    # create mapping of td_ids to team_ids - this will be necessary to save league settings to db correctly
+    tdid_to_team_id_dict = {}
 
     team_html_str = ""
     color_to_rgb_list_dict = {'blue': ['#CCE5FF', '#99CCFF'], 'red': ['#FFCCCC', '#FFAAAA']}
@@ -972,6 +976,7 @@ def build_choose_teams_html(number_of_divisions_select, number_of_teams_conf_sel
         for this_team_city_obj in team_city_obj_tuple:
 
             this_team_nickname = this_team_city_obj.team.nickname
+            this_team_id = this_team_city_obj.team_id
             this_team_city = this_team_city_obj.city.city_name
             this_team_city_id = this_team_city_obj.city_id
             this_team_conference_id = this_team_city_obj.team.conference_id
@@ -990,6 +995,11 @@ def build_choose_teams_html(number_of_divisions_select, number_of_teams_conf_sel
             else:
                 division_num_to_team_list_dict[this_team_division_id].append(this_team_city + " " + this_team_nickname)
 
+            if this_team_division_id not in division_num_to_teamid_list_dict:
+                division_num_to_teamid_list_dict[this_team_division_id] = [this_team_id]
+            else:
+                division_num_to_teamid_list_dict[this_team_division_id].append(this_team_id)
+
             city_nickname_to_city_id_dict[this_team_nickname] = this_team_city_id
 
         for i in range(1, number_of_divisions_select + 1):
@@ -1000,13 +1010,16 @@ def build_choose_teams_html(number_of_divisions_select, number_of_teams_conf_sel
         western_conference_name = conference_id_to_conference_name_dict[max(conference_id_to_conference_name_dict.keys())]
         conference_name_list = [eastern_conference_name, western_conference_name]
 
-        # convert division ids to division nums
+        # convert division ids to division nums in division_num_to_team_list_dict
         smallest_division_id_value = min(division_num_to_team_list_dict.keys())
 
         division_num_to_team_list_dict = {division_num - smallest_division_id_value + 1: team_list for division_num, team_list in division_num_to_team_list_dict.items()}
 
         # do same for division_num_to_division_name_dict
         division_num_to_division_name_dict = {division_num - smallest_division_id_value + 1: division_name for division_num, division_name in division_id_to_division_name_dict.items()}
+
+        # do same for division_num_to_teamid_list_dict
+        division_num_to_teamid_list_dict = {division_num - smallest_division_id_value + 1: teamid_list for division_num, teamid_list in division_num_to_teamid_list_dict.items()}
 
         previous_num_divisions_per_conference = len(division_num_to_division_name_dict.keys()) / 2
         previous_num_teams_per_conference = len(team_city_obj_tuple) / 2
@@ -1057,6 +1070,8 @@ def build_choose_teams_html(number_of_divisions_select, number_of_teams_conf_sel
 
                 if actual_division_number == conf_division_idx or actual_division_number == conf_division_idx + number_of_divisions_select:
 
+                    this_division_num_team_id_list = division_num_to_teamid_list_dict[actual_division_number]
+
                     if actual_division_number < conf_division_idx * 2:
                         team_html_str += "<tr>"
                         color_list = color_to_rgb_list_dict["blue"]
@@ -1068,6 +1083,8 @@ def build_choose_teams_html(number_of_divisions_select, number_of_teams_conf_sel
                     team_html_str += "<td><table align='center' style='background-color: white;' width='100%'>"
                     for this_team_div_idx, this_team_name in enumerate(division_team_list, 1):
 
+                        this_team_id = this_division_num_team_id_list[this_team_div_idx - 1]
+
                         if this_team_div_idx % 2 == 1:
                             this_team_row_color = color_list[0]
                         else:
@@ -1078,6 +1095,11 @@ def build_choose_teams_html(number_of_divisions_select, number_of_teams_conf_sel
                         team_html_str += "<td width='50%' align='center' id='td_team_" + str(this_team_div_idx) + "_" + conference_str + "_division_" + str(conf_division_idx) + "' class='td_team'>"
                         team_html_str += "<input type='text' id='" + conference_str + "_division_" + str(conf_division_idx) + "_team_" + str(this_team_div_idx) + "' name='" + conference_str + "_division_" + str(conf_division_idx) + "_team_" + str(this_team_div_idx) + "' class='team' maxlength='35' value='" + this_team_name + "' style='width: 220px; border: none; background: transparent; text-align:center; font-weight: bold;' />"
                         team_html_str += "</td></tr>"
+
+                        this_team_tdid_str = conference_str + "_division_" + str(conf_division_idx) + "_team_" + str(this_team_div_idx)
+
+                        #Eastern_division_1_team_1 is an example format string for this_team_tdid_str
+                        tdid_to_team_id_dict[this_team_tdid_str] = this_team_id
 
                     team_html_str += "</table></td>"
 
@@ -1193,4 +1215,4 @@ def build_choose_teams_html(number_of_divisions_select, number_of_teams_conf_sel
 
         team_html_str += "</table>"
 
-    return team_html_str, city_nickname_to_city_id_dict, conference_name_list
+    return team_html_str, city_nickname_to_city_id_dict, conference_name_list, tdid_to_team_id_dict
