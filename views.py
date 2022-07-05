@@ -717,12 +717,6 @@ def process_create_league_form_final(request):
     #some rows will be deleted, others will be updated to support the new league id value
     if source_page_hidden == 'els':
 
-        #update all TeamCity rows, the single Season row,
-        try:
-            TeamCity.objects.using("xactly_dev").filter(league_id=league_id_hidden).update(league_id=league_id)
-        except Exception:
-            pass
-
         try:
             Season.objects.using("xactly_dev").filter(league_id=league_id_hidden).update(league_id=league_id)
         except Exception:
@@ -751,6 +745,24 @@ def process_create_league_form_final(request):
                     Team.objects.using("xactly_dev").filter(id=this_team_id).update(nickname=this_team_nickname, conference_id=this_team_new_conference_id, division_id=this_team_new_division_id, league_id=league_id)
                 except Exception as e:
                     return HttpResponse(str(e))
+
+                this_team_city_id = city_nickname_to_city_id_dict[this_team_nickname]
+
+                #get the stadium associated with this_team_city_id
+                try:
+                    stadium_obj = Stadium.objects.using("xactly_dev").filter(city_id=this_team_city_id)
+                except Exception:
+                    pass
+
+                this_team_stadium_id = stadium_obj[0].stadium_id
+
+                #Update TeamCity object associated with this team with the new league_id and city, if the team
+                #has been switched in the standings
+                try:
+                    TeamCity.objects.using("xactly_dev").filter(league_id=league_id_hidden, team_id=this_team_id).update(league_id=league_id, city_id=this_team_city_id, stadium_id=this_team_stadium_id)
+                except Exception:
+                    pass
+
         except Exception as d:
             return HttpResponse(str(d))
 
