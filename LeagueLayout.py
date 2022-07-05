@@ -1027,6 +1027,22 @@ def build_choose_teams_html(number_of_divisions_select, number_of_teams_conf_sel
         # if we want to expand the number of divisions, we need to add dummy division names and teams to those divisions
         division_num_to_division_name_dict, division_num_to_team_list_dict = add_new_divisions_and_teams(division_num_to_division_name_dict, division_num_to_team_list_dict, number_of_divisions_select,number_of_teams_conf_select, previous_num_divisions_per_conference, previous_num_teams_per_conference)
 
+        #transform division_num_to_team_list_dict's indices to alternate between eastern and western conference divisions
+        division_num_to_team_list_dict_alt = {}
+        alt_addend_bit = 0
+        alt_addend = len(division_num_to_team_list_dict.keys()) / 2
+
+        for d in range(1, len(division_num_to_team_list_dict.keys()) / 2 + 1):
+
+            alt_addend = 0 if alt_addend_bit == 0 else len(division_num_to_team_list_dict.keys()) / 2
+            division_num_to_team_list_dict_alt[d + alt_addend] = division_num_to_team_list_dict[d + alt_addend]
+
+            alt_addend_bit = 1
+            alt_addend = 0 if alt_addend_bit == 0 else len(division_num_to_team_list_dict.keys()) / 2
+
+            division_num_to_team_list_dict_alt[d + alt_addend] = division_num_to_team_list_dict[d + alt_addend]
+            alt_addend_bit = 0
+
         # package the division names into team_html_str below
         division_name_lol = []
         division_sublist = []
@@ -1042,8 +1058,13 @@ def build_choose_teams_html(number_of_divisions_select, number_of_teams_conf_sel
 
         division_name_lol.append(division_sublist)
 
+        division_count = 0
+
         # create html tables here
         for conf_division_idx, conf_division_list in enumerate(division_name_lol, 1):
+
+            division_count += 2
+
             team_html_str += "<table cellpadding='5' width='100%' border='1'><tr>"
 
             eastern_conference_division_name = conf_division_list[0]
@@ -1066,9 +1087,9 @@ def build_choose_teams_html(number_of_divisions_select, number_of_teams_conf_sel
             color_key_str = ""
             conference_str = ""
 
-            for actual_division_number, division_team_list in division_num_to_team_list_dict.items():
+            for actual_division_number, division_team_list in division_num_to_team_list_dict_alt.items():
 
-                if actual_division_number == conf_division_idx or actual_division_number == conf_division_idx + number_of_divisions_select:
+                if actual_division_number == division_count - 1 or actual_division_number == division_count:
 
                     this_division_num_team_id_list = division_num_to_teamid_list_dict[actual_division_number]
 
