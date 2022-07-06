@@ -280,6 +280,9 @@
         formData.append("team_to_conference_dict", JSON.stringify(team_to_conference_dict))
         formData.append("city_nickname_to_city_id_dict", JSON.stringify(city_nickname_to_city_id_dict))
 
+        //alert(JSON.stringify(city_nickname_to_city_id_dict))
+        //return
+
         //alert(JSON.stringify(team_id_to_team_name_dict))
         //return
 
@@ -365,11 +368,23 @@
 
         this_clicked_td_id = $(this).attr('id')
 
+        //get division name for clicked team and previously clicked team. If they are the same, then cancel the action
+        this_clicked_td_id_parts_list = this_clicked_td_id.split("_")
+        clicked_team_td_id_str_parts_list = clicked_team_td_id_str.split("_")
+
+        this_clicked_td_id_division = this_clicked_td_id_parts_list[3] + this_clicked_td_id_parts_list[4] + this_clicked_td_id_parts_list[5]
+        clicked_team_td_id_division = clicked_team_td_id_str_parts_list[3] + clicked_team_td_id_str_parts_list[4] + clicked_team_td_id_str_parts_list[5]
+
         if (clicked_team_td_id_str == "") {
 
             clicked_team_td_orig_color_str = $(this).css("background-color")
             $(this).css("background-color", "yellow");
             clicked_team_td_id_str = this_clicked_td_id
+
+        } else if (this_clicked_td_id_division == clicked_team_td_id_division) {
+
+            $("#" + clicked_team_td_id_str).css("background-color", clicked_team_td_orig_color_str);
+            clicked_team_td_id_str = ""
 
         } else {
 
