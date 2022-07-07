@@ -618,6 +618,10 @@ def process_create_league_form_final(request):
 
         division_id += 1
 
+    # declare variables for player creation associated with any new teams added to the league
+    team_name_els_list = []
+    team_name_to_team_id_els_dict = {}
+
     #we will only create new rows for Team, TeamCity, and Season when creating a new league, otherwise we update rows
     if source_page_hidden == 'cnl':
 
@@ -830,13 +834,17 @@ def process_create_league_form_final(request):
                     except Exception as e:
                         return HttpResponse("error: " + str(e))
 
+                    # add team name to team name list
+                    whole_team_name = " ".join(this_team_name_parts_list)
+                    team_name_els_list.append(whole_team_name)
+
+                    team_name_to_team_id_els_dict[whole_team_name] = insert_team_id
+
                     insert_team_id += 1
                     insert_team_city_id += 1
 
         except Exception as d:
             return HttpResponse(str([this_team_new_conference_id, this_team_division_name, this_team_new_division_id, this_team_new_name, this_team_name_parts_list, this_team_id, this_conference_name]))
-
-        #return HttpResponse(1)
 
         #we need to update Player with the new league_id value
         try:
@@ -868,6 +876,11 @@ def process_create_league_form_final(request):
 
         if exception_str != "":
             retract_prior_db_commits(db_commit_to_delete_id_dict)
+    elif len(team_name_els_list) > 0:
+
+        #we have edited the league and added new teams. Now we need to add players to those teams
+        status_code, exception_str, db_commit_to_delete_id_dict = create_players(team_name_els_list, team_name_to_team_id_els_dict, league_id, female_setting, db_commit_to_delete_id_dict)
+
     else:
         status_code = 1
 
