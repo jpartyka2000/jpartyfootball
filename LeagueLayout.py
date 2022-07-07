@@ -15,10 +15,15 @@ def add_new_divisions_and_teams(division_num_to_division_name_dict, division_num
     # first, we will handle the cases were the number of divisions stays the same
     if number_of_divisions_select == previous_num_divisions_per_conference:
 
+        new_team_id = -1
+
         if previous_num_divisions_per_conference == 2 and previous_num_teams_per_conference == 8 and number_of_teams_conf_select == 10:
 
             for this_division_num, this_team_list in division_num_to_team_list_dict.items():
                 this_team_list.append("New Team")
+
+                division_num_to_teamid_list_dict[this_division_num].append(new_team_id)
+                new_team_id -= 1
 
         if previous_num_divisions_per_conference == 2 and previous_num_teams_per_conference == 8 and number_of_teams_conf_select == 12:
 
@@ -26,12 +31,22 @@ def add_new_divisions_and_teams(division_num_to_division_name_dict, division_num
                 this_team_list.append("New Team")
                 this_team_list.append("New Team")
 
+                division_num_to_teamid_list_dict[this_division_num].append(new_team_id)
+                division_num_to_teamid_list_dict[this_division_num].append(new_team_id - 1)
+                new_team_id -= 2
+
         if previous_num_divisions_per_conference == 2 and previous_num_teams_per_conference == 8 and number_of_teams_conf_select == 14:
 
             for this_division_num, this_team_list in division_num_to_team_list_dict.items():
                 this_team_list.append("New Team")
                 this_team_list.append("New Team")
                 this_team_list.append("New Team")
+
+                division_num_to_teamid_list_dict[this_division_num].append(new_team_id)
+                division_num_to_teamid_list_dict[this_division_num].append(new_team_id - 1)
+                division_num_to_teamid_list_dict[this_division_num].append(new_team_id - 2)
+
+                new_team_id -= 3
 
         if previous_num_divisions_per_conference == 2 and previous_num_teams_per_conference == 8 and number_of_teams_conf_select == 16:
 
@@ -41,16 +56,30 @@ def add_new_divisions_and_teams(division_num_to_division_name_dict, division_num
                 this_team_list.append("New Team")
                 this_team_list.append("New Team")
 
+                division_num_to_teamid_list_dict[this_division_num].append(new_team_id)
+                division_num_to_teamid_list_dict[this_division_num].append(new_team_id - 1)
+                division_num_to_teamid_list_dict[this_division_num].append(new_team_id - 2)
+                division_num_to_teamid_list_dict[this_division_num].append(new_team_id - 3)
+
+                new_team_id -= 4
+
         if previous_num_divisions_per_conference == 2 and previous_num_teams_per_conference == 10 and number_of_teams_conf_select == 12:
 
             for this_division_num, this_team_list in division_num_to_team_list_dict.items():
                 this_team_list.append("New Team")
+
+                division_num_to_teamid_list_dict[this_division_num].append(new_team_id)
+                new_team_id -= 1
 
         if previous_num_divisions_per_conference == 2 and previous_num_teams_per_conference == 10 and number_of_teams_conf_select == 14:
 
             for this_division_num, this_team_list in division_num_to_team_list_dict.items():
                 this_team_list.append("New Team")
                 this_team_list.append("New Team")
+
+                division_num_to_teamid_list_dict[this_division_num].append(new_team_id)
+                division_num_to_teamid_list_dict[this_division_num].append(new_team_id - 1)
+                new_team_id -= 2
 
         if previous_num_divisions_per_conference == 2 and previous_num_teams_per_conference == 10 and number_of_teams_conf_select == 16:
 
@@ -59,10 +88,19 @@ def add_new_divisions_and_teams(division_num_to_division_name_dict, division_num
                 this_team_list.append("New Team")
                 this_team_list.append("New Team")
 
+            division_num_to_teamid_list_dict[this_division_num].append(new_team_id)
+            division_num_to_teamid_list_dict[this_division_num].append(new_team_id - 1)
+            division_num_to_teamid_list_dict[this_division_num].append(new_team_id - 2)
+
+            new_team_id -= 3
+
         if previous_num_divisions_per_conference == 2 and previous_num_teams_per_conference == 12 and number_of_teams_conf_select == 14:
 
             for this_division_num, this_team_list in division_num_to_team_list_dict.items():
                 this_team_list.append("New Team")
+
+                division_num_to_teamid_list_dict[this_division_num].append(new_team_id)
+                new_team_id -= 1
 
         if previous_num_divisions_per_conference == 2 and previous_num_teams_per_conference == 12 and number_of_teams_conf_select == 16:
 
@@ -70,15 +108,25 @@ def add_new_divisions_and_teams(division_num_to_division_name_dict, division_num
                 this_team_list.append("New Team")
                 this_team_list.append("New Team")
 
+                division_num_to_teamid_list_dict[this_division_num].append(new_team_id)
+                division_num_to_teamid_list_dict[this_division_num].append(new_team_id - 1)
+                new_team_id -= 2
+
         if previous_num_divisions_per_conference == 2 and previous_num_teams_per_conference == 14 and number_of_teams_conf_select == 16:
 
             for this_division_num, this_team_list in division_num_to_team_list_dict.items():
                 this_team_list.append("New Team")
 
+                division_num_to_teamid_list_dict[this_division_num].append(new_team_id)
+                new_team_id -= 1
+
         if previous_num_divisions_per_conference == 3 and previous_num_teams_per_conference == 9 and number_of_teams_conf_select == 12:
 
             for this_division_num, this_team_list in division_num_to_team_list_dict.items():
                 this_team_list.append("New Team")
+
+                division_num_to_teamid_list_dict[this_division_num].append(new_team_id)
+                new_team_id -= 1
 
         if previous_num_divisions_per_conference == 3 and previous_num_teams_per_conference == 9 and number_of_teams_conf_select == 15:
 
@@ -86,15 +134,25 @@ def add_new_divisions_and_teams(division_num_to_division_name_dict, division_num
                 this_team_list.append("New Team")
                 this_team_list.append("New Team")
 
+                division_num_to_teamid_list_dict[this_division_num].append(new_team_id)
+                division_num_to_teamid_list_dict[this_division_num].append(new_team_id - 1)
+                new_team_id -= 2
+
         if previous_num_divisions_per_conference == 3 and previous_num_teams_per_conference == 12 and number_of_teams_conf_select == 15:
 
             for this_division_num, this_team_list in division_num_to_team_list_dict.items():
                 this_team_list.append("New Team")
 
+                division_num_to_teamid_list_dict[this_division_num].append(new_team_id)
+                new_team_id -= 1
+
         if previous_num_divisions_per_conference == 4 and previous_num_teams_per_conference == 8 and number_of_teams_conf_select == 12:
 
             for this_division_num, this_team_list in division_num_to_team_list_dict.items():
                 this_team_list.append("New Team")
+
+                division_num_to_teamid_list_dict[this_division_num].append(new_team_id)
+                new_team_id -= 1
 
         if previous_num_divisions_per_conference == 4 and previous_num_teams_per_conference == 8 and number_of_teams_conf_select == 16:
 
@@ -102,10 +160,17 @@ def add_new_divisions_and_teams(division_num_to_division_name_dict, division_num
                 this_team_list.append("New Team")
                 this_team_list.append("New Team")
 
+                division_num_to_teamid_list_dict[this_division_num].append(new_team_id)
+                division_num_to_teamid_list_dict[this_division_num].append(new_team_id - 1)
+                new_team_id -= 2
+
         if previous_num_divisions_per_conference == 4 and previous_num_teams_per_conference == 12 and number_of_teams_conf_select == 16:
 
             for this_division_num, this_team_list in division_num_to_team_list_dict.items():
                 this_team_list.append("New Team")
+
+                division_num_to_teamid_list_dict[this_division_num].append(new_team_id)
+                new_team_id -= 1
 
     elif previous_num_divisions_per_conference == 2 and number_of_divisions_select == 3:
 
@@ -491,6 +556,12 @@ def add_new_divisions_and_teams(division_num_to_division_name_dict, division_num
             del division_num_to_teamid_list_dict[5][3]
             del division_num_to_teamid_list_dict[6][3]
 
+            # recreate 3 new divisions
+            division_num_to_division_name_dict = {}
+
+            for k in range(1, len(division_num_to_team_list_dict.keys()) + 1):
+                division_num_to_division_name_dict[k] = "New Division " + str(k)
+
 
         if previous_num_teams_per_conference == 15 and number_of_teams_conf_select == 16:
 
@@ -800,6 +871,12 @@ def add_new_divisions_and_teams(division_num_to_division_name_dict, division_num
 
             del division_num_to_teamid_list_dict[7]
             del division_num_to_teamid_list_dict[8]
+
+            # recreate new divisions
+            division_num_to_division_name_dict = {}
+
+            for k in range(1, len(division_num_to_team_list_dict.keys()) + 1):
+                division_num_to_division_name_dict[k] = "New Division " + str(k)
 
         if previous_num_teams_per_conference == 12 and number_of_teams_conf_select == 15:
 
