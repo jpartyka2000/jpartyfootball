@@ -548,8 +548,7 @@ def process_create_league_form_final(request):
     #start inserting form data into database tables
     #get latest League row
     try:
-        league_id = int(
-            League.objects.using('xactly_dev').latest('id').id) + 1
+        league_id = int(League.objects.using('xactly_dev').latest('id').id) + 1
     except Exception:
         league_id = 1
 
@@ -724,47 +723,118 @@ def process_create_league_form_final(request):
 
         try:
 
+            #get latest team_id in case we have new teams
+            try:
+                insert_team_id = int(Team.objects.using('xactly_dev').latest('id').id) + 1
+            except Exception:
+                insert_team_id = 1
+
+            #also get latest team_city_id for same reason
+            try:
+                insert_team_city_id = int(TeamCity.objects.using('xactly_dev').latest('team_city_id').team_city_id) + 1
+            except Exception:
+                insert_team_city_id = 1
+
             #for Team, we have to update the division_id, conference_id and league_id.
             for this_team_id, this_conference_name in team_id_to_conference_name_dict.items():
 
-                this_team_new_conference_id = conference_name_to_id_dict[this_conference_name]
+                this_team_id_int = int(this_team_id)
 
-                this_team_division_name = team_id_to_division_name_dict[this_team_id]
-                this_team_new_division_id = division_name_to_id_dict[this_team_division_name]
+                try:
+                    this_team_new_conference_id = conference_name_to_id_dict[this_conference_name]
 
-                #get new team nickname if any
-                this_team_new_name = team_id_to_team_name_dict[this_team_id]
-                this_team_name_parts_list = this_team_new_name.split()
+                    this_team_division_name = team_id_to_division_name_dict[this_team_id]
+                    this_team_new_division_id = division_name_to_id_dict[this_team_division_name]
+
+                    #get new team nickname if any
+                    this_team_new_name = team_id_to_team_name_dict[this_team_id]
+                    this_team_name_parts_list = this_team_new_name.split()
+                except Exception as e:
+                    #return HttpResponse(s[this_team_new_conference_id, this_team_division_name]))
+                    return HttpResponse(str(this_team_new_conference_id) + " " + str(this_team_id) + " " + str(team_id_to_division_name_dict) + " " + repr(e))
 
                 if this_team_name_parts_list[0] == "Dallas":
                     this_team_nickname = this_team_name_parts_list[1] + " " + this_team_name_parts_list[2]
                 else:
                     this_team_nickname = this_team_name_parts_list[-1]
 
-                try:
-                    Team.objects.using("xactly_dev").filter(id=this_team_id).update(nickname=this_team_nickname, conference_id=this_team_new_conference_id, division_id=this_team_new_division_id, league_id=league_id)
-                except Exception as e:
-                    return HttpResponse(str(e))
+                if this_team_id_int > 0:
 
-                this_team_city_id = city_nickname_to_city_id_dict[this_team_nickname]
+                    #this is a team we already created
 
-                #get the stadium associated with this_team_city_id
-                try:
-                    stadium_obj = Stadium.objects.using("xactly_dev").filter(city_id=this_team_city_id)
-                except Exception:
-                    pass
+                    try:
+                        Team.objects.using("xactly_dev").filter(id=this_team_id).update(nickname=this_team_nickname, conference_id=this_team_new_conference_id, division_id=this_team_new_division_id, league_id=league_id)
+                    except Exception as e:
+                        return HttpResponse("Team filter id > 0 : " + str(e))
 
-                this_team_stadium_id = stadium_obj[0].stadium_id
+                    this_team_city_id = city_nickname_to_city_id_dict[this_team_nickname]
 
-                #Update TeamCity object associated with this team with the new league_id and city, if the team
-                #has been switched in the standings
-                try:
-                    TeamCity.objects.using("xactly_dev").filter(league_id=league_id_hidden, team_id=this_team_id).update(league_id=league_id, city_id=this_team_city_id, stadium_id=this_team_stadium_id)
-                except Exception:
-                    pass
+                    #get the stadium associated with this_team_city_id
+                    try:
+                        stadium_obj = Stadium.objects.using("xactly_dev").filter(city_id=this_team_city_id)
+                    except Exception:
+                        pass
+
+                    this_team_stadium_id = stadium_obj[0].stadium_id
+
+                    #Update TeamCity object associated with this team with the new league_id and city, if the team
+                    #has been switched in the standings
+                    try:
+                        TeamCity.objects.using("xactly_dev").filter(league_id=league_id_hidden, team_id=this_team_id).update(league_id=league_id, city_id=this_team_city_id, stadium_id=this_team_stadium_id)
+                    except Exception:
+                        pass
+
+                else:
+
+                    #if this is a new team, its city_id value in city_nickname_to_city_id_dict will be -1
+                    #we will then query City using city_name to get city_id
+
+                    try:
+                        this_team_city_id = city_nickname_to_city_id_dict[this_team_nickname]
+                    except Exception as e:
+                        return HttpResponse(str(city_nickname_to_city_id_dict))
+
+                    if this_team_city_id == -1:
+                        try:
+                            this_city_name = " ".join(this_team_name_parts_list[0:-1])
+                            city_obj = City.objects.using("xactly_dev").filter(city_name=this_city_name)
+                            this_team_city_id = city_obj[0].city_id
+                        except Exception:
+                            pass
+
+
+                    # get the stadium associated with this_team_city_id
+                    try:
+                        stadium_obj = Stadium.objects.using("xactly_dev").filter(city_id=this_team_city_id)
+                    except Exception:
+                        pass
+
+                    try:
+                        this_team_stadium_id = stadium_obj[0].stadium_id
+                    except Exception:
+                        return HttpResponse("Getting stadium id..." + str(this_team_city_id) + " " + str(this_team_nickname) + str(this_city_name))
+
+                    #create new Team and TeamCity objects for the new team
+                    try:
+                        Team.objects.using("xactly_dev").create(id=insert_team_id, nickname=this_team_nickname, first_season_id=-1, current_season_wins=0, current_season_losses=0,
+                                                        stadium_id=this_team_stadium_id, conference_id=this_team_new_conference_id,
+                                                        division_id=this_team_new_division_id,league_id=league_id)
+                    except Exception as e:
+                        return HttpResponse("error: " + str(e))
+
+                    try:
+                        TeamCity.objects.using("xactly_dev").create(team_city_id=insert_team_city_id, team_id=insert_team_id,
+                                                                    city_id=this_team_city_id,
+                                                                    first_season_id=-1, stadium_id=this_team_stadium_id,
+                                                                    league_id=league_id)
+                    except Exception as e:
+                        return HttpResponse("error: " + str(e))
+
+                    insert_team_id += 1
+                    insert_team_city_id += 1
 
         except Exception as d:
-            return HttpResponse(str(d))
+            return HttpResponse(str([this_team_new_conference_id, this_team_division_name, this_team_new_division_id, this_team_new_name, this_team_name_parts_list, this_team_id, this_conference_name]))
 
         #return HttpResponse(1)
 
