@@ -1,0 +1,438 @@
+{% extends "backendBase.html" %}
+
+{% load staticfiles %}
+{% load static %}
+
+{%block mainContent%}	
+	<div class="container" style="border:1px solid #C0C0C0;" align="center">
+          {% csrf_token %}
+		<div class='row' style='text-align:center;'>
+            <div style="float:left;">
+			</div>
+			<h1>{{ welcome_message }}</h1></div><br>
+        <div class='breadcrumb' style='text-color: blue; background-color: white;'>
+            <a href="{% url 'jpartyfb:index' %}">Home</a> >
+            <a href="{% url 'jpartyfb:manage_leagues' %}">Manage Leagues</a> >
+
+            {% ifequal source_page "els" %}
+                <a href="{% url 'jpartyfb:show_league_form_1' source='els' %}">Edit League</a> >
+                <a href="{% url 'jpartyfb:process_create_league_form_1' edit_from_breadcrumb='True' %}?league_id={{ league_id }}">Edit Teams</a>
+            {% else %}
+                <a href="{% url 'jpartyfb:show_league_form_1' source='cnl' %}">Create New League</a> >
+                Choose Teams
+            {% endifequal %}
+
+        </div>
+
+{% if Error_message %}
+    <p style="color: red;">
+        {{ Error_message }}
+    </p>
+{% endif %}
+
+    <table align="center">
+        <tr>
+            <img style="border-radius:1px;height:160px; width:160px;" src="{% static 'jpartyfb/images/league_logo.png' %}"/>
+        </tr>
+    </table>
+    <div style="height: 75px;"></div>
+
+    <form name="create_league_form_final" action="{% url 'jpartyfb:process_create_league_form_final' %}" method="post">
+
+        <table cellpadding="5" width="100%" border="1">
+            <tr>
+                <td width="50%" align="center" style="background-color: navy;" id="td_conference_eastern" class="td_conference">
+                     <input type="text" id="Eastern_conf_name_text" name="Eastern_conf_name_text" class="conference" maxlength="35" value="{{ eastern_conference_name }}" style="width: 280px; border: none; background: transparent; text-align:center; font-weight: bold; font-size: 20px; color: white;" />
+                </td>
+                <td width="50%" align="center" style="background-color: #630b0f;" id="td_conference_western" class="td_conference">
+                    <input type="text" id="Western_conf_name_text" name="Western_conf_name_text" class="conference" maxlength="35" value="{{ western_conference_name }}" style="width: 280px; border: none; background: transparent; text-align:center; font-weight: bold; font-size: 20px; color: white;" />
+                </td>
+            </tr>
+        </table>
+
+        <div style="height: 35px;"></div>
+
+        <!-- create divisions based on user settings-->
+        {{ team_html_str | safe }}
+
+        <div style="height: 35px;"></div>
+
+        <table>
+            <tr>
+                <td colspan="2" align="center">
+                  <input type="button" id="submit_button" value='Finalize League' />
+                </td>
+                <td style="vertical-align: top;">
+                    <img id="loading_image" src="{% static 'jpartyfb/images/loading.gif' %}" alt="Loading" title="Loading" width="100px" style="display: none; margin-top: 20px;"/>
+                </td>
+            </tr>
+        </table>
+
+       <!-- values from the first part of the create league form-->
+       <input type="hidden" id="league_id_hidden" name="league_id_hidden" value="{{ league_id }}" />
+       <input type="hidden" id="league_name_hidden" name="league_name_hidden" value="{{ league_name }}" />
+       <input type="hidden" id="injury_hidden" name="injury_hidden" value="{{ injury_mode }}" />
+       <input type="hidden" id="weather_hidden" name="weather_hidden" value="{{ weather_mode }}" />
+       <input type="hidden" id="female_hidden" name="female_hidden" value="{{ female_mode }}" />
+       <input type="hidden" id="neutral_site_hidden" name="neutral_site_hidden" value="{{ neutral_site_mode }}" />
+       <input type="hidden" id="number_of_weeks_hidden" name="number_of_weeks_hidden" value="{{ number_of_weeks }}" />
+       <input type="hidden" id="number_of_playoff_teams_hidden" name="number_of_playoff_teams_hidden" value="{{ number_of_playoff_teams }}" />
+       <input type="hidden" id="number_of_teams_conf_hidden" name="number_of_teams_conf_hidden" value="{{ number_of_teams_conf }}" />
+       <input type="hidden" id="number_of_divisions_conf_hidden" name="number_of_divisions_conf_hidden" value="{{ number_of_divisions_conf }}" />
+       <input type="hidden" id="source_page_hidden" name="source_page_hidden" value="{{ source_page }}" />
+       <input type="hidden" id="season_active_hidden" name="season_active_hidden" value="{{ season_active }}" />
+
+    </form>
+    <div style="height: 35px;"></div>
+
+</div>
+
+<script language="Javascript">
+
+    city_nickname_to_city_id_dict = {
+        {% for key, value in city_nickname_to_city_id_dict.items %}
+            {% if not forloop.first %}
+                 ,
+            {% endif %}
+            '{{ key }}':{{ value }}
+        {% endfor %}
+
+     }
+
+     tdid_to_team_id_dict = {
+         {% for this_tdid, this_team_id in tdid_to_team_id_dict.items %}
+            {% if not forloop.first %}
+                 ,
+            {% endif %}
+            '{{ this_tdid }}':'{{ this_team_id }}'
+         {% endfor %}
+     }
+
+    var clicked_team_td_id_str = ""
+    var clicked_team_td_orig_color_str = ""
+
+    $("#submit_button").click(function() {
+
+        //we will need to grab the conference names, division names, team names, and team to division and team to conference mappings
+        var conference_element_list = []
+        var division_element_list = []
+        var team_element_list = []
+
+        var conference_name_list = []
+        var division_name_list = []
+        var team_name_list = []
+
+        $(".conference").each(function() {
+
+            var this_conference_element = $(this)
+            conference_element_list.push(this_conference_element)
+
+            this_conference_name = this_conference_element.val()
+            conference_name_list.push(this_conference_name)
+        });
+
+        $(".division").each(function() {
+
+            var this_division_element = $(this)
+            division_element_list.push(this_division_element)
+
+            this_division_name = this_division_element.val()
+            division_name_list.push(this_division_name)
+        });
+
+        $(".team").each(function() {
+
+            var this_team_element = $(this)
+            team_element_list.push(this_team_element)
+
+            this_team_name = this_team_element.val()
+            team_name_list.push(this_team_name)
+        });
+
+        //perform quality control checks
+
+        //you can't duplicate a conference name, division name or team name
+        var conference_set = new Set(conference_name_list);
+
+        if (conference_set.size != conference_name_list.length) {
+            alert("Please choose unique names for each conference")
+            return
+        }
+
+        var division_set = new Set(division_name_list);
+
+        if (division_set.size != division_name_list.length) {
+            alert("Please choose unique names for each division")
+            return
+        }
+
+        var team_set = new Set(team_name_list);
+
+        if (team_set.size != team_name_list.length) {
+            alert("Please choose unique names for each team")
+            return
+        }
+
+        //next, make sure that no value is an empty string
+        if (conference_name_list.includes('')) {
+            alert("No conference can have a blank name")
+            return
+        }
+
+        if (division_name_list.includes('')) {
+            alert("No division can have a blank name")
+            return
+        }
+
+        if (team_name_list.includes('')) {
+            alert("No team can have a blank name")
+            return
+        }
+
+        //now we will get mappings of division -> conference and team -> division
+        var conference_geoname_to_username_dict = {}
+        var division_geoname_to_username_dict = {}
+        var division_to_conference_dict = {}
+        var team_to_division_dict = {}
+        var team_id_to_division_dict = {}
+        var team_to_conference_dict = {}
+        var team_id_to_conference_dict = {}
+        var team_id_to_team_name_dict = {}
+
+        for (var i = 0; i < conference_element_list.length; i++) {
+            var this_conference_element = conference_element_list[i];
+            var this_conference_id = this_conference_element.attr("id")
+            var this_conference_name = this_conference_element.val()
+
+            var this_conference_part_list = this_conference_id.split("_")
+            var this_conference_geoname = this_conference_part_list[0]
+
+            conference_geoname_to_username_dict[this_conference_geoname] = this_conference_name
+
+        }//end if
+
+        for (var i = 0; i < division_element_list.length; i++) {
+            var this_division_element = division_element_list[i];
+            var this_division_id = this_division_element.attr("id")
+            var this_division_name = this_division_element.val()
+
+            this_division_part_list = this_division_id.split("_")
+            this_division_conference_geoname = this_division_part_list[0] + "_" + this_division_part_list[2]
+
+            division_geoname_to_username_dict[this_division_conference_geoname] = this_division_name
+
+            this_division_conference = conference_geoname_to_username_dict[this_division_part_list[0]]
+
+            division_to_conference_dict[this_division_name] = this_division_conference
+
+        }//end for
+
+
+        for (var i = 0; i < team_element_list.length; i++) {
+            var this_team_element = team_element_list[i];
+            var this_team_tdid = this_team_element.attr("id")
+            var this_team_name = this_team_element.val()
+
+            this_team_part_list = this_team_tdid.split("_")
+
+            this_team_conference_geoname = this_team_part_list[0]
+            team_to_conference_dict[this_team_name] = conference_geoname_to_username_dict[this_team_conference_geoname]
+
+            this_team_division_geoname = this_team_part_list[0] + "_" + this_team_part_list[2]
+
+            team_to_division_dict[this_team_name] = division_geoname_to_username_dict[this_team_division_geoname]
+
+            //create team_id_to_division_dict and team_id_to_conference_dict mappings
+            var this_team_id = tdid_to_team_id_dict[this_team_tdid]
+            team_id_to_division_dict[this_team_id] = division_geoname_to_username_dict[this_team_division_geoname]
+            team_id_to_conference_dict[this_team_id] = conference_geoname_to_username_dict[this_team_conference_geoname]
+
+            team_id_to_team_name_dict[this_team_id] = this_team_name
+
+            this_team_id_int = parseInt(this_team_id)
+
+            //if we are adding new teams, then we need to update city_nickname_to_city_id_dict
+            if (this_team_id_int < 0) {
+                this_team_name_parts_list = this_team_name.split(" ")
+                this_team_nickname = this_team_name_parts_list.pop()
+                city_nickname_to_city_id_dict[this_team_nickname] = -1
+            }
+
+        }//end for
+
+        //next, we will push the form data on this page to the backend via an ajax call
+        var formData = new FormData()
+
+        formData.append("league_name_hidden", $("#league_name_hidden").val())
+        formData.append("league_id_hidden", $("#league_id_hidden").val())
+        formData.append("source_page_hidden", $("#source_page_hidden").val())
+        formData.append("injury_hidden", $("#injury_hidden").val())
+        formData.append("weather_hidden", $("#weather_hidden").val())
+        formData.append("female_hidden", $("#female_hidden").val())
+        formData.append("neutral_site_hidden", $("#neutral_site_hidden").val())
+
+        formData.append("number_of_weeks_hidden", $("#number_of_weeks_hidden").val())
+        formData.append("number_of_playoff_teams_hidden", $("#number_of_playoff_teams_hidden").val())
+        formData.append("number_of_teams_conf_hidden", $("#number_of_teams_conf_hidden").val())
+        formData.append("number_of_divisions_conf_hidden", $("#number_of_divisions_conf_hidden").val())
+
+        formData.append("conference_name_list", JSON.stringify(conference_name_list))
+        formData.append("division_name_list", JSON.stringify(division_name_list))
+        formData.append("team_name_list", JSON.stringify(team_name_list))
+
+        formData.append("team_id_to_division_dict", JSON.stringify(team_id_to_division_dict))
+        formData.append("team_id_to_conference_dict", JSON.stringify(team_id_to_conference_dict))
+        formData.append("team_id_to_team_name_dict", JSON.stringify(team_id_to_team_name_dict))
+
+        formData.append("division_to_conference_dict", JSON.stringify(division_to_conference_dict))
+        formData.append("team_to_division_dict", JSON.stringify(team_to_division_dict))
+        formData.append("team_to_conference_dict", JSON.stringify(team_to_conference_dict))
+        formData.append("city_nickname_to_city_id_dict", JSON.stringify(city_nickname_to_city_id_dict))
+
+        //alert(JSON.stringify(city_nickname_to_city_id_dict))
+        //return
+
+        //alert(JSON.stringify(team_id_to_conference_dict))
+        //return
+
+        $("#loading_image").show()
+
+        $.ajax({
+
+            type: "POST",
+            url: "/jpartyfb/process_create_league_form_final/",
+            data: formData,
+            processData: false,
+            contentType: false,
+            cache: false,
+            success: function(data) {
+
+               alert(JSON.stringify(data))
+               $("#loading_image").hide()
+               return
+
+               if (data == "-1") {
+                   alert("Error in trying to save to League db table")
+                   return
+               }
+
+               if (data == "-2") {
+                   alert("Error in trying to save to Conference db table")
+                   return
+               }
+
+               if (data == "-3") {
+                   alert("Error in trying to save to Division db table")
+                   return
+               }
+
+               if (data == "-4") {
+                   alert("Error in trying to save to Team db table")
+                   return
+               }
+
+               if (data == "-5") {
+                   alert("Error in trying to save to TeamCity db table")
+                   return
+               }
+
+                if (data == "-6") {
+                   alert("Error in trying to save to Player db table")
+                   return
+               }
+
+                if (data == "-7") {
+                   alert("Error in trying to save to PlayerTeam db table")
+                   return
+                }
+
+                if (data == "-8") {
+                   alert("Error in trying to save to one of the player spec db tables")
+                   return
+                }
+
+                if (data == "-9") {
+                   alert("Error in trying to save to Season db table")
+                   return
+                }
+
+               alert("League has been successfully created")
+
+               //window.location.href = "/jpartyfb/"
+
+           }
+        })
+
+    })
+
+    $(".td_team").click(function() {
+
+        //if season is active, then we can't make changes to division/conference alignment; return immediately
+        var season_active = $("#season_active_hidden").val()
+
+        if (season_active == "True") {
+            alert("We can't make changes to division/conference alignment during an active season")
+            return
+        }
+
+        this_clicked_td_id = $(this).attr('id')
+
+        //get division name for clicked team and previously clicked team. If they are the same, then cancel the action
+        this_clicked_td_id_parts_list = this_clicked_td_id.split("_")
+        clicked_team_td_id_str_parts_list = clicked_team_td_id_str.split("_")
+
+        this_clicked_td_id_division = this_clicked_td_id_parts_list[3] + this_clicked_td_id_parts_list[4] + this_clicked_td_id_parts_list[5]
+        clicked_team_td_id_division = clicked_team_td_id_str_parts_list[3] + clicked_team_td_id_str_parts_list[4] + clicked_team_td_id_str_parts_list[5]
+
+        if (clicked_team_td_id_str == "") {
+
+            clicked_team_td_orig_color_str = $(this).css("background-color")
+            $(this).css("background-color", "yellow");
+            clicked_team_td_id_str = this_clicked_td_id
+
+        } else if (this_clicked_td_id_division == clicked_team_td_id_division) {
+
+            $("#" + clicked_team_td_id_str).css("background-color", clicked_team_td_orig_color_str);
+            clicked_team_td_id_str = ""
+
+        } else {
+
+            if (clicked_team_td_id_str == this_clicked_td_id) {
+
+                $(this).css("background-color", clicked_team_td_orig_color_str);
+
+            } else {
+
+                //perform the switcheroo
+                var clicked_td_1_val = $("#" + clicked_team_td_id_str).find("input").val()
+                var temp_val = $(this).find("input").val()
+
+                $("#" + this_clicked_td_id).find("input").val(clicked_td_1_val)
+                $("#" + clicked_team_td_id_str).find("input").val(temp_val)
+
+                //set original background color of first clicked td
+                $("#" + clicked_team_td_id_str).css("background-color", clicked_team_td_orig_color_str);
+
+                //get tdids of switched teams and switch their team_ids, but only if editing a league
+                if ($("#source_page_hidden").val() == "els") {
+                    var clicked_td_1_team_id = tdid_to_team_id_dict[clicked_team_td_id_str]
+                    tdid_to_team_id_dict[clicked_team_td_id_str] = tdid_to_team_id_dict[this_clicked_td_id]
+                    tdid_to_team_id_dict[this_clicked_td_id] = clicked_td_1_team_id
+                }
+
+            }//end if
+
+             clicked_team_td_orig_color_str = ""
+             clicked_team_td_id_str = ""
+
+        }//end if
+
+    }).children().click(function(e) {
+        return false;
+    });
+
+</script>
+
+
+
+{% endblock%}
