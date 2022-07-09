@@ -210,25 +210,25 @@ def add_new_divisions_and_teams(division_num_to_division_name_dict, division_num
             division_num_to_teamid_list_dict[6].append(division_num_to_teamid_list_dict[4][5])
 
             #delete dup teams
-            del division_num_to_team_list_dict[1][4]
             del division_num_to_team_list_dict[1][5]
-            del division_num_to_team_list_dict[2][4]
+            del division_num_to_team_list_dict[1][4]
             del division_num_to_team_list_dict[2][5]
+            del division_num_to_team_list_dict[2][4]
 
-            del division_num_to_teamid_list_dict[1][4]
             del division_num_to_teamid_list_dict[1][5]
-            del division_num_to_teamid_list_dict[2][4]
+            del division_num_to_teamid_list_dict[1][4]
             del division_num_to_teamid_list_dict[2][5]
+            del division_num_to_teamid_list_dict[2][4]
 
-            del division_num_to_team_list_dict[3][4]
             del division_num_to_team_list_dict[3][5]
-            del division_num_to_team_list_dict[4][4]
+            del division_num_to_team_list_dict[3][4]
             del division_num_to_team_list_dict[4][5]
+            del division_num_to_team_list_dict[4][4]
 
-            del division_num_to_teamid_list_dict[3][4]
             del division_num_to_teamid_list_dict[3][5]
-            del division_num_to_teamid_list_dict[4][4]
+            del division_num_to_teamid_list_dict[3][4]
             del division_num_to_teamid_list_dict[4][5]
+            del division_num_to_teamid_list_dict[4][4]
 
             # create 2 new divisions
             division_num_to_division_name_dict[5] = "New Division 1"
@@ -453,14 +453,14 @@ def add_new_divisions_and_teams(division_num_to_division_name_dict, division_num
             division_num_to_teamid_list_dict[max_division_num + 1].append(-2)
 
             #delete dup teams and ids
-            del division_num_to_team_list_dict[1][4]
             del division_num_to_team_list_dict[1][5]
-            del division_num_to_team_list_dict[2][4]
+            del division_num_to_team_list_dict[1][4]
             del division_num_to_team_list_dict[2][5]
-            del division_num_to_team_list_dict[3][4]
+            del division_num_to_team_list_dict[2][5]
             del division_num_to_team_list_dict[3][5]
-            del division_num_to_team_list_dict[4][4]
+            del division_num_to_team_list_dict[3][4]
             del division_num_to_team_list_dict[4][5]
+            del division_num_to_team_list_dict[4][4]
 
     elif previous_num_divisions_per_conference == 2 and number_of_divisions_select == 4:
 
@@ -479,15 +479,27 @@ def add_new_divisions_and_teams(division_num_to_division_name_dict, division_num
             division_num_to_team_list_dict[max_division_num + 3] = []
             division_num_to_team_list_dict[max_division_num + 4] = []
 
+            division_num_to_teamid_list_dict[max_division_num + 1] = []
+            division_num_to_teamid_list_dict[max_division_num + 2] = []
+            division_num_to_teamid_list_dict[max_division_num + 3] = []
+            division_num_to_teamid_list_dict[max_division_num + 4] = []
+
             for i in range(1, max_division_num + 1):
                 # first pop two teams from division i
 
                 division_i_team_1 = division_num_to_team_list_dict[i].pop()
                 division_i_team_2 = division_num_to_team_list_dict[i].pop()
 
+                division_id_i_team_1 = division_num_to_teamid_list_dict[i].pop()
+                division_id_i_team_2 = division_num_to_teamid_list_dict[i].pop()
+
                 # and add these teams to new division max_division_num + i
                 division_num_to_team_list_dict[max_division_num + i].append(division_i_team_1)
                 division_num_to_team_list_dict[max_division_num + i].append(division_i_team_2)
+
+                division_num_to_teamid_list_dict[max_division_num + i].append(division_id_i_team_1)
+                division_num_to_teamid_list_dict[max_division_num + i].append(division_id_i_team_2)
+
 
         if previous_num_teams_per_conference == 8 and number_of_teams_conf_select == 12:
 
@@ -501,6 +513,11 @@ def add_new_divisions_and_teams(division_num_to_division_name_dict, division_num
             division_num_to_team_list_dict[max_division_num + 3] = []
             division_num_to_team_list_dict[max_division_num + 4] = []
 
+            division_num_to_teamid_list_dict[max_division_num + 1] = []
+            division_num_to_teamid_list_dict[max_division_num + 2] = []
+            division_num_to_teamid_list_dict[max_division_num + 3] = []
+            division_num_to_teamid_list_dict[max_division_num + 4] = []
+
             # we will pop out one team from an existing division and add to a new division
 
             for i in range(1, max_division_num + 1):
@@ -508,8 +525,12 @@ def add_new_divisions_and_teams(division_num_to_division_name_dict, division_num
 
                 division_i_team_1 = division_num_to_team_list_dict[i].pop()
 
+                division_id_i_team_1 = division_num_to_teamid_list_dict[i].pop()
+
                 # and add these teams to new division max_division_num + i
                 division_num_to_team_list_dict[max_division_num + i].append(division_i_team_1)
+
+                division_num_to_teamid_list_dict[max_division_num + i].append(division_id_i_team_1)
 
             # we will now add 2 new teams to each new division
             division_num_to_team_list_dict[max_division_num + 1].append("New Team")
@@ -520,6 +541,16 @@ def add_new_divisions_and_teams(division_num_to_division_name_dict, division_num
             division_num_to_team_list_dict[max_division_num + 3].append("New Team")
             division_num_to_team_list_dict[max_division_num + 4].append("New Team")
             division_num_to_team_list_dict[max_division_num + 4].append("New Team")
+
+            division_num_to_teamid_list_dict[max_division_num + 1].append(-1)
+            division_num_to_teamid_list_dict[max_division_num + 1].append(-2)
+            division_num_to_teamid_list_dict[max_division_num + 2].append(-3)
+            division_num_to_teamid_list_dict[max_division_num + 2].append(-4)
+            division_num_to_teamid_list_dict[max_division_num + 3].append(-5)
+            division_num_to_teamid_list_dict[max_division_num + 3].append(-6)
+            division_num_to_teamid_list_dict[max_division_num + 4].append(-7)
+            division_num_to_teamid_list_dict[max_division_num + 4].append(-8)
+
 
         if previous_num_teams_per_conference == 8 and number_of_teams_conf_select == 16:
 
@@ -534,11 +565,25 @@ def add_new_divisions_and_teams(division_num_to_division_name_dict, division_num
             division_num_to_team_list_dict[max_division_num + 3] = []
             division_num_to_team_list_dict[max_division_num + 4] = []
 
+            division_num_to_teamid_list_dict[max_division_num + 1] = []
+            division_num_to_teamid_list_dict[max_division_num + 2] = []
+            division_num_to_teamid_list_dict[max_division_num + 3] = []
+            division_num_to_teamid_list_dict[max_division_num + 4] = []
+
+            starting_index = 0
+
             for i in range(max_division_num + 1, max_division_num + 4 + 1):
                 division_num_to_team_list_dict[i].append("New Team")
                 division_num_to_team_list_dict[i].append("New Team")
                 division_num_to_team_list_dict[i].append("New Team")
                 division_num_to_team_list_dict[i].append("New Team")
+
+                division_num_to_teamid_list_dict[i].append(starting_index + -1)
+                division_num_to_teamid_list_dict[i].append(starting_index + -2)
+                division_num_to_teamid_list_dict[i].append(starting_index + -3)
+                division_num_to_teamid_list_dict[i].append(starting_index + -4)
+
+                starting_index += -4
 
         if previous_num_teams_per_conference == 12 and number_of_teams_conf_select == 16:
 
@@ -550,45 +595,166 @@ def add_new_divisions_and_teams(division_num_to_division_name_dict, division_num
             division_num_to_team_list_dict[5].append(division_num_to_team_list_dict[2][4])
             division_num_to_team_list_dict[5].append(division_num_to_team_list_dict[2][5])
 
+            division_num_to_teamid_list_dict[5] = []
+
+            division_num_to_teamid_list_dict[5].append(division_num_to_teamid_list_dict[1][4])
+            division_num_to_teamid_list_dict[5].append(division_num_to_teamid_list_dict[1][5])
+            division_num_to_teamid_list_dict[5].append(division_num_to_teamid_list_dict[2][4])
+            division_num_to_teamid_list_dict[5].append(division_num_to_teamid_list_dict[2][5])
+
             #new div6 will be 4 new teams
             division_num_to_team_list_dict[6] = []
+            division_num_to_teamid_list_dict[6] = []
 
             division_num_to_team_list_dict[6].append("New Team")
             division_num_to_team_list_dict[6].append("New Team")
             division_num_to_team_list_dict[6].append("New Team")
             division_num_to_team_list_dict[6].append("New Team")
+
+            division_num_to_teamid_list_dict[6].append(-1)
+            division_num_to_teamid_list_dict[6].append(-2)
+            division_num_to_teamid_list_dict[6].append(-3)
+            division_num_to_teamid_list_dict[6].append(-4)
 
             # create new div7 with 2 teams from old div3 and 2 teams from old div4
             division_num_to_team_list_dict[7] = []
+            division_num_to_teamid_list_dict[7] = []
 
             division_num_to_team_list_dict[7].append(division_num_to_team_list_dict[3][4])
             division_num_to_team_list_dict[7].append(division_num_to_team_list_dict[3][5])
             division_num_to_team_list_dict[7].append(division_num_to_team_list_dict[4][4])
             division_num_to_team_list_dict[7].append(division_num_to_team_list_dict[4][5])
 
+            division_num_to_teamid_list_dict[7].append(division_num_to_teamid_list_dict[3][4])
+            division_num_to_teamid_list_dict[7].append(division_num_to_teamid_list_dict[3][5])
+            division_num_to_teamid_list_dict[7].append(division_num_to_teamid_list_dict[4][4])
+            division_num_to_teamid_list_dict[7].append(division_num_to_teamid_list_dict[4][5])
+
             # new div8 will be 4 new teams
             division_num_to_team_list_dict[8] = []
+            division_num_to_teamid_list_dict[8] = []
 
             division_num_to_team_list_dict[8].append("New Team")
             division_num_to_team_list_dict[8].append("New Team")
             division_num_to_team_list_dict[8].append("New Team")
             division_num_to_team_list_dict[8].append("New Team")
+
+            division_num_to_teamid_list_dict[8].append(-5)
+            division_num_to_teamid_list_dict[8].append(-6)
+            division_num_to_teamid_list_dict[8].append(-7)
+            division_num_to_teamid_list_dict[8].append(-8)
 
             #delete dup teams
-            del division_num_to_team_list_dict[1][4]
             del division_num_to_team_list_dict[1][5]
-            del division_num_to_team_list_dict[2][4]
+            del division_num_to_team_list_dict[1][4]
             del division_num_to_team_list_dict[2][5]
-            del division_num_to_team_list_dict[3][4]
+            del division_num_to_team_list_dict[2][4]
             del division_num_to_team_list_dict[3][5]
-            del division_num_to_team_list_dict[4][4]
+            del division_num_to_team_list_dict[3][4]
             del division_num_to_team_list_dict[4][5]
+            del division_num_to_team_list_dict[4][4]
+
+            del division_num_to_teamid_list_dict[1][5]
+            del division_num_to_teamid_list_dict[1][4]
+            del division_num_to_teamid_list_dict[2][5]
+            del division_num_to_teamid_list_dict[2][4]
+            del division_num_to_teamid_list_dict[3][5]
+            del division_num_to_teamid_list_dict[3][4]
+            del division_num_to_teamid_list_dict[4][5]
+            del division_num_to_teamid_list_dict[4][4]
 
             #create new divisions
             division_num_to_division_name_dict[5] = "New Division 1"
             division_num_to_division_name_dict[6] = "New Division 2"
             division_num_to_division_name_dict[7] = "New Division 3"
             division_num_to_division_name_dict[8] = "New Division 4"
+
+        if previous_num_teams_per_conference == 14 and number_of_teams_conf_select == 16:
+
+            division_num_to_division_name_dict[max_division_num + 1] = "New Division 1"
+            division_num_to_division_name_dict[max_division_num + 2] = "New Division 2"
+            division_num_to_division_name_dict[max_division_num + 3] = "New Division 3"
+            division_num_to_division_name_dict[max_division_num + 4] = "New Division 4"
+
+            division_num_to_team_list_dict[max_division_num + 1] = []
+            division_num_to_team_list_dict[max_division_num + 2] = []
+            division_num_to_team_list_dict[max_division_num + 3] = []
+            division_num_to_team_list_dict[max_division_num + 4] = []
+
+            division_num_to_teamid_list_dict[max_division_num + 1] = []
+            division_num_to_teamid_list_dict[max_division_num + 2] = []
+            division_num_to_teamid_list_dict[max_division_num + 3] = []
+            division_num_to_teamid_list_dict[max_division_num + 4] = []
+
+            #add 3 teams from div1 to div5 and 3 teams from div2 to div6. Add 1 new team to div5 and 1 new team to div6
+            division_num_to_team_list_dict[5].append(division_num_to_team_list_dict[1][4])
+            division_num_to_team_list_dict[5].append(division_num_to_team_list_dict[1][5])
+            division_num_to_team_list_dict[5].append(division_num_to_team_list_dict[1][6])
+            division_num_to_team_list_dict[5].append("New Team")
+
+            division_num_to_team_list_dict[6].append(division_num_to_team_list_dict[2][4])
+            division_num_to_team_list_dict[6].append(division_num_to_team_list_dict[2][5])
+            division_num_to_team_list_dict[6].append(division_num_to_team_list_dict[2][6])
+            division_num_to_team_list_dict[6].append("New Team")
+
+            # add 3 teams from div3 to div7 and 3 teams from div4 to div8. Add 1 new team to div7 and 1 new team to div8
+            division_num_to_team_list_dict[7].append(division_num_to_team_list_dict[3][4])
+            division_num_to_team_list_dict[7].append(division_num_to_team_list_dict[3][5])
+            division_num_to_team_list_dict[7].append(division_num_to_team_list_dict[3][6])
+            division_num_to_team_list_dict[7].append("New Team")
+
+            division_num_to_team_list_dict[8].append(division_num_to_team_list_dict[4][4])
+            division_num_to_team_list_dict[8].append(division_num_to_team_list_dict[4][5])
+            division_num_to_team_list_dict[8].append(division_num_to_team_list_dict[4][6])
+            division_num_to_team_list_dict[8].append("New Team")
+
+            division_num_to_teamid_list_dict[5].append(division_num_to_teamid_list_dict[1][4])
+            division_num_to_teamid_list_dict[5].append(division_num_to_teamid_list_dict[1][5])
+            division_num_to_teamid_list_dict[5].append(division_num_to_teamid_list_dict[1][6])
+            division_num_to_teamid_list_dict[5].append(-1)
+
+            division_num_to_teamid_list_dict[6].append(division_num_to_teamid_list_dict[2][4])
+            division_num_to_teamid_list_dict[6].append(division_num_to_teamid_list_dict[2][5])
+            division_num_to_teamid_list_dict[6].append(division_num_to_teamid_list_dict[2][6])
+            division_num_to_teamid_list_dict[6].append(-2)
+
+            # add 3 teams from div3 to div7 and 3 teams from div4 to div8. Add 1 new team to div7 and 1 new team to div8
+            division_num_to_teamid_list_dict[7].append(division_num_to_teamid_list_dict[3][4])
+            division_num_to_teamid_list_dict[7].append(division_num_to_teamid_list_dict[3][5])
+            division_num_to_teamid_list_dict[7].append(division_num_to_teamid_list_dict[3][6])
+            division_num_to_teamid_list_dict[7].append(-3)
+
+            division_num_to_teamid_list_dict[8].append(division_num_to_teamid_list_dict[4][4])
+            division_num_to_teamid_list_dict[8].append(division_num_to_teamid_list_dict[4][5])
+            division_num_to_teamid_list_dict[8].append(division_num_to_teamid_list_dict[4][6])
+            division_num_to_teamid_list_dict[8].append(-4)
+
+            # delete dup teams
+            del division_num_to_team_list_dict[1][6]
+            del division_num_to_team_list_dict[1][5]
+            del division_num_to_team_list_dict[1][4]
+            del division_num_to_team_list_dict[2][6]
+            del division_num_to_team_list_dict[2][5]
+            del division_num_to_team_list_dict[2][4]
+            del division_num_to_team_list_dict[3][6]
+            del division_num_to_team_list_dict[3][5]
+            del division_num_to_team_list_dict[3][4]
+            del division_num_to_team_list_dict[4][6]
+            del division_num_to_team_list_dict[4][5]
+            del division_num_to_team_list_dict[4][4]
+
+            del division_num_to_teamid_list_dict[1][6]
+            del division_num_to_teamid_list_dict[1][5]
+            del division_num_to_teamid_list_dict[1][4]
+            del division_num_to_teamid_list_dict[2][6]
+            del division_num_to_teamid_list_dict[2][5]
+            del division_num_to_teamid_list_dict[2][4]
+            del division_num_to_teamid_list_dict[3][6]
+            del division_num_to_teamid_list_dict[3][5]
+            del division_num_to_teamid_list_dict[3][4]
+            del division_num_to_teamid_list_dict[4][6]
+            del division_num_to_teamid_list_dict[4][5]
+            del division_num_to_teamid_list_dict[4][4]
 
         if previous_num_teams_per_conference == 16 and number_of_teams_conf_select == 16:
 
@@ -644,10 +810,21 @@ def add_new_divisions_and_teams(division_num_to_division_name_dict, division_num
             division_num_to_team_list_dict[max_division_num + 1] = []
             division_num_to_team_list_dict[max_division_num + 2] = []
 
+            division_num_to_teamid_list_dict[max_division_num + 1] = []
+            division_num_to_teamid_list_dict[max_division_num + 2] = []
+
+            starting_index = 0
+
             for i in range(max_division_num + 1, max_division_num + 2 + 1):
                 division_num_to_team_list_dict[i].append("New Team")
                 division_num_to_team_list_dict[i].append("New Team")
                 division_num_to_team_list_dict[i].append("New Team")
+
+                division_num_to_teamid_list_dict[i].append(starting_index + -1)
+                division_num_to_teamid_list_dict[i].append(starting_index + -2)
+                division_num_to_teamid_list_dict[i].append(starting_index + -3)
+
+                starting_index += -3
 
         if previous_num_teams_per_conference == 9 and number_of_teams_conf_select == 16:
 
@@ -659,8 +836,16 @@ def add_new_divisions_and_teams(division_num_to_division_name_dict, division_num
             division_num_to_team_list_dict[max_division_num + 1] = []
             division_num_to_team_list_dict[max_division_num + 2] = []
 
+            division_num_to_teamid_list_dict[max_division_num + 1] = []
+            division_num_to_teamid_list_dict[max_division_num + 2] = []
+
+            starting_index = -1
+
             for i in range(1, max_division_num + 1):
                 division_num_to_team_list_dict[i].append("New Team")
+                division_num_to_team_list_dict[i].append(starting_index)
+
+                starting_index += -1
 
             division_num_to_team_list_dict[max_division_num + 1].append("New Team")
             division_num_to_team_list_dict[max_division_num + 1].append("New Team")
@@ -670,6 +855,15 @@ def add_new_divisions_and_teams(division_num_to_division_name_dict, division_num
             division_num_to_team_list_dict[max_division_num + 2].append("New Team")
             division_num_to_team_list_dict[max_division_num + 2].append("New Team")
             division_num_to_team_list_dict[max_division_num + 2].append("New Team")
+
+            division_num_to_teamid_list_dict[max_division_num + 1].append(-7)
+            division_num_to_teamid_list_dict[max_division_num + 1].append(-8)
+            division_num_to_teamid_list_dict[max_division_num + 1].append(-9)
+            division_num_to_teamid_list_dict[max_division_num + 1].append(-10)
+            division_num_to_teamid_list_dict[max_division_num + 2].append(-11)
+            division_num_to_teamid_list_dict[max_division_num + 2].append(-12)
+            division_num_to_teamid_list_dict[max_division_num + 2].append(-13)
+            division_num_to_teamid_list_dict[max_division_num + 2].append(-14)
 
         if previous_num_teams_per_conference == 12 and number_of_teams_conf_select == 12:
 
@@ -730,12 +924,23 @@ def add_new_divisions_and_teams(division_num_to_division_name_dict, division_num
             division_num_to_team_list_dict[7].append(division_num_to_team_list_dict[3][4])
             division_num_to_team_list_dict[7].append("New Team")
 
+            division_num_to_teamid_list_dict[7] = []
+            division_num_to_teamid_list_dict[7].append(division_num_to_teamid_list_dict[1][4])
+            division_num_to_teamid_list_dict[7].append(division_num_to_teamid_list_dict[2][4])
+            division_num_to_teamid_list_dict[7].append(division_num_to_teamid_list_dict[3][4])
+            division_num_to_teamid_list_dict[7].append(-1)
+
             # create a new div8 that takes 1 team from old div4, div5 and div6 and adds a new team
             division_num_to_team_list_dict[8] = []
             division_num_to_team_list_dict[8].append(division_num_to_team_list_dict[4][4])
             division_num_to_team_list_dict[8].append(division_num_to_team_list_dict[5][4])
             division_num_to_team_list_dict[8].append(division_num_to_team_list_dict[6][4])
             division_num_to_team_list_dict[8].append("New Team")
+
+            division_num_to_teamid_list_dict[8].append(division_num_to_teamid_list_dict[4][4])
+            division_num_to_teamid_list_dict[8].append(division_num_to_teamid_list_dict[5][4])
+            division_num_to_teamid_list_dict[8].append(division_num_to_teamid_list_dict[6][4])
+            division_num_to_teamid_list_dict[8].append(-2)
 
             #delete dup teams
             del division_num_to_team_list_dict[1][4]
@@ -744,6 +949,13 @@ def add_new_divisions_and_teams(division_num_to_division_name_dict, division_num
             del division_num_to_team_list_dict[4][4]
             del division_num_to_team_list_dict[5][4]
             del division_num_to_team_list_dict[6][4]
+
+            del division_num_to_teamid_list_dict[1][4]
+            del division_num_to_teamid_list_dict[2][4]
+            del division_num_to_teamid_list_dict[3][4]
+            del division_num_to_teamid_list_dict[4][4]
+            del division_num_to_teamid_list_dict[5][4]
+            del division_num_to_teamid_list_dict[6][4]
 
             #just add 2 new divisions for div7 and div8
             division_num_to_division_name_dict[7] = "New Division 1"
@@ -782,6 +994,7 @@ def add_new_divisions_and_teams(division_num_to_division_name_dict, division_num
             #delete empty divisions
             for j in range(5, max_division_num + 1):
                 del division_num_to_team_list_dict[j]
+                del division_num_to_teamid_list_dict[j]
 
             #finally, create 4 new divisions
             division_num_to_division_name_dict = {}
@@ -794,17 +1007,24 @@ def add_new_divisions_and_teams(division_num_to_division_name_dict, division_num
             #we need to create 2 divisions of 5 teams each per conference
             #divisions will have all new names.
 
+            starting_index = -1
+
             for i in range(1, max_division_num / 2 + 1):
 
                 #first, add teams in old div 3 to div 1 for each conference, since we will delete old div 3
                 division_num_to_team_list_dict[i] = division_num_to_team_list_dict[i] + division_num_to_team_list_dict[i + 4]
+                division_num_to_teamid_list_dict[i] = division_num_to_teamid_list_dict[i] + division_num_to_teamid_list_dict[i + 4]
 
                 #add one new team to new div 1
                 division_num_to_team_list_dict[i].append("New Team")
+                division_num_to_teamid_list_dict[i].append(starting_index)
 
-            #delete empty divisions in division_num_to_team_list_dict
+                starting_index += -1
+
+            #delete empty divisions in division_num_to_team_list_dict and division_num_to_teamid_list_dict
             for j in range(5, max_division_num + 1):
                 del division_num_to_team_list_dict[j]
+                del division_num_to_teamid_list_dict[j]
 
             #finally, create 4 new divisions
             division_num_to_division_name_dict = {}
@@ -813,6 +1033,8 @@ def add_new_divisions_and_teams(division_num_to_division_name_dict, division_num
                 division_num_to_division_name_dict[k] = "New Division " + str(k)
 
         if previous_num_teams_per_conference == 8 and number_of_teams_conf_select == 12:
+
+            starting_index = 0
 
             #it is almost the same as the 8-10 case above, except that now we are adding 2 new teams to each newly made division
             for i in range(1, max_division_num / 2 + 1):
@@ -824,9 +1046,18 @@ def add_new_divisions_and_teams(division_num_to_division_name_dict, division_num
                 division_num_to_team_list_dict[i].append("New Team")
                 division_num_to_team_list_dict[i].append("New Team")
 
+                division_num_to_teamid_list_dict[i] = division_num_to_teamid_list_dict[i] + division_num_to_teamid_list_dict[i + 4]
+
+                # add 2 new teams to new div 1
+                division_num_to_teamid_list_dict[i].append(starting_index + -1)
+                division_num_to_teamid_list_dict[i].append(starting_index + -2)
+
+                starting_index += -2
+
             #delete empty divisions in division_num_to_team_list_dict
             for j in range(5, max_division_num + 1):
                 del division_num_to_team_list_dict[j]
+                del division_num_to_teamid_list_dict[j]
 
             #finally, create 4 new divisions
             division_num_to_division_name_dict = {}
@@ -836,19 +1067,29 @@ def add_new_divisions_and_teams(division_num_to_division_name_dict, division_num
 
         if previous_num_teams_per_conference == 8 and number_of_teams_conf_select == 14:
 
+            starting_index = 0
+
             # it is almost the same as the 8-12 case above, except that now we are adding 3 new teams to each newly made division
             for i in range(1, max_division_num / 2 + 1):
                 # first, add teams in old div 3 to div 1 for each conference, since we will delete old div 3
                 division_num_to_team_list_dict[i] = division_num_to_team_list_dict[i] + division_num_to_team_list_dict[i + 4]
+                division_num_to_teamid_list_dict[i] = division_num_to_teamid_list_dict[i] + division_num_to_teamid_list_dict[i + 4]
 
                 # add 3 new teams to new div 1
                 division_num_to_team_list_dict[i].append("New Team")
                 division_num_to_team_list_dict[i].append("New Team")
                 division_num_to_team_list_dict[i].append("New Team")
 
+                division_num_to_teamid_list_dict[i].append(starting_index + -1)
+                division_num_to_teamid_list_dict[i].append(starting_index + -2)
+                division_num_to_teamid_list_dict[i].append(starting_index + -3)
+
+                starting_index += -3
+
             # delete empty divisions in division_num_to_team_list_dict
             for j in range(5, max_division_num + 1):
                 del division_num_to_team_list_dict[j]
+                del division_num_to_teamid_list_dict[j]
 
             # finally, create 4 new divisions
             division_num_to_division_name_dict = {}
@@ -858,10 +1099,14 @@ def add_new_divisions_and_teams(division_num_to_division_name_dict, division_num
 
         if previous_num_teams_per_conference == 8 and number_of_teams_conf_select == 16:
 
+            starting_index = 0
+
             # it is almost the same as the 8-12 case above, except that now we are adding 3 new teams to each newly made division
             for i in range(1, max_division_num / 2 + 1):
                 # first, add teams in old div 3 to div 1 for each conference, since we will delete old div 3
                 division_num_to_team_list_dict[i] = division_num_to_team_list_dict[i] + division_num_to_team_list_dict[i + 4]
+
+                division_num_to_teamid_list_dict[i] = division_num_to_teamid_list_dict[i] + division_num_to_teamid_list_dict[i + 4]
 
                 # add 4 new teams to new div 1
                 division_num_to_team_list_dict[i].append("New Team")
@@ -869,9 +1114,17 @@ def add_new_divisions_and_teams(division_num_to_division_name_dict, division_num
                 division_num_to_team_list_dict[i].append("New Team")
                 division_num_to_team_list_dict[i].append("New Team")
 
+                division_num_to_teamid_list_dict[i].append(starting_index + -1)
+                division_num_to_teamid_list_dict[i].append(starting_index + -2)
+                division_num_to_teamid_list_dict[i].append(starting_index + -3)
+                division_num_to_teamid_list_dict[i].append(starting_index + -4)
+
+                starting_index += -4
+
             # delete empty divisions in division_num_to_team_list_dict
             for j in range(5, max_division_num + 1):
                 del division_num_to_team_list_dict[j]
+                del division_num_to_teamid_list_dict[j]
 
             # finally, create 4 new divisions
             division_num_to_division_name_dict = {}
@@ -881,17 +1134,24 @@ def add_new_divisions_and_teams(division_num_to_division_name_dict, division_num
 
         if previous_num_teams_per_conference == 12 and number_of_teams_conf_select == 14:
 
+            starting_index = 0
+
             # merge two divisions and add 1 team
             for i in range(1, max_division_num / 2 + 1):
                 # first, add teams in old div 3 to div 1 for each conference, since we will delete old div 3
                 division_num_to_team_list_dict[i] = division_num_to_team_list_dict[i] + division_num_to_team_list_dict[i + 4]
+                division_num_to_teamid_list_dict[i] = division_num_to_teamid_list_dict[i] + division_num_to_teamid_list_dict[i + 4]
 
                 # add 1 new team to new div i
                 division_num_to_team_list_dict[i].append("New Team")
 
+                division_num_to_teamid_list_dict[i].append(starting_index + -1)
+                starting_index += -1
+
             # delete empty divisions in division_num_to_team_list_dict
             for j in range(5, max_division_num + 1):
                 del division_num_to_team_list_dict[j]
+                del division_num_to_teamid_list_dict[j]
 
             # finally, create 4 new divisions
             division_num_to_division_name_dict = {}
@@ -901,18 +1161,27 @@ def add_new_divisions_and_teams(division_num_to_division_name_dict, division_num
 
         if previous_num_teams_per_conference == 12 and number_of_teams_conf_select == 16:
 
+            starting_index = 0
+
             # merge two divisions and add 2 teams
             for i in range(1, max_division_num / 2 + 1):
                 # first, add teams in old div 3 to div 1 for each conference, since we will delete old div 3
                 division_num_to_team_list_dict[i] = division_num_to_team_list_dict[i] + division_num_to_team_list_dict[i + 4]
+                division_num_to_teamid_list_dict[i] = division_num_to_teamid_list_dict[i] + division_num_to_teamid_list_dict[i + 4]
 
                 # add 2 new teams to new div i
                 division_num_to_team_list_dict[i].append("New Team")
                 division_num_to_team_list_dict[i].append("New Team")
 
+                division_num_to_teamid_list_dict[i].append(starting_index + -1)
+                division_num_to_teamid_list_dict[i].append(starting_index + -2)
+
+                starting_index += -2
+
             # delete empty divisions in division_num_to_team_list_dict
             for j in range(5, max_division_num + 1):
                 del division_num_to_team_list_dict[j]
+                del division_num_to_teamid_list_dict[j]
 
             # finally, create 4 new divisions
             division_num_to_division_name_dict = {}
@@ -933,15 +1202,28 @@ def add_new_divisions_and_teams(division_num_to_division_name_dict, division_num
             division_num_to_team_list_dict[6].append(division_num_to_team_list_dict[8][1])
             division_num_to_team_list_dict[7].append("New Team")
 
+            division_num_to_teamid_list_dict[1].append(division_num_to_teamid_list_dict[4][0])
+            division_num_to_teamid_list_dict[2].append(division_num_to_teamid_list_dict[4][1])
+            division_num_to_teamid_list_dict[3].append(-1)
+
+            division_num_to_teamid_list_dict[5].append(division_num_to_teamid_list_dict[8][0])
+            division_num_to_teamid_list_dict[6].append(division_num_to_teamid_list_dict[8][1])
+            division_num_to_teamid_list_dict[7].append(-2)
+
             #delete empty divisions
             del division_num_to_team_list_dict[4]
             del division_num_to_team_list_dict[8]
 
+            del division_num_to_teamid_list_dict[4]
+            del division_num_to_teamid_list_dict[8]
+
             #renumber division nums in division_num_to_team_list_dict
             #all we need to do is reassign 7 to 4 and delete 7
             division_num_to_team_list_dict[4] = division_num_to_team_list_dict[7]
+            division_num_to_teamid_list_dict[4] = division_num_to_teamid_list_dict[7]
 
             del division_num_to_team_list_dict[7]
+            del division_num_to_teamid_list_dict[7]
 
             #recreate 3 new divisions
             division_num_to_division_name_dict = {}
@@ -962,10 +1244,23 @@ def add_new_divisions_and_teams(division_num_to_division_name_dict, division_num
             division_num_to_team_list_dict[6] = division_num_to_team_list_dict[6] + division_num_to_team_list_dict[8]
             division_num_to_team_list_dict[7] = ["New Team", "New Team", "New Team", "New Team"]
 
+            division_num_to_teamid_list_dict[1] = division_num_to_teamid_list_dict[1] + division_num_to_teamid_list_dict[3]
+            division_num_to_teamid_list_dict[2] = division_num_to_teamid_list_dict[2] + division_num_to_teamid_list_dict[4]
+            division_num_to_teamid_list_dict[3] = [-1, -2, -3, -4]
+
+            division_num_to_teamid_list_dict[5] = division_num_to_teamid_list_dict[5] + division_num_to_teamid_list_dict[7]
+            division_num_to_teamid_list_dict[6] = division_num_to_teamid_list_dict[6] + division_num_to_teamid_list_dict[8]
+            division_num_to_teamid_list_dict[7] = [-5, -6, -7, -8]
+
             division_num_to_team_list_dict[4] = division_num_to_team_list_dict[7]
 
             del division_num_to_team_list_dict[7]
             del division_num_to_team_list_dict[8]
+
+            division_num_to_teamid_list_dict[4] = division_num_to_teamid_list_dict[7]
+
+            del division_num_to_teamid_list_dict[7]
+            del division_num_to_teamid_list_dict[8]
 
             # recreate 3 new divisions
             division_num_to_division_name_dict = {}
@@ -982,8 +1277,17 @@ def add_new_divisions_and_teams(division_num_to_division_name_dict, division_num
             division_num_to_team_list_dict[2] = division_num_to_team_list_dict[2] + division_num_to_team_list_dict[4]
             division_num_to_team_list_dict[2].append("New Team")
 
+            division_num_to_teamid_list_dict[1] = division_num_to_teamid_list_dict[1] + division_num_to_teamid_list_dict[3]
+            division_num_to_teamid_list_dict[1].append(-1)
+
+            division_num_to_teamid_list_dict[2] = division_num_to_teamid_list_dict[2] + division_num_to_teamid_list_dict[4]
+            division_num_to_teamid_list_dict[2].append(-2)
+
             division_num_to_team_list_dict[3] = ["New Team","New Team","New Team","New Team","New Team"]
             division_num_to_team_list_dict[4] = ["New Team", "New Team", "New Team", "New Team", "New Team"]
+
+            division_num_to_teamid_list_dict[3] = [-3, -4, -5, -6, -7]
+            division_num_to_teamid_list_dict[4] = [-8, -9, -10, -11, -12]
 
             division_num_to_team_list_dict[5] = division_num_to_team_list_dict[5] + division_num_to_team_list_dict[7]
             division_num_to_team_list_dict[5].append("New Team")
@@ -991,8 +1295,17 @@ def add_new_divisions_and_teams(division_num_to_division_name_dict, division_num
             division_num_to_team_list_dict[6] = division_num_to_team_list_dict[6] + division_num_to_team_list_dict[8]
             division_num_to_team_list_dict[6].append("New Team")
 
+            division_num_to_teamid_list_dict[5] = division_num_to_teamid_list_dict[5] + division_num_to_teamid_list_dict[7]
+            division_num_to_teamid_list_dict[5].append(-13)
+
+            division_num_to_teamid_list_dict[6] = division_num_to_teamid_list_dict[6] + division_num_to_teamid_list_dict[8]
+            division_num_to_teamid_list_dict[6].append(-14)
+
             del division_num_to_team_list_dict[7]
             del division_num_to_team_list_dict[8]
+
+            del division_num_to_teamid_list_dict[7]
+            del division_num_to_teamid_list_dict[8]
 
             # recreate 3 new divisions
             division_num_to_division_name_dict = {}
@@ -1046,11 +1359,28 @@ def add_new_divisions_and_teams(division_num_to_division_name_dict, division_num
             division_num_to_team_list_dict[2].append(division_num_to_team_list_dict[4][1])
 
             division_num_to_team_list_dict[3].append(division_num_to_team_list_dict[4][2])
+
             del division_num_to_team_list_dict[3][0]
             del division_num_to_team_list_dict[3][1]
+
+            division_num_to_teamid_list_dict[1].append(division_num_to_teamid_list_dict[3][0])
+            division_num_to_teamid_list_dict[1].append(division_num_to_teamid_list_dict[3][1])
+
+            division_num_to_teamid_list_dict[2].append(division_num_to_teamid_list_dict[4][0])
+            division_num_to_teamid_list_dict[2].append(division_num_to_teamid_list_dict[4][1])
+
+            division_num_to_teamid_list_dict[3].append(division_num_to_teamid_list_dict[4][2])
+
+            del division_num_to_teamid_list_dict[3][0]
+            del division_num_to_teamid_list_dict[3][1]
+
             division_num_to_team_list_dict[3].append("New Team")
             division_num_to_team_list_dict[3].append("New Team")
             division_num_to_team_list_dict[3].append("New Team")
+
+            division_num_to_teamid_list_dict[3].append(-1)
+            division_num_to_teamid_list_dict[3].append(-2)
+            division_num_to_teamid_list_dict[3].append(-3)
 
             division_num_to_team_list_dict[5].append(division_num_to_team_list_dict[7][0])
             division_num_to_team_list_dict[5].append(division_num_to_team_list_dict[7][1])
@@ -1059,16 +1389,38 @@ def add_new_divisions_and_teams(division_num_to_division_name_dict, division_num
             division_num_to_team_list_dict[6].append(division_num_to_team_list_dict[8][1])
 
             division_num_to_team_list_dict[7].append(division_num_to_team_list_dict[8][2])
+
             del division_num_to_team_list_dict[7][0]
             del division_num_to_team_list_dict[7][1]
+
+            division_num_to_teamid_list_dict[5].append(division_num_to_teamid_list_dict[7][0])
+            division_num_to_teamid_list_dict[5].append(division_num_to_teamid_list_dict[7][1])
+
+            division_num_to_teamid_list_dict[6].append(division_num_to_teamid_list_dict[8][0])
+            division_num_to_teamid_list_dict[6].append(division_num_to_teamid_list_dict[8][1])
+
+            division_num_to_teamid_list_dict[7].append(division_num_to_teamid_list_dict[8][2])
+
+            del division_num_to_teamid_list_dict[7][0]
+            del division_num_to_teamid_list_dict[7][1]
+
             division_num_to_team_list_dict[7].append("New Team")
             division_num_to_team_list_dict[7].append("New Team")
             division_num_to_team_list_dict[7].append("New Team")
+
+            division_num_to_teamid_list_dict[7].append(-4)
+            division_num_to_teamid_list_dict[7].append(-5)
+            division_num_to_teamid_list_dict[7].append(-6)
 
             division_num_to_team_list_dict[4] = division_num_to_team_list_dict[7]
 
             del division_num_to_team_list_dict[7]
             del division_num_to_team_list_dict[8]
+
+            division_num_to_teamid_list_dict[4] = division_num_to_teamid_list_dict[7]
+
+            del division_num_to_teamid_list_dict[7]
+            del division_num_to_teamid_list_dict[8]
 
             # recreate 3 new divisions
             division_num_to_division_name_dict = {}
@@ -1090,6 +1442,16 @@ def add_new_divisions_and_teams(division_num_to_division_name_dict, division_num
             #add 1 new team
             division_num_to_team_list_dict[2].append("New Team")
 
+            # add two teams from the last conf division to div 1
+            division_num_to_teamid_list_dict[1].append(division_num_to_teamid_list_dict[3][0])
+            division_num_to_teamid_list_dict[1].append(division_num_to_teamid_list_dict[3][1])
+
+            # add the last div3 team to div 2
+            division_num_to_teamid_list_dict[2].append(division_num_to_teamid_list_dict[3][2])
+
+            # add 1 new team
+            division_num_to_teamid_list_dict[2].append(-1)
+
             #add two teams from last conf division to div 4
             division_num_to_team_list_dict[4].append(division_num_to_team_list_dict[6][0])
             division_num_to_team_list_dict[4].append(division_num_to_team_list_dict[6][1])
@@ -1100,6 +1462,15 @@ def add_new_divisions_and_teams(division_num_to_division_name_dict, division_num
             # add 1 new team
             division_num_to_team_list_dict[5].append("New Team")
 
+            division_num_to_teamid_list_dict[4].append(division_num_to_teamid_list_dict[6][0])
+            division_num_to_teamid_list_dict[4].append(division_num_to_teamid_list_dict[6][1])
+
+            # add the last div3 team to div 2
+            division_num_to_teamid_list_dict[5].append(division_num_to_teamid_list_dict[6][2])
+
+            # add 1 new team
+            division_num_to_teamid_list_dict[5].append(-2)
+
             #move div 4 to div 3 and div 5 to div 4
             division_num_to_team_list_dict[3] = division_num_to_team_list_dict[4]
             division_num_to_team_list_dict[4] = division_num_to_team_list_dict[5]
@@ -1107,6 +1478,13 @@ def add_new_divisions_and_teams(division_num_to_division_name_dict, division_num
             #delete div 5 and 6
             del division_num_to_team_list_dict[5]
             del division_num_to_team_list_dict[6]
+
+            division_num_to_teamid_list_dict[3] = division_num_to_teamid_list_dict[4]
+            division_num_to_teamid_list_dict[4] = division_num_to_teamid_list_dict[5]
+
+            # delete div 5 and 6
+            del division_num_to_teamid_list_dict[5]
+            del division_num_to_teamid_list_dict[6]
 
             # recreate 2 new divisions
             division_num_to_division_name_dict = {}
@@ -1127,6 +1505,16 @@ def add_new_divisions_and_teams(division_num_to_division_name_dict, division_num
             #renumber div3 as div2
             division_num_to_team_list_dict[2] = division_num_to_team_list_dict[3]
 
+            division_num_to_teamid_list_dict[1] = division_num_to_teamid_list_dict[1] + division_num_to_teamid_list_dict[2]
+
+            # add 3 new teams to div 3
+            division_num_to_teamid_list_dict[3].append(-1)
+            division_num_to_teamid_list_dict[3].append(-2)
+            division_num_to_teamid_list_dict[3].append(-3)
+
+            # renumber div3 as div2
+            division_num_to_teamid_list_dict[2] = division_num_to_teamid_list_dict[3]
+
             #merge div4 and div5
             division_num_to_team_list_dict[4] = division_num_to_team_list_dict[4] + division_num_to_team_list_dict[5]
 
@@ -1138,9 +1526,22 @@ def add_new_divisions_and_teams(division_num_to_division_name_dict, division_num
             #renumber div 6 as div 3
             division_num_to_team_list_dict[3] = division_num_to_team_list_dict[6]
 
+            division_num_to_teamid_list_dict[4] = division_num_to_teamid_list_dict[4] + division_num_to_teamid_list_dict[5]
+
+            # add 3 new teams to div 6
+            division_num_to_teamid_list_dict[6].append("New Team")
+            division_num_to_teamid_list_dict[6].append("New Team")
+            division_num_to_teamid_list_dict[6].append("New Team")
+
+            # renumber div 6 as div 3
+            division_num_to_teamid_list_dict[3] = division_num_to_teamid_list_dict[6]
+
             #delete div5 and div6
             del division_num_to_team_list_dict[5]
             del division_num_to_team_list_dict[6]
+
+            del division_num_to_teamid_list_dict[5]
+            del division_num_to_teamid_list_dict[6]
 
             # recreate 2 new divisions
             division_num_to_division_name_dict = {}
@@ -1163,6 +1564,18 @@ def add_new_divisions_and_teams(division_num_to_division_name_dict, division_num
             #renumber div3 to div2
             division_num_to_team_list_dict[2] = division_num_to_team_list_dict[3]
 
+            division_num_to_teamid_list_dict[1] = division_num_to_teamid_list_dict[1] + division_num_to_teamid_list_dict[2]
+            division_num_to_teamid_list_dict[1].append(-1)
+
+            # add 4 new teams to div3
+            division_num_to_teamid_list_dict[3].append(-2)
+            division_num_to_teamid_list_dict[3].append(-3)
+            division_num_to_teamid_list_dict[3].append(-4)
+            division_num_to_teamid_list_dict[3].append(-5)
+
+            # renumber div3 to div2
+            division_num_to_teamid_list_dict[2] = division_num_to_teamid_list_dict[3]
+
             #merge div4 and div5
             division_num_to_team_list_dict[4] = division_num_to_team_list_dict[4] + division_num_to_team_list_dict[5]
             division_num_to_team_list_dict[4].append("New Team")
@@ -1176,8 +1589,23 @@ def add_new_divisions_and_teams(division_num_to_division_name_dict, division_num
             # renumber div6 to div4
             division_num_to_team_list_dict[4] = division_num_to_team_list_dict[6]
 
+            division_num_to_teamid_list_dict[4] = division_num_to_teamid_list_dict[4] + division_num_to_teamid_list_dict[5]
+            division_num_to_teamid_list_dict[4].append(-6)
+
+            # add 4 new teams to div6
+            division_num_to_teamid_list_dict[6].append(-7)
+            division_num_to_teamid_list_dict[6].append(-8)
+            division_num_to_teamid_list_dict[6].append(-9)
+            division_num_to_teamid_list_dict[6].append(-10)
+
+            # renumber div6 to div4
+            division_num_to_teamid_list_dict[4] = division_num_to_teamid_list_dict[6]
+
             del division_num_to_team_list_dict[5]
             del division_num_to_team_list_dict[6]
+
+            del division_num_to_teamid_list_dict[5]
+            del division_num_to_teamid_list_dict[6]
 
             # recreate 2 new divisions
             division_num_to_division_name_dict = {}
@@ -1199,6 +1627,17 @@ def add_new_divisions_and_teams(division_num_to_division_name_dict, division_num
             division_num_to_team_list_dict[3].append("New Team")
             division_num_to_team_list_dict[3].append("New Team")
 
+            division_num_to_teamid_list_dict[1] = division_num_to_teamid_list_dict[1] + division_num_to_teamid_list_dict[2]
+            division_num_to_teamid_list_dict[1].append(-1)
+            division_num_to_teamid_list_dict[1].append(-2)
+
+            # add 5 new teams to div3
+            division_num_to_teamid_list_dict[3].append(-3)
+            division_num_to_teamid_list_dict[3].append(-4)
+            division_num_to_teamid_list_dict[3].append(-5)
+            division_num_to_teamid_list_dict[3].append(-6)
+            division_num_to_teamid_list_dict[3].append(-7)
+
             #merge old div4 and div5 and add 2 new teams
             division_num_to_team_list_dict[4] = division_num_to_team_list_dict[4] + division_num_to_team_list_dict[5]
             division_num_to_team_list_dict[4].append("New Team")
@@ -1211,12 +1650,29 @@ def add_new_divisions_and_teams(division_num_to_division_name_dict, division_num
             division_num_to_team_list_dict[6].append("New Team")
             division_num_to_team_list_dict[6].append("New Team")
 
+            division_num_to_teamid_list_dict[4] = division_num_to_teamid_list_dict[4] + division_num_to_teamid_list_dict[5]
+            division_num_to_teamid_list_dict[4].append(-8)
+            division_num_to_teamid_list_dict[4].append(-9)
+
+            # add 5 new teams to div6
+            division_num_to_teamid_list_dict[6].append(-10)
+            division_num_to_teamid_list_dict[6].append(-11)
+            division_num_to_teamid_list_dict[6].append(-12)
+            division_num_to_teamid_list_dict[6].append(-13)
+            division_num_to_teamid_list_dict[6].append(-14)
+
             #renumber div6 to div2
             division_num_to_team_list_dict[2] = division_num_to_team_list_dict[6]
 
             #del div5 and div6
             del division_num_to_team_list_dict[5]
             del division_num_to_team_list_dict[6]
+
+            division_num_to_teamid_list_dict[2] = division_num_to_teamid_list_dict[6]
+
+            # del div5 and div6
+            del division_num_to_teamid_list_dict[5]
+            del division_num_to_teamid_list_dict[6]
 
             #recreate divisions
             division_num_to_division_name_dict = {}
@@ -1271,6 +1727,15 @@ def add_new_divisions_and_teams(division_num_to_division_name_dict, division_num
             division_num_to_team_list_dict[2].append("New Team")
             division_num_to_team_list_dict[2].append("New Team")
 
+            division_num_to_teamid_list_dict[1].append(division_num_to_teamid_list_dict[3][0])
+            division_num_to_teamid_list_dict[1].append(division_num_to_teamid_list_dict[3][1])
+            division_num_to_teamid_list_dict[1].append(division_num_to_teamid_list_dict[3][2])
+
+            # add remaining team from div3 to div2, add 2 new teams
+            division_num_to_teamid_list_dict[2].append(division_num_to_teamid_list_dict[3][3])
+            division_num_to_teamid_list_dict[2].append(-1)
+            division_num_to_teamid_list_dict[2].append(-2)
+
             #add 3 teams from old div 6 to div 4
             division_num_to_team_list_dict[4].append(division_num_to_team_list_dict[6][0])
             division_num_to_team_list_dict[4].append(division_num_to_team_list_dict[6][1])
@@ -1281,12 +1746,27 @@ def add_new_divisions_and_teams(division_num_to_division_name_dict, division_num
             division_num_to_team_list_dict[5].append("New Team")
             division_num_to_team_list_dict[5].append("New Team")
 
+            division_num_to_teamid_list_dict[4].append(division_num_to_teamid_list_dict[6][0])
+            division_num_to_teamid_list_dict[4].append(division_num_to_teamid_list_dict[6][1])
+            division_num_to_teamid_list_dict[4].append(division_num_to_teamid_list_dict[6][2])
+
+            # add remaining team from div6 to div5, add 2 new teams
+            division_num_to_teamid_list_dict[5].append(division_num_to_teamid_list_dict[6][3])
+            division_num_to_teamid_list_dict[5].append(-3)
+            division_num_to_teamid_list_dict[5].append(-4)
+
             #renumber div5 to div3
             division_num_to_team_list_dict[3] = division_num_to_team_list_dict[5]
 
             #delete divisions
             del division_num_to_team_list_dict[5]
             del division_num_to_team_list_dict[6]
+
+            division_num_to_teamid_list_dict[3] = division_num_to_teamid_list_dict[5]
+
+            # delete divisions
+            del division_num_to_teamid_list_dict[5]
+            del division_num_to_teamid_list_dict[6]
 
             # recreate new divisions
             division_num_to_division_name_dict = {}
@@ -1307,6 +1787,16 @@ def add_new_divisions_and_teams(division_num_to_division_name_dict, division_num
 
             division_num_to_team_list_dict[2] = division_num_to_team_list_dict[3]
 
+            division_num_to_teamid_list_dict[1] = division_num_to_teamid_list_dict[1] + division_num_to_teamid_list_dict[2]
+
+            # div3 will just add 4 new teams and be renumbered to div2
+            division_num_to_teamid_list_dict[3].append(-1)
+            division_num_to_teamid_list_dict[3].append(-2)
+            division_num_to_teamid_list_dict[3].append(-3)
+            division_num_to_teamid_list_dict[3].append(-4)
+
+            division_num_to_teamid_list_dict[2] = division_num_to_teamid_list_dict[3]
+
             #merge old div4 and div5 into 1 new div
             division_num_to_team_list_dict[4] = division_num_to_team_list_dict[4] + division_num_to_team_list_dict[5]
 
@@ -1318,9 +1808,22 @@ def add_new_divisions_and_teams(division_num_to_division_name_dict, division_num
 
             division_num_to_team_list_dict[3] = division_num_to_team_list_dict[6]
 
+            division_num_to_teamid_list_dict[4] = division_num_to_teamid_list_dict[4] + division_num_to_teamid_list_dict[5]
+
+            # div6 will just add 4 new teams and be renumbered to div2
+            division_num_to_teamid_list_dict[6].append(-5)
+            division_num_to_teamid_list_dict[6].append(-6)
+            division_num_to_teamid_list_dict[6].append(-7)
+            division_num_to_teamid_list_dict[6].append(-8)
+
+            division_num_to_teamid_list_dict[3] = division_num_to_teamid_list_dict[6]
+
             # delete divisions
             del division_num_to_team_list_dict[5]
             del division_num_to_team_list_dict[6]
+
+            del division_num_to_teamid_list_dict[5]
+            del division_num_to_teamid_list_dict[6]
 
             # recreate new divisions
             division_num_to_division_name_dict = {}
@@ -1340,6 +1843,15 @@ def add_new_divisions_and_teams(division_num_to_division_name_dict, division_num
             division_num_to_team_list_dict[2].append(division_num_to_team_list_dict[3][4])
             division_num_to_team_list_dict[2].append("New Team")
 
+            division_num_to_teamid_list_dict[1].append(division_num_to_teamid_list_dict[3][0])
+            division_num_to_teamid_list_dict[1].append(division_num_to_teamid_list_dict[3][1])
+            division_num_to_teamid_list_dict[1].append(division_num_to_teamid_list_dict[3][2])
+
+            # add 2 teams from div3 to div2 and then add one new one
+            division_num_to_teamid_list_dict[2].append(division_num_to_teamid_list_dict[3][3])
+            division_num_to_teamid_list_dict[2].append(division_num_to_teamid_list_dict[3][4])
+            division_num_to_teamid_list_dict[2].append(-1)
+
             # add 3 teams from div6 to div4
             division_num_to_team_list_dict[4].append(division_num_to_team_list_dict[6][0])
             division_num_to_team_list_dict[4].append(division_num_to_team_list_dict[6][1])
@@ -1350,12 +1862,27 @@ def add_new_divisions_and_teams(division_num_to_division_name_dict, division_num
             division_num_to_team_list_dict[5].append(division_num_to_team_list_dict[6][4])
             division_num_to_team_list_dict[5].append("New Team")
 
+            division_num_to_teamid_list_dict[4].append(division_num_to_teamid_list_dict[6][0])
+            division_num_to_teamid_list_dict[4].append(division_num_to_teamid_list_dict[6][1])
+            division_num_to_teamid_list_dict[4].append(division_num_to_teamid_list_dict[6][2])
+
+            # add 2 teams from div6 to div5 and then add one new one
+            division_num_to_teamid_list_dict[5].append(division_num_to_teamid_list_dict[6][3])
+            division_num_to_teamid_list_dict[5].append(division_num_to_teamid_list_dict[6][4])
+            division_num_to_teamid_list_dict[5].append(-2)
+
             #renumber div5 to div3
             division_num_to_team_list_dict[3] = division_num_to_team_list_dict[5]
 
             # delete divisions
             del division_num_to_team_list_dict[5]
             del division_num_to_team_list_dict[6]
+
+            division_num_to_teamid_list_dict[3] = division_num_to_teamid_list_dict[5]
+
+            # delete divisions
+            del division_num_to_teamid_list_dict[5]
+            del division_num_to_teamid_list_dict[6]
 
             # recreate new divisions
             division_num_to_division_name_dict = {}
