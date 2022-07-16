@@ -276,29 +276,86 @@ def edit_league_settings(request):
     return HttpResponseRedirect('/jpartyfb/choose_league/')
 
 @ensure_csrf_cookie
+def start_new_season(request):
+
+    #use session variable to pass along parameter in HttpResponseRedirect
+    request.session['source_page'] = 'start_new_season'
+
+    #redirect to choose league page
+    return HttpResponseRedirect('/jpartyfb/choose_league/')
+
+@ensure_csrf_cookie
+def draft_options(request):
+
+    context = {}
+
+    welcome_message = "Draft Options"
+    context['welcome_message'] = welcome_message
+
+    return render(request, 'jpartyfb/draft_options.html', context)
+
+@ensure_csrf_cookie
+def create_draft_list(request, source=None):
+
+    context = {}
+
+    welcome_message = "Draft Options"
+    context['welcome_message'] = welcome_message
+
+    return render(request, 'jpartyfb/draft_options.html', context)
+
+
+@ensure_csrf_cookie
 def choose_league(request):
 
     context = {}
 
-    #get session variable and delete
+    #get session variable
+    source_page = request.session['source_page']
     context['source_page'] = request.session['source_page']
 
     welcome_message = "Choose League"
     context['welcome_message'] = welcome_message
 
-    # load all league ids and names
-    try:
-        league_obj_list = League.objects.using("xactly_dev").all().order_by("-id")
-    except Exception:
-        league_obj_list = []
-
     league_select_list = []
 
-    for this_league_obj in league_obj_list:
-        league_id = this_league_obj.id
-        league_name = this_league_obj.name
+    if source_page == 'edit_league_settings':
 
-        league_select_list.append([league_id, league_name])
+        # load all league ids and names
+        try:
+            league_obj_list = League.objects.using("xactly_dev").all().order_by("-id")
+        except Exception:
+            league_obj_list = []
+
+        for this_league_obj in league_obj_list:
+            league_id = this_league_obj.id
+            league_name = this_league_obj.name
+
+            league_select_list.append([league_id, league_name])
+
+    elif source_page == 'start_new_season':
+
+        # load only leagues that do not currently have an active season. This will require submitting a
+        # raw SQL query so that I can use GROUP BY
+
+        try:
+            league_obj_list = League.objects.using("xactly_dev").raw("SELECT 1 as id, l.id as league_id, l.name as league_name, max(s.id) as most_recent_season_id FROM season s INNER JOIN league l ON l.id = s.league_id GROUP BY l.id")
+        except Exception:
+            league_obj_list = []
+
+        for this_league_obj in league_obj_list:
+            league_id = this_league_obj.league_id
+            league_name = this_league_obj.league_name
+            most_recent_season_id = this_league_obj.most_recent_season_id
+
+            #query Season to determine if most_recent_season_id is active or not
+            try:
+                this_season_obj = Season.objects.using("xactly_dev").filter(id=most_recent_season_id)
+            except Exception:
+                this_season_obj = None
+
+            if this_season_obj[0].start_time is not None:
+                league_select_list.append([league_id, league_name])
 
     context['league_list'] = league_select_list
 
@@ -311,13 +368,14 @@ def league_redirect(request):
     league_id = request.POST['choose_league_select']
     source_page = request.POST['source_page_hidden']
 
+    # pass league_id in a session variable
+    request.session['league_id'] = league_id
+
     #depending on how we got to the choose league page, we will redirect to the proper location
     if source_page == 'edit_league_settings':
-
-        #pass league_id in a session variable
-        request.session['league_id'] = league_id
-
         return HttpResponseRedirect('/jpartyfb/show_league_form_1/els/')
+    elif source_page == 'start_new_season':
+        return HttpResponseRedirect('/jpartyfb/draft_options/')
 
 
 @csrf_exempt
@@ -710,7 +768,7 @@ def process_create_league_form_final(request):
         try:
             Season.objects.using("xactly_dev").create(id=season_id, start_time=None,
                                                         end_time=None,
-                                                        season_year=1, league_id=league_id)
+                                                        season_year=1, league_id=league_id, created_draft_list=False)
 
             db_commit_to_delete_id_dict['Season'] = season_id
 
@@ -885,3 +943,13 @@ def process_create_league_form_final(request):
         status_code = 1
 
     return HttpResponse(status_code)
+
+
+def watch_draft(request):
+    pass
+
+def fast_forward_draft(request):
+    pass
+
+def view_draft_list(request):
+    pass
