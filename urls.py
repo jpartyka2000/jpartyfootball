@@ -14,6 +14,16 @@ urlpatterns = patterns('',
     url(r'^process_create_league_form_final/$', views.process_create_league_form_final, name='process_create_league_form_final'),
     url(r'^choose_league/$', views.choose_league, name='choose_league'),
     url(r'^league_redirect/$', views.league_redirect, name='league_redirect'),
+    url(r'^watch_draft/$', views.watch_draft, name='watch_draft'),
+    url(r'^fast_forward_draft/$', views.fast_forward_draft, name='fast_forward_draft'),
+    url(r'^view_draft_list/$', views.view_draft_list, name='view_draft_list'),
+    url(r'^start_new_season/$', views.start_new_season, name='start_new_season'),
+    url(r'^draft_options/$', views.draft_options, name='draft_options'),
+    url(r'^create_draft_list/(?P<source>\w+)$', views.create_draft_list, name='create_draft_list'),
+    url(r'^watch_draft/$', views.watch_draft, name='watch_draft'),
+    url(r'^fast_forward_draft/$', views.fast_forward_draft, name='fast_forward_draft'),
+    url(r'^view_draft_list/$', views.view_draft_list, name='view_draft_list'),
+
 
 )
 
