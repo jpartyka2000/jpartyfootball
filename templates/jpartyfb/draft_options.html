@@ -1,0 +1,54 @@
+{% extends "backendBase.html" %}
+
+{% load staticfiles %}
+{% load static %}
+
+{%block mainContent%}	
+	<div class="container" style="border:1px solid #C0C0C0;" align="center">
+          {% csrf_token %}
+		<div class='row' style='text-align:center;'>
+            <div style="float:left;">
+			</div>
+			<h1>{{ welcome_message }}</h1></div><br>
+
+{% if Error_message %}
+    <p style="color: red;">
+        {{ Error_message }}
+    </p>
+{% endif %}
+
+    <table align="center">
+        <tr>
+            <img style="border-radius:1px;height:160px; width:160px;" src="{% static 'jpartyfb/images/league_logo.png' %}"/>
+        </tr>
+    </table>
+    <div style="height: 75px;"></div>
+
+    <table width="100%">
+	    <tr align="center">
+	        
+	        <td width="33%" align="center">
+                <a href="{% url 'jpartyfb:create_draft_list' source='watch_draft' %}">
+                    <img style="border-radius:1px;height:108px; width:125px;" src="{% static 'jpartyfb/images/menu_icons/watch_draft.png' %}"/>
+                    <img style="border-radius:1px;height:65px; width:260px;" src="{% static 'jpartyfb/images/text_graphics/watch_draft.png' %}"/>
+                </a>
+	        </td>
+            <td width="33%" align="center">
+                <a href="{% url 'jpartyfb:create_draft_list' source='fast_forward_draft' %}">
+                    <img style="border-radius:1px;height:108px; width:125px;" src="{% static 'jpartyfb/images/menu_icons/fast_forward_draft.png' %}"/>
+                    <img style="border-radius:1px;height:65px; width:260px;" src="{% static 'jpartyfb/images/text_graphics/fast_forward_draft.png' %}"/>
+                </a>
+	        </td>
+            <td width="33%" align="center">
+                <a href="{% url 'jpartyfb:view_draft_list' %}">
+                    <img style="border-radius:1px;height:108px; width:125px;" src="{% static 'jpartyfb/images/menu_icons/view_draft_list.png' %}"/>
+                    <img style="border-radius:1px;height:65px; width:260px;" src="{% static 'jpartyfb/images/text_graphics/view_draft_list.png' %}"/>
+                </a>
+	        </td>
+	    </tr>
+	</table>
+
+</div>
+
+
+{% endblock%}
