@@ -249,6 +249,15 @@
 
             team_id_to_team_name_dict[this_team_id] = this_team_name
 
+            this_team_id_int = parseInt(this_team_id)
+
+            //if we are adding new teams, then we need to update city_nickname_to_city_id_dict
+            if (this_team_id_int < 0) {
+                this_team_name_parts_list = this_team_name.split(" ")
+                this_team_nickname = this_team_name_parts_list.pop()
+                city_nickname_to_city_id_dict[this_team_nickname] = -1
+            }
+
         }//end for
 
         //next, we will push the form data on this page to the backend via an ajax call
@@ -283,9 +292,6 @@
         //alert(JSON.stringify(city_nickname_to_city_id_dict))
         //return
 
-        //alert(JSON.stringify(team_id_to_team_name_dict))
-        //return
-
         $("#loading_image").show()
 
         $.ajax({
@@ -298,9 +304,9 @@
             cache: false,
             success: function(data) {
 
-               alert(JSON.stringify(data))
+               //alert(JSON.stringify(data))
                $("#loading_image").hide()
-               return
+               //return
 
                if (data == "-1") {
                    alert("Error in trying to save to League db table")
@@ -349,7 +355,7 @@
 
                alert("League has been successfully created")
 
-               //window.location.href = "/jpartyfb/"
+               window.location.href = "/jpartyfb/"
 
            }
         })
