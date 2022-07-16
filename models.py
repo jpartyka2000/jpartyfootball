@@ -763,7 +763,8 @@ class Season(models.Model):
     start_time = models.DateTimeField()
     end_time = models.DateTimeField()
     season_year = models.IntegerField()
-    league_id = models.IntegerField()
+    league = models.ForeignKey(League)
+    created_draft_list = models.BooleanField()
 
     class Meta:
         managed = True
