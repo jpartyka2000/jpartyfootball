@@ -13,6 +13,8 @@ import time
 import json
 import random
 
+from operator import itemgetter
+
 from jpartyfb.forms import CreateLeagueForm1
 from jpartyfb.models import *
 
@@ -20,6 +22,7 @@ from PlayerCreation import PlayerCreation
 from PlayerCreation import create_player_career_arc, create_players
 
 from LeagueLayout import build_choose_teams_html
+from DraftUtils import calculate_player_draft_value
 
 def retract_prior_db_commits(db_commit_to_delete_id_dict):
 
@@ -94,6 +97,59 @@ def retract_prior_db_commits(db_commit_to_delete_id_dict):
         first_league_id = db_commit_to_delete_id_dict["League"]
         League.objects.using("xactly_dev").filter(id__gte=first_league_id).delete()
 
+
+def create_draft_players(league_id):
+
+    # first, query the Team table to construct team_name_list and team_name_to_team_id_dict
+
+    try:
+        team_obj_list = Team.objects.using("xactly_dev").filter(league_id=league_id)
+    except Exception:
+        team_obj_list = None
+
+    team_name_to_team_id_dict = {}
+    team_name_list = []
+
+    for this_team in team_obj_list:
+
+        this_team_id = this_team.id
+        this_team_nickname = this_team.nickname
+
+        # we need to get the city
+        try:
+            team_city_obj = TeamCity.objects.using("xactly_dev").filter(team_id=this_team_id, league_id=league_id)
+        except Exception:
+            team_city_obj = None
+
+        if team_city_obj is not None:
+            this_team_city = team_city_obj[0].city.city_name
+
+        this_team_fullname = this_team_city + " " + this_team_nickname
+
+        team_name_list.append(this_team_fullname)
+        team_name_to_team_id_dict[this_team_fullname] = this_team_id
+
+    # get female setting for this league_id
+    try:
+        league_obj = League.objects.using("xactly_dev").filter(id=league_id)
+    except Exception:
+        league_obj = None
+
+    female_setting = ""
+
+    if league_obj is not None:
+        female_setting = league_obj[0].female_setting
+
+    db_commit_to_delete_id_dict = {}
+
+    status_code, exception_str, db_commit_to_delete_id_dict = create_players(team_name_list, team_name_to_team_id_dict,
+                                                                             league_id, female_setting,
+                                                                             db_commit_to_delete_id_dict, "draft")
+    if exception_str != "":
+        retract_prior_db_commits(db_commit_to_delete_id_dict)
+        return -1
+    else:
+        return 0
 
 @ensure_csrf_cookie
 def index(request):
@@ -291,6 +347,16 @@ def draft_options(request):
 
     welcome_message = "Draft Options"
     context['welcome_message'] = welcome_message
+    league_id = request.session['league_id']
+
+    #create a session variable to store the latest season_id for this league
+    try:
+        season_obj = Season.objects.using("xactly_dev").filter(league_id=league_id).order_by("-id")
+    except Exception:
+        season_obj = None
+
+    if season_obj is not None:
+        request.session['season_id'] = season_obj[0].id
 
     return render(request, 'jpartyfb/draft_options.html', context)
 
@@ -301,6 +367,30 @@ def create_draft_list(request, source=None):
 
     welcome_message = "Draft Options"
     context['welcome_message'] = welcome_message
+
+    league_id = int(request.session['league_id'])
+    season_id = int(request.session['season_id'])
+
+    #if the draft list has not been created, then create it now.
+    #the draft list is officially created when a row for this season's draft in the league exists
+
+    try:
+        draft_obj = Draft.objects.using("xactly_dev").filter(season_id=season_id, league_id=league_id)
+    except Exception:
+        draft_obj = None
+
+    if draft_obj is not None:
+        #we already have created the draft player list
+        #depending on source, we will either watch the draft or fast forward the draft
+        #....
+        pass
+    else:
+
+        # we need to create the draft player list for this coming season in the league
+        status_code = create_draft_players(league_id)
+
+        if status_code == -1:
+            context['error_msg'] = "Failed to create draft player list."
 
     return render(request, 'jpartyfb/draft_options.html', context)
 
@@ -354,7 +444,7 @@ def choose_league(request):
             except Exception:
                 this_season_obj = None
 
-            if this_season_obj[0].start_time is not None:
+            if this_season_obj[0].start_time is None:
                 league_select_list.append([league_id, league_name])
 
     context['league_list'] = league_select_list
@@ -683,7 +773,6 @@ def process_create_league_form_final(request):
     #we will only create new rows for Team, TeamCity, and Season when creating a new league, otherwise we update rows
     if source_page_hidden == 'cnl':
 
-        # next insert team rows for this league
         try:
             team_id = int(
                 Team.objects.using('xactly_dev').latest('id').id) + 1
@@ -930,14 +1019,14 @@ def process_create_league_form_final(request):
 
     #create all player info, including career arcs
     if source_page_hidden == 'cnl':
-        status_code, exception_str, db_commit_to_delete_id_dict = create_players(team_name_list, team_name_to_team_id_dict, league_id, female_setting, db_commit_to_delete_id_dict)
+        status_code, exception_str, db_commit_to_delete_id_dict = create_players(team_name_list, team_name_to_team_id_dict, league_id, female_setting, db_commit_to_delete_id_dict, "league")
 
         if exception_str != "":
             retract_prior_db_commits(db_commit_to_delete_id_dict)
     elif len(team_name_els_list) > 0:
 
         #we have edited the league and added new teams. Now we need to add players to those teams
-        status_code, exception_str, db_commit_to_delete_id_dict = create_players(team_name_els_list, team_name_to_team_id_els_dict, league_id, female_setting, db_commit_to_delete_id_dict)
+        status_code, exception_str, db_commit_to_delete_id_dict = create_players(team_name_els_list, team_name_to_team_id_els_dict, league_id, female_setting, db_commit_to_delete_id_dict, "league")
 
     else:
         status_code = 1
@@ -952,4 +1041,103 @@ def fast_forward_draft(request):
     pass
 
 def view_draft_list(request):
-    pass
+
+    #get league_id session variable and refresh it
+    league_id = request.session['league_id']
+
+    error_msg = ""
+    context = {}
+
+    #if the current season of this league_id has a created_draft_list value of True, then return an error message back to the draft
+    #options page
+
+    try:
+        current_season_obj = Season.objects.using("xactly_dev").filter(id=league_id).order_by("-id")
+    except Exception:
+        context['error_msg'] = "Failed to load current season."
+        context['welcome_message'] = "Draft Options"
+        return render(request, 'jpartyfb/draft_options.html', context)
+
+    created_draft_list = current_season_obj[0].created_draft_list
+    league_id = current_season_obj[0].league_id
+
+    if current_season_obj[0].created_draft_list == False:
+
+        #create draft player list
+        status_code = create_draft_players(league_id)
+
+        if status_code == -1:
+            context['error_msg'] = "Failed to create draft player list."
+            context['welcome_message'] = "Draft Options"
+            return render(request, 'jpartyfb/draft_options.html', context)
+
+        #if we just created the draft list, then we'll have to calculate player draft ranks
+        # query for all the players in the draft list
+        try:
+            player_obj_list = Player.objects.using("xactly_dev").filter(league_id=league_id, playing_status=0)
+        except Exception:
+            context['error_msg'] = "Failed to load draft player list."
+            context['welcome_message'] = "Draft Options"
+            return render(request, 'jpartyfb/draft_options.html', context)
+
+        # indicate that draft player list has been created by updating the Season obj's created_draft_list property
+        try:
+            Season.objects.using("xactly_dev").filter(id=league_id).update(created_draft_list=True)
+        except Exception:
+            context['error_msg'] = "Failed to mark player list as created in Season db table"
+            context['welcome_message'] = "Draft Options"
+            return render(request, 'jpartyfb/draft_options.html', context)
+    else:
+
+        try:
+            player_obj_list = Player.objects.using("xactly_dev").filter(league_id=league_id, playing_status=0)
+        except Exception:
+            context['error_msg'] = "Failed to load draft player list."
+            context['welcome_message'] = "Draft Options"
+            return render(request, 'jpartyfb/draft_options.html', context)
+
+    player_info_lol = []
+
+    for this_player_obj in player_obj_list:
+
+        this_player_id = this_player_obj.id
+        this_player_first_name = this_player_obj.first_name.strip()
+        this_player_last_name = this_player_obj.last_name.strip()
+        this_player_middle_initial = this_player_obj.middle_initial.strip()
+
+        if this_player_middle_initial == "":
+            this_player_middle_initial = " "
+        else:
+            this_player_middle_initial = " " + this_player_middle_initial + " "
+
+        this_player_full_name = this_player_first_name + this_player_middle_initial + this_player_last_name
+
+        this_player_alma_mater = this_player_obj.alma_mater
+        this_player_primary_position = this_player_obj.primary_position
+
+        this_player_height = this_player_obj.height
+        this_player_weight = this_player_obj.weight
+
+        if created_draft_list == False:
+            this_player_draft_value = calculate_player_draft_value(this_player_id, this_player_primary_position)
+
+            # finally, insert this_player_draft_value into the Player table
+            try:
+                Player.objects.using("xactly_dev").filter(id=this_player_id).update(draft_value=this_player_draft_value)
+            except Exception:
+                context['error_msg'] = "Failed to update player draft value"
+                context['welcome_message'] = "Draft Options"
+                return render(request, 'jpartyfb/draft_options.html', context)
+
+        else:
+            this_player_draft_value = this_player_obj.draft_value
+
+        player_info_lol.append([this_player_full_name, this_player_primary_position, this_player_alma_mater, this_player_height, this_player_weight, this_player_draft_value])
+
+    # sort lists in player_info_lol by this_player_draft_value
+    player_info_lol.sort(key=itemgetter(5), reverse=True)
+
+    context['welcome_message'] = "Draft List"
+    context['player_info_lol'] = player_info_lol
+    return render(request, 'jpartyfb/draft_list.html', context)
+
