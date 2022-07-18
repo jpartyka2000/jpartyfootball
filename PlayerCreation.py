@@ -62,7 +62,7 @@ class PlayerCreation():
     fbs_school_list = ['Abilene Christian University', 'Appalachian State University', 'Arizona State University',
                        'Arkansas State University', 'Auburn University', 'Ball State University', 'Baylor University',
                        'Boise State University', 'Boston College', 'Bowling Green State University',
-                       'Brigham Young University', 'California State University – Fresno',
+                       'Brigham Young University', 'California State University at Fresno',
                        'Central Michigan University', 'Clemson University', 'Coastal Carolina University',
                        'Colorado State University', 'Duke University', 'East Carolina University',
                        'Eastern Michigan University', 'Florida Atlantic University', 'Florida International University',
@@ -75,29 +75,29 @@ class PlayerCreation():
                        'Northwestern University', 'Ohio State University', 'Ohio University',
                        'Oklahoma State University', 'Old Dominion University', 'Oregon State University', 'Penn State',
                        'Purdue University', 'Rice University', 'Rutgers University', 'San Diego State University',
-                       'San Jose State University', 'Southern Methodist University – SMU', 'Stanford University',
+                       'San Jose State University', 'Southern Methodist University', 'Stanford University',
                        'SUNY University at Buffalo', 'Syracuse University', 'Temple University', 'Texas A&M University',
                        'Texas Christian University', 'Texas State University', 'Texas Tech University',
                        'Troy University', 'Tulane University', 'United States Air Force Academy',
                        'United States Military Academy', 'United States Naval Academy', 'University of Akron',
-                       'University of Alabama', 'University of Alabama – Birmingham', 'University of Arizona',
-                       'University of Arkansas', 'University of California – Berkeley',
-                       'University of California – Los Angeles – UCLA', 'University of Central Florida',
-                       'University of Cincinnati', 'University of Colorado – Boulder', 'University of Connecticut',
+                       'University of Alabama', 'University of Alabama at Birmingham', 'University of Arizona',
+                       'University of Arkansas', 'University of California at Berkeley',
+                       'University of California at Los Angeles', 'University of Central Florida',
+                       'University of Cincinnati', 'University of Colorado', 'University of Connecticut',
                        'University of Florida', 'University of Georgia', 'University of Hawaii at Manoa',
                        'University of Houston', 'University of Illinois', 'University of Iowa', 'University of Kansas',
-                       'University of Kentucky', 'University of Louisiana', 'University of Louisiana – Monroe',
-                       'University of Louisville', 'University of Maryland', 'University of Massachusetts – Amherst',
+                       'University of Kentucky', 'University of Louisiana', 'University of Louisiana at Monroe',
+                       'University of Louisville', 'University of Maryland', 'University of Massachusetts at Amherst',
                        'University of Memphis', 'University of Miami', 'University of Michigan',
                        'University of Minnesota', 'University of Mississippi', 'University of Missouri',
-                       'University of Nebraska', 'University of Nevada – Las Vegas', 'University of Nevada – Reno',
+                       'University of Nebraska', 'University of Nevada at Las Vegas', 'University of Nevada at Reno',
                        'University of New Mexico', 'University of North Carolina at Chapel Hill',
                        'University of North Carolina at Charlotte', 'University of North Texas',
                        'University of Notre Dame', 'University of Oklahoma', 'University of Oregon',
                        'University of Pittsburgh', 'University of South Alabama', 'University of South Carolina',
                        'University of South Florida', 'University of Southern California',
-                       'University of Southern Mississippi', 'University of Tennessee', 'University of Texas – Austin',
-                       'University of Texas – El Paso', 'University of Texas – San Antonio', 'University of Toledo',
+                       'University of Southern Mississippi', 'University of Tennessee', 'University of Texas at Austin',
+                       'University of Texas at El Paso', 'University of Texas at San Antonio', 'University of Toledo',
                        'University of Tulsa', 'University of Utah', 'University of Virginia',
                        'University of Washington', 'University of Wisconsin', 'University of Wyoming',
                        'Utah State University', 'Vanderbilt University', 'Virginia Tech', 'Wake Forest University',
@@ -107,8 +107,8 @@ class PlayerCreation():
     fcs_school_list = ['Alabama A&M University', 'Alabama State University', 'Alcorn State University',
                        'Austin Peay State University', 'Bethune-Cookman University', 'Brown University',
                        'Bryant University', 'Bucknell University', 'Butler University',
-                       'California Polytechnic State University – San Luis Obispo',
-                       'California State University – Sacramento', 'Campbell University',
+                       'California Polytechnic State University at San Luis Obispo',
+                       'California State University at Sacramento', 'Campbell University',
                        'Central Connecticut State University', 'Charleston Southern University', 'Colgate University',
                        'College of the Holy Cross', 'Columbia University', 'Cornell University', 'Dartmouth College',
                        'Davidson College', 'Delaware State University', 'Dixie State University', 'Drake University',
@@ -128,7 +128,7 @@ class PlayerCreation():
                        'North Carolina Central University', 'North Dakota State University',
                        'Northern Arizona University', 'Northwestern State University of Louisiana',
                        'Portland State University', 'Prairie View A & M University', 'Presbyterian College',
-                       'Princeton University', 'Robert Morris University – Pennsylvania', 'Sacred Heart University',
+                       'Princeton University', 'Robert Morris University at Pennsylvania', 'Sacred Heart University',
                        'Saint Francis University', 'Sam Houston State University', 'Samford University',
                        'South Carolina State University', 'South Dakota State University',
                        'Southeast Missouri State University', 'Southeastern Louisiana University',
@@ -137,30 +137,30 @@ class PlayerCreation():
                        'SUNY Stony Brook University', 'SUNY University at Albany', 'Tarleton State University',
                        'Tennessee State University', 'Tennessee Technological University', 'Texas Southern University',
                        'The Citadel', 'Towson University', 'University of Arkansas at Pine Bluff',
-                       'University of California – Davis', 'University of Central Arkansas', 'University of Dayton',
+                       'University of California at Davis', 'University of Central Arkansas', 'University of Dayton',
                        'University of Delaware', 'University of Idaho', 'University of Maine', 'University of Montana',
                        'University of New Hampshire', 'University of North Alabama', 'University of North Dakota',
                        'University of Northern Colorado', 'University of Northern Iowa',
                        'University of Pennsylvania – Penn', 'University of Rhode Island', 'University of Richmond',
-                       'University of San Diego', 'University of South Dakota', 'University of St. Thomas – Minnesota',
-                       'University of Tennessee – Chattanooga', 'University of Tennessee – Martin',
+                       'University of San Diego', 'University of South Dakota', 'University of St. Thomas at Minnesota',
+                       'University of Tennessee at Chattanooga', 'University of Tennessee at Martin',
                        'University of the Incarnate Word', 'Valparaiso University', 'Villanova University',
-                       'Virginia Military Institute – VMI', 'Wagner College', 'Weber State University',
+                       'Virginia Military Institute', 'Wagner College', 'Weber State University',
                        'Western Carolina University', 'Western Illinois University', 'William & Mary',
                        'Wofford College', 'Yale University', 'Youngstown State University']
 
     d2_school_list = ['Adams State University', 'Albany State University', 'Alderson Broaddus University',
-                      'Allen University', 'American International College', 'Anderson University – South Carolina',
+                      'Allen University', 'American International College', 'Anderson University at South Carolina',
                       'Angelo State University', 'Arkansas Tech University', 'Ashland University',
-                      'Assumption University', 'Augustana University – South Dakota', 'Barton College',
+                      'Assumption University', 'Augustana University at South Dakota', 'Barton College',
                       'Bemidji State University', 'Benedict College', 'Bentley University',
                       'Black Hills State University', 'Bloomsburg University of Pennsylvania',
                       'Bluefield State College', 'Bowie State University', 'California University of Pennsylvania',
                       'Carson-Newman University', 'Catawba College', 'Central State University',
                       'Central Washington University', 'Chadron State College', 'Chowan University',
                       'Clarion University of Pennsylvania', 'Clark Atlanta University', 'Colorado Mesa University',
-                      'Colorado School of Mines', 'Colorado State University – Pueblo', 'Concord University',
-                      'Concordia University, St. Paul – Minnesota', 'Davenport University', 'Delta State University',
+                      'Colorado School of Mines', 'Colorado State University at Pueblo', 'Concord University',
+                      'Concordia University, St. Paul at Minnesota', 'Davenport University', 'Delta State University',
                       'East Central University', 'East Stroudsburg University of Pennsylvania',
                       'Eastern New Mexico University', 'Edinboro University', 'Edward Waters University',
                       'Elizabeth City State University', 'Emporia State University', 'Erskine College',
@@ -171,18 +171,18 @@ class PlayerCreation():
                       'Henderson State University', 'Hillsdale College', 'Indiana University of Pennsylvania',
                       'Johnson C. Smith University', 'Kentucky State University', 'Kentucky Wesleyan College',
                       'Kutztown University of Pennsylvania', 'Lake Erie College', 'Lane College',
-                      'Lenoir-Rhyne University', 'Limestone University', 'Lincoln University – Missouri',
+                      'Lenoir-Rhyne University', 'Limestone University', 'Lincoln University at Missouri',
                       'Lincoln University Pennsylvania', 'Lindenwood University', 'Livingstone College',
                       'Lock Haven University', 'Mars Hill University', 'McKendree University', 'Mercyhurst University',
                       'Michigan Technological University', 'Midwestern State University', 'Miles College',
-                      'Millersville University of Pennsylvania', 'Minnesota State University – Mankato',
-                      'Minnesota State University – Moorhead', 'Minot State University', 'Mississippi College',
+                      'Millersville University of Pennsylvania', 'Minnesota State University at Mankato',
+                      'Minnesota State University at Moorhead', 'Minot State University', 'Mississippi College',
                       'Missouri Southern State University', 'Missouri University of Science & Technology',
                       'Missouri Western State University', 'Morehouse College', 'New Mexico Highlands University',
                       'Newberry College', 'North Greenville University', 'Northeastern State University',
                       'Northern Michigan University', 'Northern State University',
                       'Northwest Missouri State University', 'Northwestern Oklahoma State University',
-                      'Northwood University – Michigan', 'Notre Dame College', 'Ohio Dominican University',
+                      'Northwood University at Michigan', 'Notre Dame College', 'Ohio Dominican University',
                       'Oklahoma Baptist University', 'Ouachita Baptist University', 'Pace University',
                       'Pittsburg State University', 'Post University', 'Quincy University',
                       'Saginaw Valley State University', 'Saint Anselm College', "Saint Augustine's University",
@@ -191,15 +191,15 @@ class PlayerCreation():
                       'South Dakota Mines', 'Southeastern Oklahoma State University', 'Southern Arkansas University',
                       'Southern Connecticut State University', 'Southern Nazarene University',
                       'Southwest Baptist University', 'Southwest Minnesota State University',
-                      'Southwestern Oklahoma State University', 'Stonehill College', 'Texas A&M University – Commerce',
-                      'Texas A&M University – Kingsville', "The University of Virginia's College at Wise",
+                      'Southwestern Oklahoma State University', 'Stonehill College', 'Texas A&M University - Commerce',
+                      'Texas A&M University at Kingsville', "The University of Virginia's College at Wise",
                       'Tiffin University', 'Truman State University', 'Tusculum University', 'Tuskegee University',
                       'University of Arkansas at Monticello', 'University of Central Missouri',
                       'University of Central Oklahoma', 'University of Charleston', 'University of Findlay',
-                      'University of Indianapolis', 'University of Mary', 'University of Minnesota – Duluth',
+                      'University of Indianapolis', 'University of Mary', 'University of Minnesota at Duluth',
                       'University of Nebraska at Kearney', 'University of New Haven',
                       'University of North Carolina at Pembroke', 'University of Sioux Falls',
-                      'University of Texas – Permian Basin', 'University of West Alabama', 'University of West Florida',
+                      'University of Texas at Permian Basin', 'University of West Alabama', 'University of West Florida',
                       'University of West Georgia', 'Upper Iowa University', 'Valdosta State University',
                       'Virginia State University', 'Virginia Union University', 'Walsh University',
                       'Washburn University', 'Wayne State College', 'Wayne State University',
@@ -210,19 +210,19 @@ class PlayerCreation():
                       'Winston-Salem State University']
 
     d3_school_list = ['Adrian College', 'Albion College', 'Albright College', 'Alfred University', 'Allegheny College',
-                      'Alma College', 'Alvernia University', 'Amherst College', 'Anderson University – Indiana',
-                      'Anna Maria College', 'Augsburg University', 'Augustana College – Illinois', 'Aurora University',
+                      'Alma College', 'Alvernia University', 'Amherst College', 'Anderson University at Indiana',
+                      'Anna Maria College', 'Augsburg University', 'Augustana College at Illinois', 'Aurora University',
                       'Austin College', 'Averett University', 'Baldwin Wallace University', 'Bates College',
                       'Belhaven University', 'Beloit College', 'Benedictine University', 'Berry College',
-                      'Bethany College – West Virginia', 'Bethel University – Minnesota', 'Birmingham-Southern College',
+                      'Bethany College at West Virginia', 'Bethel University at Minnesota', 'Birmingham-Southern College',
                       'Bluffton University', 'Bowdoin College', 'Brevard College', 'Bridgewater College',
                       'Bridgewater State University', 'Buena Vista University', 'California Lutheran University',
                       'Capital University', 'Carleton College', 'Carnegie Mellon University', 'Carroll University',
                       'Carthage College', 'Case Western Reserve University', 'Castleton University',
                       'Catholic University of America', 'Central College', 'Centre College', 'Chapman University',
                       'Christopher Newport University', 'Claremont-Mudd-Scripps Colleges', 'Coe College',
-                      'Colby College', 'College of Wooster', 'Concordia College – Minnesota',
-                      'Concordia University – Chicago', 'Concordia University Wisconsin', 'Cornell College',
+                      'Colby College', 'College of Wooster', 'Concordia College at Minnesota',
+                      'Concordia University at Chicago', 'Concordia University Wisconsin', 'Cornell College',
                       'Crown College', 'Curry College', 'Dean College', 'Defiance College',
                       'Delaware Valley University', 'Denison University', 'DePauw University', 'Dickinson College',
                       'East Texas Baptist University', 'Elmhurst University', 'Endicott College', 'Eureka College',
@@ -237,7 +237,7 @@ class PlayerCreation():
                       'Huntingdon College', 'Husson University', 'Illinois College', 'Illinois Wesleyan University',
                       'Ithaca College', 'John Carroll University', 'Johns Hopkins University', 'Juniata College',
                       'Kalamazoo College', 'Kean University', 'Kenyon College', 'Keystone College',
-                      "King's College – Pennsylvania", 'Knox College', 'LaGrange College', 'Lake Forest College',
+                      "King's College at Pennsylvania", 'Knox College', 'LaGrange College', 'Lake Forest College',
                       'Lakeland University', 'Lawrence University', 'Lebanon Valley College', 'Lewis & Clark College',
                       'Linfield University', 'Loras College', 'Luther College', 'Lycoming College',
                       'Macalester College', 'Manchester University', 'Marietta College', 'Martin Luther College',
@@ -250,33 +250,33 @@ class PlayerCreation():
                       'Norwich University', 'Oberlin College', 'Ohio Northern University', 'Ohio Wesleyan University',
                       'Olivet College', 'Otterbein University', 'Pacific Lutheran University', 'Pacific University',
                       'Plymouth State University', 'Pomona-Pitzer Colleges', 'Randolph-Macon College',
-                      'Rensselaer Polytechnic Institute – RPI', 'Rhodes College', 'Ripon College',
+                      'Rensselaer Polytechnic Institute', 'Rhodes College', 'Ripon College',
                       'Rockford University', 'Rose-Hulman Institute of Technology', 'Rowan University',
-                      "Saint John's University – Minnesota", 'Saint Vincent College – Pennsylvania',
-                      'Salisbury University', 'Salve Regina University', 'Sewanee – The University of the South',
+                      "Saint John's University at Minnesota", 'Saint Vincent College at Pennsylvania',
+                      'Salisbury University', 'Salve Regina University', 'Sewanee at The University of the South',
                       'Shenandoah University', 'Simpson College', 'Southern Virginia University',
                       'Southwestern University', 'Springfield College', 'St. John Fisher College',
                       'St. Lawrence University', 'St. Norbert College', 'St. Olaf College', 'Stevenson University',
                       'Sul Ross State University', 'SUNY Buffalo State College', 'SUNY College at Brockport',
                       'SUNY Cortland', 'SUNY Maritime College', 'SUNY Morrisville', 'Susquehanna University',
                       'Texas Lutheran University', 'The College of New Jersey', 'The College of St. Scholastica',
-                      'Thiel College', 'Trine University', 'Trinity College – Connecticut',
-                      'Trinity University – Texas', 'Tufts University', 'Union College – New York',
+                      'Thiel College', 'Trine University', 'Trinity College at Connecticut',
+                      'Trinity University at Texas', 'Tufts University', 'Union College at New York',
                       'United States Coast Guard Academy', 'United States Merchant Marine Academy',
                       'University of Chicago', 'University of Dubuque', 'University of La Verne',
                       'University of Mary Hardin-Baylor', 'University of Massachusetts – Dartmouth',
-                      'University of Minnesota – Morris', 'University of Mount Union', 'University of New England',
-                      'University of Northwestern – St. Paul', 'University of Puget Sound', 'University of Redlands',
-                      'University of Rochester', 'University of Wisconsin – Eau Claire',
-                      'University of Wisconsin – La Crosse', 'University of Wisconsin – Oshkosh',
-                      'University of Wisconsin – Platteville', 'University of Wisconsin – River Falls',
-                      'University of Wisconsin – Stevens Point', 'University of Wisconsin – Stout',
-                      'University of Wisconsin – Whitewater', 'Ursinus College', 'Utica College', 'Wabash College',
+                      'University of Minnesota at Morris', 'University of Mount Union', 'University of New England',
+                      'University of Northwestern at St. Paul', 'University of Puget Sound', 'University of Redlands',
+                      'University of Rochester', 'University of Wisconsin at Eau Claire',
+                      'University of Wisconsin at La Crosse', 'University of Wisconsin at Oshkosh',
+                      'University of Wisconsin at Platteville', 'University of Wisconsin at River Falls',
+                      'University of Wisconsin at Stevens Point', 'University of Wisconsin at Stout',
+                      'University of Wisconsin at Whitewater', 'Ursinus College', 'Utica College', 'Wabash College',
                       'Wartburg College', 'Washington & Jefferson College', 'Washington & Lee University',
                       'Washington University in St. Louis', 'Waynesburg University', 'Wesleyan University',
                       'Western Connecticut State University', 'Western New England University',
-                      'Westfield State University', 'Westminster College – Missouri',
-                      'Westminster College – Pennsylvania', 'Wheaton College – Illinois', 'Whittier College',
+                      'Westfield State University', 'Westminster College at Missouri',
+                      'Westminster College at Pennsylvania', 'Wheaton College at Illinois', 'Whittier College',
                       'Whitworth University', 'Widener University', 'Wilkes University', 'Willamette University',
                       'William Paterson University of New Jersey', 'Williams College', 'Wilmington College',
                       'Wittenberg University', 'Worcester Polytechnic Institute', 'Worcester State University']
@@ -341,11 +341,30 @@ class PlayerCreation():
     roster_position_count_sto_list = ["sto"] * 2
     roster_position_count_std_list = ["std"] * 2
 
+    roster_position_count_draft_qb_list = ["qb"] * 1
+    roster_position_count_draft_rb_list = ["rb"] * 1
+    roster_position_count_draft_te_list = ["te"] * 1
+    roster_position_count_draft_fb_list = ["fb"] * 1
+    roster_position_count_draft_wr_list = ["wr"] * 1
+    roster_position_count_draft_ol_list = ["ol"] * 1
+    roster_position_count_draft_k_list = ["k"] * 1
+    roster_position_count_draft_p_list = ["p"] * 1
+    roster_position_count_draft_dl_list = ["dl"] * 1
+    roster_position_count_draft_lb_list = ["lb"] * 1
+    roster_position_count_draft_cb_list = ["cb"] * 1
+    roster_position_count_draft_sf_list = ["sf"] * 1
+    roster_position_count_draft_sto_list = ["sto"] * 1
+    roster_position_count_draft_std_list = ["std"] * 1
 
-    roster_position_count_list = roster_position_count_qb_list + roster_position_count_rb_list + roster_position_count_te_list + roster_position_count_fb_list + \
+    roster_position_count_league_list = roster_position_count_qb_list + roster_position_count_rb_list + roster_position_count_te_list + roster_position_count_fb_list + \
                                  roster_position_count_wr_list + roster_position_count_ol_list + roster_position_count_k_list + roster_position_count_p_list + \
                                  roster_position_count_dl_list + roster_position_count_lb_list + roster_position_count_cb_list + roster_position_count_sf_list + \
                                  roster_position_count_sto_list + roster_position_count_std_list
+
+    roster_position_count_draft_list = roster_position_count_draft_qb_list + roster_position_count_draft_rb_list + roster_position_count_draft_te_list + roster_position_count_draft_fb_list + \
+                                 roster_position_count_draft_wr_list + roster_position_count_draft_ol_list + roster_position_count_draft_k_list + roster_position_count_draft_p_list + \
+                                 roster_position_count_draft_dl_list + roster_position_count_draft_lb_list + roster_position_count_draft_cb_list + roster_position_count_draft_sf_list + \
+                                 roster_position_count_draft_sto_list + roster_position_count_draft_std_list
 
     #store player career arc data here
     player_name_to_career_arc_list_dict = {}
@@ -642,7 +661,7 @@ def initialize_spec_db_table_ids(player_position_list):
     return player_position_to_db_id_dict
 
 
-def create_players(team_name_list, team_name_to_team_id_dict, league_id, female_setting, db_commit_to_delete_id_dict):
+def create_players(team_name_list, team_name_to_team_id_dict, league_id, female_setting, db_commit_to_delete_id_dict, mode):
 
     exception_str = ""
     status_code = 1
@@ -669,12 +688,21 @@ def create_players(team_name_list, team_name_to_team_id_dict, league_id, female_
 
     first_ids_player_position_to_db_id_dict = copy.deepcopy(player_position_to_db_id_dict)
 
+    #depending upon the mode, we will assign roster_position_count_list
+    roster_position_count_list = []
+
+    if mode == "league":
+        roster_position_count_list = PlayerCreation.roster_position_count_league_list
+    else:
+        #draft mode
+        roster_position_count_list = PlayerCreation.roster_position_count_draft_list
+
     for this_team_name in team_name_list:
 
         this_team_id = team_name_to_team_id_dict[this_team_name]
         team_numbers_used = set()
 
-        for player_position in PlayerCreation.roster_position_count_list:
+        for player_position in roster_position_count_list:
 
             player_name_uniqueness_verified = False
             player_number_uniqueness_verified = False
@@ -720,6 +748,10 @@ def create_players(team_name_list, team_name_to_team_id_dict, league_id, female_
             else:
                 height_feet = 5
                 height_inches = round(float(PlayerCreation.five_feet_tall_inches_norm_dist_obj.rvs()))
+
+            #sometimes, we get -1 inches, so let's fix that
+            if height_inches == -1:
+                height_inches = 0
 
             # weight in lbs is position dependent - ols and dls have one dist, everyone else has another
             # it is also height dependent - the taller the player, the more the player is likely to weigh
@@ -831,8 +863,18 @@ def create_players(team_name_list, team_name_to_team_id_dict, league_id, female_
             this_player_dict["first_name"] = player_first_name
             this_player_dict["middle_initial"] = middle_initial
             this_player_dict["last_name"] = player_last_name
-            this_player_dict["number"] = player_number
-            this_player_dict["age"] = int(player_age)
+
+            #we only assign a number to a player in league mode
+            if mode == "league":
+                this_player_dict["number"] = player_number
+            else:
+                this_player_dict["number"] = None
+
+            if mode == "league":
+                this_player_dict["age"] = int(player_age)
+            else:
+                this_player_dict["age"] = random.randint(19, 22)
+
             this_player_dict["first_season_id"] = 1
             this_player_dict["last_season_id"] = -1
             this_player_dict["injury_status"] = 0
@@ -844,6 +886,12 @@ def create_players(team_name_list, team_name_to_team_id_dict, league_id, female_
             this_player_dict["height"] = str(int(height_feet)) + "'" + str(int(height_inches))
             this_player_dict["weight"] = weight_lbs
             this_player_dict["league_id"] = league_id
+            this_player_dict["draft_value"] = 0.0
+
+            if mode == "league":
+                this_player_dict["playing_status"] = 1
+            else:
+                this_player_dict["playing_status"] = 0
 
             #create Player db object
             try:
@@ -855,15 +903,18 @@ def create_players(team_name_list, team_name_to_team_id_dict, league_id, female_
                 status_code = -6
                 return status_code, exception_str, db_commit_to_delete_id_dict
 
-            #Create PlayerTeam db object
-            try:
-                this_player_team_db_obj = PlayerTeam(player_team_id=player_team_id, player_id=player_id, team_id=this_team_id, season_id=1)
-                this_player_team_db_obj.save(using="xactly_dev")
-                db_commit_to_delete_id_dict["PlayerTeam"] = first_player_team_id
-            except Exception as e:
-                exception_str = str(e)
-                status_code = -7
-                return status_code, exception_str, db_commit_to_delete_id_dict
+            #only assign a player to a team in league mode
+            if mode == "league":
+
+                #Create PlayerTeam db object
+                try:
+                    this_player_team_db_obj = PlayerTeam(player_team_id=player_team_id, player_id=player_id, team_id=this_team_id, season_id=1)
+                    this_player_team_db_obj.save(using="xactly_dev")
+                    db_commit_to_delete_id_dict["PlayerTeam"] = first_player_team_id
+                except Exception as e:
+                    exception_str = str(e)
+                    status_code = -7
+                    return status_code, exception_str, db_commit_to_delete_id_dict
 
             #Create specs object for this player_position
             this_player_position_specs_db_obj = None
