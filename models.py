@@ -510,6 +510,8 @@ class Player(models.Model):
     height = models.CharField(max_length=4)
     weight = models.IntegerField()
     league = models.ForeignKey(League)
+    playing_status = models.IntegerField()
+    draft_value = models.FloatField()
 
     class Meta:
         managed = True
