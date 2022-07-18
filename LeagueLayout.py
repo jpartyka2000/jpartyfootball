@@ -1715,6 +1715,12 @@ def add_new_divisions_and_teams(division_num_to_division_name_dict, division_num
             del division_num_to_teamid_list_dict[5]
             del division_num_to_teamid_list_dict[6]
 
+            # recreate divisions
+            division_num_to_division_name_dict = {}
+
+            for k in range(1, len(division_num_to_team_list_dict.keys()) + 1):
+                division_num_to_division_name_dict[k] = "New Division " + str(k)
+
         if previous_num_teams_per_conference == 12 and number_of_teams_conf_select == 14:
 
             #add 3 teams from old div3 to div1
