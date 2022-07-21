@@ -1048,6 +1048,12 @@ def view_draft_list(request):
     error_msg = ""
     context = {}
 
+    player_filter = None
+
+    #get filter, if user clicked on one already
+    if 'player_filter' in request.GET:
+        player_filter = request.GET['player_filter']
+
     #if the current season of this league_id has a created_draft_list value of True, then return an error message back to the draft
     #options page
 
@@ -1089,8 +1095,13 @@ def view_draft_list(request):
             return render(request, 'jpartyfb/draft_options.html', context)
     else:
 
+        player_query_dict = {'league_id': league_id, 'playing_status': 0}
+
+        if player_filter is not None:
+            player_query_dict['primary_position'] = player_filter
+
         try:
-            player_obj_list = Player.objects.using("xactly_dev").filter(league_id=league_id, playing_status=0)
+            player_obj_list = Player.objects.using("xactly_dev").filter(**player_query_dict)
         except Exception:
             context['error_msg'] = "Failed to load draft player list."
             context['welcome_message'] = "Draft Options"
