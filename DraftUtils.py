@@ -7,15 +7,15 @@ import json
 import random
 
 DRAFT_VALUE_BASELINE_QB = 50
-DRAFT_VALUE_BASELINE_RB = 48
-DRAFT_VALUE_BASELINE_WR = 47
-DRAFT_VALUE_BASELINE_TE = 44
+DRAFT_VALUE_BASELINE_RB = 49
+DRAFT_VALUE_BASELINE_WR = 49
+DRAFT_VALUE_BASELINE_TE = 45
 DRAFT_VALUE_BASELINE_FB = 35
-DRAFT_VALUE_BASELINE_OL = 48
-DRAFT_VALUE_BASELINE_DL = 48
-DRAFT_VALUE_BASELINE_LB = 44
-DRAFT_VALUE_BASELINE_CB = 43
-DRAFT_VALUE_BASELINE_SF = 43
+DRAFT_VALUE_BASELINE_OL = 49
+DRAFT_VALUE_BASELINE_DL = 49
+DRAFT_VALUE_BASELINE_LB = 45
+DRAFT_VALUE_BASELINE_CB = 44
+DRAFT_VALUE_BASELINE_SF = 44
 DRAFT_VALUE_BASELINE_K = 35
 DRAFT_VALUE_BASELINE_P = 35
 DRAFT_VALUE_BASELINE_STD = 30
@@ -25,6 +25,7 @@ def calculate_player_draft_value(this_player_id, this_player_primary_position):
 
     player_stats_obj = None
     baseline_rank_value = 0
+    critical_attribute_list = []
 
     if this_player_primary_position == 'dl':
 
@@ -34,6 +35,7 @@ def calculate_player_draft_value(this_player_id, this_player_primary_position):
             return 0.0
 
         baseline_rank_value = DRAFT_VALUE_BASELINE_DL
+        critical_attribute_list = ['block_power_rating','tackle_rating']
 
     elif this_player_primary_position == 'cb':
 
@@ -43,6 +45,7 @@ def calculate_player_draft_value(this_player_id, this_player_primary_position):
             return 0.0
 
         baseline_rank_value = DRAFT_VALUE_BASELINE_CB
+        critical_attribute_list = ['speed_rating','route_rating']
 
     elif this_player_primary_position == 'fb':
 
@@ -52,6 +55,7 @@ def calculate_player_draft_value(this_player_id, this_player_primary_position):
             return 0.0
 
         baseline_rank_value = DRAFT_VALUE_BASELINE_FB
+        critical_attribute_list = ['speed_rating','strength_rating']
 
     elif this_player_primary_position == 'k':
 
@@ -61,6 +65,7 @@ def calculate_player_draft_value(this_player_id, this_player_primary_position):
             return 0.0
 
         baseline_rank_value = DRAFT_VALUE_BASELINE_K
+        critical_attribute_list = ['leg_rating','accuracy_rating']
 
     elif this_player_primary_position == 'lb':
 
@@ -70,6 +75,7 @@ def calculate_player_draft_value(this_player_id, this_player_primary_position):
             return 0.0
 
         baseline_rank_value = DRAFT_VALUE_BASELINE_LB
+        critical_attribute_list = ['speed_rating','tackle_rating']
 
     elif this_player_primary_position == 'ol':
 
@@ -79,6 +85,7 @@ def calculate_player_draft_value(this_player_id, this_player_primary_position):
             return 0.0
 
         baseline_rank_value = DRAFT_VALUE_BASELINE_OL
+        critical_attribute_list = ['block_power_rating','block_agility_rating']
 
     elif this_player_primary_position == 'p':
 
@@ -88,6 +95,7 @@ def calculate_player_draft_value(this_player_id, this_player_primary_position):
             return 0.0
 
         baseline_rank_value = DRAFT_VALUE_BASELINE_P
+        critical_attribute_list = ['leg_rating','hangtime_rating']
 
     elif this_player_primary_position == 'qb':
 
@@ -97,6 +105,7 @@ def calculate_player_draft_value(this_player_id, this_player_primary_position):
             return 0.0
 
         baseline_rank_value = DRAFT_VALUE_BASELINE_QB
+        critical_attribute_list = ['arm_strength_rating','arm_accuracy_rating']
 
     elif this_player_primary_position == 'rb':
 
@@ -106,6 +115,7 @@ def calculate_player_draft_value(this_player_id, this_player_primary_position):
             return 0.0
 
         baseline_rank_value = DRAFT_VALUE_BASELINE_RB
+        critical_attribute_list = ['speed_rating','elusiveness_rating']
 
     elif this_player_primary_position == 'sf':
 
@@ -115,6 +125,7 @@ def calculate_player_draft_value(this_player_id, this_player_primary_position):
             return 0.0
 
         baseline_rank_value = DRAFT_VALUE_BASELINE_SF
+        critical_attribute_list = ['speed_rating','route_rating']
 
     elif this_player_primary_position == 'std':
 
@@ -124,6 +135,7 @@ def calculate_player_draft_value(this_player_id, this_player_primary_position):
             return 0.0
 
         baseline_rank_value = DRAFT_VALUE_BASELINE_STD
+        critical_attribute_list = ['agility_rating','tackle_rating']
 
     elif this_player_primary_position == 'sto':
 
@@ -133,6 +145,7 @@ def calculate_player_draft_value(this_player_id, this_player_primary_position):
             return 0.0
 
         baseline_rank_value = DRAFT_VALUE_BASELINE_STO
+        critical_attribute_list = ['speed_rating','elusiveness_rating']
 
     elif this_player_primary_position == 'te':
 
@@ -142,6 +155,7 @@ def calculate_player_draft_value(this_player_id, this_player_primary_position):
             return 0.0
 
         baseline_rank_value = DRAFT_VALUE_BASELINE_TE
+        critical_attribute_list = ['catching_rating','block_power_rating']
 
     elif this_player_primary_position == 'wr':
 
@@ -151,6 +165,7 @@ def calculate_player_draft_value(this_player_id, this_player_primary_position):
             return 0.0
 
         baseline_rank_value = DRAFT_VALUE_BASELINE_WR
+        critical_attribute_list = ['catching_rating','route_rating']
 
     #get the career_arc dict from player_stats_obj
     this_player_career_arc_dict_str = player_stats_obj[0].career_arc_dict
@@ -171,8 +186,18 @@ def calculate_player_draft_value(this_player_id, this_player_primary_position):
 
     for year_idx, this_year_dict in enumerate(this_player_career_arc_first_3_years_list_dict, 1):
 
-        this_year_average_spec_value_list = this_year_dict.values()
-        this_year_average_spec_final_value = round(sum(this_year_average_spec_value_list) / len(this_year_average_spec_value_list), 3)
+        attribute_sum = 0
+        attribute_weight = 0.0
+
+        for this_attribute_name, this_attribute_value in this_year_dict.items():
+            if this_attribute_name in critical_attribute_list:
+                attribute_weight = 1.5
+            else:
+                attribute_weight = 1.0
+
+            attribute_sum += attribute_weight * int(this_attribute_value)
+
+        this_year_average_spec_final_value =  round(attribute_sum / len(this_year_dict.values()), 3)
 
         if year_idx == 2:
 
