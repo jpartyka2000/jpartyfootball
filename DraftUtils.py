@@ -1,7 +1,8 @@
 # coding: utf-8
 
 from jpartyfb.models import PlayerSpecsQb, PlayerSpecsRb, PlayerSpecsWr, PlayerSpecsFb, PlayerSpecsTe, PlayerSpecsOl, \
-    PlayerSpecsDl, PlayerSpecsLb, PlayerSpecsCb, PlayerSpecsSf, PlayerSpecsK, PlayerSpecsP, PlayerSpecsStd, PlayerSpecsSto
+    PlayerSpecsDl, PlayerSpecsLb, PlayerSpecsCb, PlayerSpecsSf, PlayerSpecsK, PlayerSpecsP, PlayerSpecsStd, PlayerSpecsSto, \
+    Season, Team, Player
 
 import json
 import random
@@ -11,7 +12,7 @@ DRAFT_VALUE_BASELINE_RB = 49
 DRAFT_VALUE_BASELINE_WR = 49
 DRAFT_VALUE_BASELINE_TE = 45
 DRAFT_VALUE_BASELINE_FB = 35
-DRAFT_VALUE_BASELINE_OL = 49
+DRAFT_VALUE_BASELINE_OL = 47
 DRAFT_VALUE_BASELINE_DL = 49
 DRAFT_VALUE_BASELINE_LB = 45
 DRAFT_VALUE_BASELINE_CB = 44
@@ -20,6 +21,8 @@ DRAFT_VALUE_BASELINE_K = 35
 DRAFT_VALUE_BASELINE_P = 35
 DRAFT_VALUE_BASELINE_STD = 30
 DRAFT_VALUE_BASELINE_STO = 30
+
+NUMBER_OF_DRAFT_ROUNDS = 8
 
 def calculate_player_draft_value(this_player_id, this_player_primary_position):
 
@@ -191,7 +194,7 @@ def calculate_player_draft_value(this_player_id, this_player_primary_position):
 
         for this_attribute_name, this_attribute_value in this_year_dict.items():
             if this_attribute_name in critical_attribute_list:
-                attribute_weight = 1.5
+                attribute_weight = 1.25
             else:
                 attribute_weight = 1.0
 
@@ -236,6 +239,95 @@ def calculate_player_draft_value(this_player_id, this_player_primary_position):
     player_draft_value = round(overall_avg_stat_rating + baseline_rank_value, 3)
 
     return player_draft_value
+
+
+def determine_draft_picks(league_id, season_id):
+
+    team_id_to_team_name_dict = {}
+    team_id_to_draft_order_dict = {}
+    team_id_to_draft_pick_dict_dict = {}  #k: team_id, val: dict of round num -> player_id
+    team_id_to_draft_player_score_dict_dict = {}
+    team_id_to_player_id_position_list_dict_dict = {}
+
+    #first, get all teams in this league by querying Team table
+    try:
+        team_obj_list = Team.objects.using("xactly_dev").filter(league_id=league_id)
+    except Exception:
+        team_obj_list = None
+
+    if team_obj_list is not None:
+
+        #populate team_id_to_team_name_dict and initialize team_id_to_draft_pick_dict_dict
+        for this_team_obj in team_obj_list:
+            this_team_id = this_team_obj.id
+            this_team_nickname = this_team_obj.nickname
+
+            team_id_to_team_name_dict[this_team_id] = this_team_nickname
+            team_id_to_draft_order_dict[this_team_id] = -1
+            team_id_to_draft_pick_dict_dict[this_team_id] = {}
+            team_id_to_draft_player_score_dict_dict[this_team_id] = {}
+            team_id_to_player_id_position_list_dict_dict[this_team_id] = {}
+
+            for i in range(1, NUMBER_OF_DRAFT_ROUNDS + 1):
+                team_id_to_draft_pick_dict_dict[this_team_id][i] = -1
+    else:
+        return -1
+
+    #next, get season number of this season. If we are in season 1 of this league, then we will randomly determine
+    #drafting order for teams. Otherwise, it will be determined by league rankings of the teams.
+
+    try:
+        season_obj = Season.objects.using("xactly_dev").filter(id=season_id)
+    except Exception:
+        season_obj = None
+
+    if season_obj is not None:
+        if season_obj[0].season_year == 1:
+
+            #randomly determine team drafting order
+            team_id_draft_order_list = random.sample(team_id_to_draft_order_dict.keys(), len(team_id_to_draft_order_dict.keys()))
+
+            for this_draft_order_num in team_id_draft_order_list:
+                team_id_to_draft_order_dict[this_team_id] = this_draft_order_num
+
+        else:
+            #we will need to query for the previous season's records and set draft order based on team rankings
+            pass
+    else:
+        return -1
+
+    #next, we need to get each team's score of the draftable players. I will calculate this by taking the player rank and deviating from
+    #it randomly by +- 6
+
+    try:
+        draft_player_obj_list = Player.objects.using("xactly_dev").filter(league_id=league_id, playing_status=0)
+    except Exception:
+        draft_player_obj_list = None
+
+    if draft_player_obj_list is not None:
+
+        for this_draft_player in draft_player_obj_list:
+
+            this_draft_player_base_value = this_draft_player.draft_value
+            this_draft_player_id = this_draft_player.id
+
+            for this_team_id in team_id_to_draft_player_score_dict_dict.keys():
+
+                #create team-based deviation
+                team_based_deviation = random.randint(-6, 6)
+                team_id_to_draft_player_score_dict_dict[this_team_id][this_draft_player_id] = this_draft_player_base_value + team_based_deviation
+
+    else:
+        return -1
+
+
+
+
+
+
+
+
+
 
 
 
