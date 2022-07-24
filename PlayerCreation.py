@@ -319,6 +319,8 @@ class PlayerCreation():
     high_5_ft_lb_weight_dist = get_truncated_normal(mean=265, sd=20, low=235, upp=285)
     low_6_ft_lb_weight_dist = get_truncated_normal(mean=300, sd=20, low=275, upp=325)
     high_6_ft_lb_weight_dist = get_truncated_normal(mean=340, sd=20, low=315, upp=365)
+    low_6_ft_te_weight_dist = get_truncated_normal(mean=250, sd=10, low=235, upp=265)
+    high_6_ft_te_weight_dist = get_truncated_normal(mean=275, sd=10, low=260, upp=290)
     low_5_ft_nlb_weight_dist = get_truncated_normal(mean=160, sd=10, low=140, upp=180)
     high_5_ft_nlb_weight_dist = get_truncated_normal(mean=190, sd=20, low=170, upp=210)
     low_6_ft_nlb_weight_dist = get_truncated_normal(mean=220, sd=20, low=190, upp=250)
@@ -742,7 +744,7 @@ def create_players(team_name_list, team_name_to_team_id_dict, league_id, female_
 
             height_feet_random_value = random.randint(0, 9)
 
-            if height_feet_random_value <= 7 or player_position in ['ol', 'dl']:
+            if height_feet_random_value <= 7 or player_position in ['ol', 'dl', 'te']:
                 height_feet = 6
                 height_inches = round(float(PlayerCreation.six_feet_tall_inches_norm_dist_obj.rvs()))
             else:
@@ -753,7 +755,7 @@ def create_players(team_name_list, team_name_to_team_id_dict, league_id, female_
             if height_inches == -1:
                 height_inches = 0
 
-            # weight in lbs is position dependent - ols and dls have one dist, everyone else has another
+            # weight in lbs is position dependent - ol, dl and te have one dist, everyone else has another
             # it is also height dependent - the taller the player, the more the player is likely to weigh
 
             if height_feet == 5 and height_inches <= 8 and player_position in ['dl', 'ol']:
@@ -766,16 +768,20 @@ def create_players(team_name_list, team_name_to_team_id_dict, league_id, female_
                 weight_lbs = round(PlayerCreation.high_5_ft_nlb_weight_dist.rvs())
             elif height_feet == 6 and height_inches <= 6 and player_position in ['dl', 'ol']:
                 weight_lbs = round(PlayerCreation.low_6_ft_lb_weight_dist.rvs())
-            elif height_feet == 6 and height_inches <= 6 and player_position not in ['dl', 'ol']:
+            elif height_feet == 6 and height_inches <= 6 and player_position == 'te':
+                weight_lbs = round(PlayerCreation.low_6_ft_te_weight_dist.rvs())
+            elif height_feet == 6 and height_inches <= 6 and player_position not in ['dl', 'ol', 'te']:
                 weight_lbs = round(PlayerCreation.low_6_ft_nlb_weight_dist.rvs())
             elif height_feet == 6 and height_inches > 6 and player_position in ['dl', 'ol']:
                 weight_lbs = round(PlayerCreation.high_6_ft_lb_weight_dist.rvs())
-            elif height_feet == 6 and height_inches > 6 and player_position not in ['dl', 'ol']:
+            elif height_feet == 6 and height_inches > 6 and player_position == 'te':
+                weight_lbs = round(PlayerCreation.high_6_ft_te_weight_dist.rvs())
+            elif height_feet == 6 and height_inches > 6 and player_position not in ['dl', 'ol', 'te']:
                 weight_lbs = round(PlayerCreation.high_6_ft_nlb_weight_dist.rvs())
 
             while player_name_uniqueness_verified == False:
 
-                if female_setting == "on":
+                if female_setting == True:
                     gender_value = random.randint(0, 1)
                 else:
                     gender_value = 0
