@@ -22,7 +22,7 @@ from PlayerCreation import PlayerCreation
 from PlayerCreation import create_player_career_arc, create_players
 
 from LeagueLayout import build_choose_teams_html
-from DraftUtils import calculate_player_draft_value
+from DraftUtils import calculate_player_draft_value, determine_draft_picks
 
 def retract_prior_db_commits(db_commit_to_delete_id_dict):
 
@@ -142,7 +142,9 @@ def create_draft_players(league_id):
 
     db_commit_to_delete_id_dict = {}
 
-    status_code, exception_str, db_commit_to_delete_id_dict = create_players(team_name_list, team_name_to_team_id_dict,
+    #we will create 12 rounds worth of draftable players
+
+    status_code, exception_str, db_commit_to_delete_id_dict = create_players(team_name_list[:12], team_name_to_team_id_dict,
                                                                              league_id, female_setting,
                                                                              db_commit_to_delete_id_dict, "draft")
     if exception_str != "":
@@ -379,18 +381,69 @@ def create_draft_list(request, source=None):
     except Exception:
         draft_obj = None
 
-    if draft_obj is not None:
-        #we already have created the draft player list
-        #depending on source, we will either watch the draft or fast forward the draft
-        #....
-        pass
-    else:
+    #we also need to check if we have created the draft list already
+
+    try:
+        current_season_obj = Season.objects.using("xactly_dev").filter(id=league_id).order_by("-id")
+    except Exception:
+        context['error_msg'] = "Failed to load current season."
+        context['welcome_message'] = "Draft Options"
+        return render(request, 'jpartyfb/draft_options.html', context)
+
+    created_draft_list = current_season_obj[0].created_draft_list
+
+    #if the draft list has not been created, then create draft list
+
+    if current_season_obj[0].created_draft_list == False:
 
         # we need to create the draft player list for this coming season in the league
         status_code = create_draft_players(league_id)
 
         if status_code == -1:
             context['error_msg'] = "Failed to create draft player list."
+
+        # indicate that draft player list has been created by updating the Season obj's created_draft_list property
+        try:
+            Season.objects.using("xactly_dev").filter(id=league_id).update(created_draft_list=True)
+        except Exception:
+            context['error_msg'] = "Failed to mark player list as created in Season db table"
+            context['welcome_message'] = "Draft Options"
+            return render(request, 'jpartyfb/draft_options.html', context)
+
+        #we now need to calculate player ranks
+        player_query_dict = {'league_id': league_id, 'playing_status': 0}
+
+        try:
+            player_obj_list = Player.objects.using("xactly_dev").filter(**player_query_dict)
+        except Exception:
+            context['error_msg'] = "Failed to load draft player list."
+            context['welcome_message'] = "Draft Options"
+            return render(request, 'jpartyfb/draft_options.html', context)
+
+        for this_player_obj in player_obj_list:
+            this_player_id = this_player_obj.id
+            this_player_primary_position = this_player_obj.primary_position
+
+            this_player_draft_value = calculate_player_draft_value(this_player_id, this_player_primary_position)
+
+            # finally, insert this_player_draft_value into the Player table
+            try:
+                Player.objects.using("xactly_dev").filter(id=this_player_id).update(draft_value=this_player_draft_value)
+            except Exception:
+                context['error_msg'] = "Failed to update player draft value"
+                context['welcome_message'] = "Draft Options"
+                return render(request, 'jpartyfb/draft_options.html', context)
+
+
+    #the draft is actually conducted entirely in the backend before the user even starts watching it
+    #for both fast forward draft and watch draft, we need to conduct the draft first
+    status_code = determine_draft_picks(league_id, season_id)
+
+    if status_code == -1:
+        sddadsda
+
+    #depending on whether user selected fast forward draft or watch draft, we will go to those respective views
+    #....
 
     return render(request, 'jpartyfb/draft_options.html', context)
 
