@@ -10,6 +10,11 @@
             <div style="float:left;">
 			</div>
 			<h1>{{ welcome_message }}</h1></div><br>
+            <div class='breadcrumb' style='text-color: blue; background-color: white;'>
+                <a href="{% url 'jpartyfb:index' %}">Home</a> >
+                <a href="{% url 'jpartyfb:choose_league' %}">Choose League</a> >
+                <a href="{% url 'jpartyfb:draft_options' %}">Draft Options</a>
+            </div>
 
 {% if Error_message %}
     <p style="color: red;">
@@ -22,6 +27,35 @@
             <img style="border-radius:1px;height:160px; width:160px;" src="{% static 'jpartyfb/images/league_logo.png' %}"/>
         </tr>
     </table>
+
+    <div style="height: 25px;"></div>
+
+    <h3> Filter by Position</h3>
+
+    <table align="center" border="1" width="35%">
+        <tr align="center">
+            <td width="5%"><a href="{% url 'jpartyfb:view_draft_list' %}?player_filter=qb">QB</a></td>
+            <td width="5%"><a href="{% url 'jpartyfb:view_draft_list' %}?player_filter=rb">RB</a></td>
+            <td width="5%"><a href="{% url 'jpartyfb:view_draft_list' %}?player_filter=wr">WR</a></td>
+            <td width="5%"><a href="{% url 'jpartyfb:view_draft_list' %}?player_filter=te">TE</a></td>
+            <td width="5%"><a href="{% url 'jpartyfb:view_draft_list' %}?player_filter=fb">FB</a></td>
+            <td width="5%"><a href="{% url 'jpartyfb:view_draft_list' %}?player_filter=ol">OL</a></td>
+            <td width="5%"><a href="{% url 'jpartyfb:view_draft_list' %}?player_filter=dl">DL</a></td>
+        </tr>
+        <tr align="center">
+            <td width="5%"><a href="{% url 'jpartyfb:view_draft_list' %}?player_filter=lb">LB</a></td>
+            <td width="5%"><a href="{% url 'jpartyfb:view_draft_list' %}?player_filter=cb">CB</a></td>
+            <td width="5%"><a href="{% url 'jpartyfb:view_draft_list' %}?player_filter=sf">SF</a></td>
+            <td width="5%"><a href="{% url 'jpartyfb:view_draft_list' %}?player_filter=k">K</a></td>
+            <td width="5%"><a href="{% url 'jpartyfb:view_draft_list' %}?player_filter=p">P</a></td>
+            <td width="5%"><a href="{% url 'jpartyfb:view_draft_list' %}?player_filter=sto">STO</a></td>
+            <td width="5%"><a href="{% url 'jpartyfb:view_draft_list' %}?player_filter=std">STD</a></td>
+        </tr>
+        <tr align="center">
+            <td colspan="7" width="35%"><a href="{% url 'jpartyfb:view_draft_list' %}">All</a></td>
+        </tr>
+    </table>
+
     <div style="height: 75px;"></div>
 
     <table width="100%" border="1">
