@@ -10,10 +10,14 @@
             <div style="float:left;">
 			</div>
 			<h1>{{ welcome_message }}</h1></div><br>
+            <div class='breadcrumb' style='text-color: blue; background-color: white;'>
+                <a href="{% url 'jpartyfb:index' %}">Home</a> >
+                <a href="{% url 'jpartyfb:choose_league' %}">Choose League</a>
+            </div>
 
-{% if Error_message %}
+{% if error_msg %}
     <p style="color: red;">
-        {{ Error_message }}
+        {{ error_msg }}
     </p>
 {% endif %}
 
