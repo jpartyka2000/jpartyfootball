@@ -65,30 +65,6 @@ class DjangoMigrations(models.Model):
         db_table = 'django_migrations'
 
 
-class Draft(models.Model):
-    id = models.IntegerField(primary_key=True)
-    host_city_id = models.IntegerField()
-    season_id = models.IntegerField()
-    num_rounds = models.IntegerField()
-
-    class Meta:
-        managed = True
-        db_table = 'draft'
-
-
-class DraftPick(models.Model):
-    id = models.IntegerField(primary_key=True)
-    draft_id = models.IntegerField()
-    round = models.IntegerField()
-    pick_number = models.IntegerField()
-    selected_player_id = models.IntegerField()
-    team_id = models.IntegerField()
-
-    class Meta:
-        managed = True
-        db_table = 'draft_pick'
-
-
 class Game(models.Model):
     id = models.IntegerField(primary_key=True)
     season_id = models.IntegerField()
@@ -799,6 +775,29 @@ class Team(models.Model):
     class Meta:
         managed = True
         db_table = 'team'
+
+class Draft(models.Model):
+    id = models.IntegerField(primary_key=True)
+    host_city_id = models.IntegerField()
+    season_id = models.IntegerField()
+    num_rounds = models.IntegerField()
+    league = models.ForeignKey(League)
+
+    class Meta:
+        managed = True
+        db_table = 'draft'
+
+class DraftPick(models.Model):
+    id = models.IntegerField(primary_key=True)
+    draft = models.ForeignKey(Draft)
+    round = models.IntegerField()
+    pick_number = models.IntegerField()
+    team = models.ForeignKey(Team)
+    player = models.ForeignKey(Player)
+
+    class Meta:
+        managed = True
+        db_table = 'draft_pick'
 
 class PlayerTeam(models.Model):
     player_team_id = models.IntegerField(primary_key=True)
