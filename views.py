@@ -384,7 +384,7 @@ def create_draft_list(request, source=None):
     #we also need to check if we have created the draft list already
 
     try:
-        current_season_obj = Season.objects.using("xactly_dev").filter(id=league_id).order_by("-id")
+        current_season_obj = Season.objects.using("xactly_dev").filter(league_id=league_id).order_by("-id")
     except Exception:
         context['error_msg'] = "Failed to load current season."
         context['welcome_message'] = "Draft Options"
@@ -404,7 +404,7 @@ def create_draft_list(request, source=None):
 
         # indicate that draft player list has been created by updating the Season obj's created_draft_list property
         try:
-            Season.objects.using("xactly_dev").filter(id=league_id).update(created_draft_list=True)
+            Season.objects.using("xactly_dev").filter(id=season_id).update(created_draft_list=True)
         except Exception:
             context['error_msg'] = "Failed to mark player list as created in Season db table"
             context['welcome_message'] = "Draft Options"
@@ -433,7 +433,6 @@ def create_draft_list(request, source=None):
                 context['error_msg'] = "Failed to update player draft value"
                 context['welcome_message'] = "Draft Options"
                 return render(request, 'jpartyfb/draft_options.html', context)
-
 
     #the draft is actually conducted entirely in the backend before the user even starts watching it
     #for both fast forward draft and watch draft, we need to conduct the draft first
@@ -1049,6 +1048,12 @@ def process_create_league_form_final(request):
         #we need to update Player with the new league_id value
         try:
             Player.objects.using("xactly_dev").filter(league_id=league_id_hidden).update(league_id=league_id)
+        except Exception:
+            pass
+
+        #update PlayerTeam with new league_id value
+        try:
+            PlayerTeam.objects.using("xactly_dev").filter(league_id=league_id_hidden).update(league_id=league_id)
         except Exception:
             pass
 
