@@ -1116,7 +1116,7 @@ def view_draft_list(request):
     #options page
 
     try:
-        current_season_obj = Season.objects.using("xactly_dev").filter(id=league_id).order_by("-id")
+        current_season_obj = Season.objects.using("xactly_dev").filter(league_id=league_id).order_by("-id")
     except Exception:
         context['error_msg'] = "Failed to load current season."
         context['welcome_message'] = "Draft Options"
