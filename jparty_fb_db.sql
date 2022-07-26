@@ -152,7 +152,7 @@ CREATE TABLE public.draft_pick (
     draft_id integer NOT NULL,
     round integer NOT NULL,
     pick_number integer NOT NULL,
-    selected_player_id integer NOT NULL,
+    player_id integer NOT NULL,
     team_id integer NOT NULL
 );
 
@@ -957,7 +957,8 @@ CREATE TABLE public.player_team (
     player_team_id integer NOT NULL,
     player_id integer NOT NULL,
     team_id integer NOT NULL,
-    season_id integer NOT NULL
+    season_id integer NOT NULL,
+    league_id integer
 );
 
 
@@ -1108,7 +1109,6 @@ INSERT INTO public.city VALUES (36, 'Kinshasa', 1);
 --
 
 INSERT INTO public.default_teams VALUES (1, 1, 'Titans', 'new_york_titans.png');
-INSERT INTO public.default_teams VALUES (2, 2, 'Swordfish', 'miami_swordfish.png');
 INSERT INTO public.default_teams VALUES (3, 3, 'Talons', 'atlanta_talons.png');
 INSERT INTO public.default_teams VALUES (4, 4, 'Bison', 'buffalo_bison.png');
 INSERT INTO public.default_teams VALUES (5, 5, 'Fascists', 'washington_fascists.png');
@@ -1139,6 +1139,7 @@ INSERT INTO public.default_teams VALUES (29, 29, 'Panteras', 'new_york_titans.pn
 INSERT INTO public.default_teams VALUES (30, 30, 'Tans', 'new_york_titans.png');
 INSERT INTO public.default_teams VALUES (31, 31, 'Cornhuskers', 'new_york_titans.png');
 INSERT INTO public.default_teams VALUES (32, 32, 'Goonies', 'new_york_titans.png');
+INSERT INTO public.default_teams VALUES (2, 2, 'Agujas', 'miami_agujas.png');
 
 
 --
