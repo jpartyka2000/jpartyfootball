@@ -2,7 +2,7 @@
 
 from jpartyfb.models import PlayerSpecsQb, PlayerSpecsRb, PlayerSpecsWr, PlayerSpecsFb, PlayerSpecsTe, PlayerSpecsOl, \
     PlayerSpecsDl, PlayerSpecsLb, PlayerSpecsCb, PlayerSpecsSf, PlayerSpecsK, PlayerSpecsP, PlayerSpecsStd, PlayerSpecsSto, \
-    Season, Team, Player, PlayerTeam
+    Season, Team, Player, PlayerTeam, Draft, DraftPick, City
 
 from operator import itemgetter
 
@@ -277,6 +277,35 @@ def determine_draft_picks(league_id, season_id):
     # create data structure indicating how much the team improves with a drafted player
     # over the worst starter at a given position
     team_id_to_player_improvement_score_dict_dict = {}
+
+    #first, create a row in the Draft table - this officially starts the draft
+    try:
+        draft_id = int(Draft.objects.using('xactly_dev').latest('id').id) + 1
+    except Exception:
+        draft_id = 1
+
+    # determine the host city - it is completely random
+    try:
+        city_id_list = City.objects.using("xactly_dev").all().values_list('city_id', flat=True)
+    except Exception:
+        return -1
+
+    draft_host_city_id = random.choice(city_id_list)
+
+    try:
+        Draft.objects.using('xactly_dev').create(id=draft_id, host_city_id=draft_host_city_id, season_id=season_id, num_rounds=NUMBER_OF_DRAFT_ROUNDS, league_id=league_id)
+    except Exception:
+        return -1
+
+    try:
+        draft_pick_id = int(DraftPick.objects.using('xactly_dev').latest('id').id) + 1
+    except Exception:
+        draft_pick_id = 1
+
+    try:
+        player_team_id = int(PlayerTeam.objects.using('xactly_dev').latest('player_team_id').player_team_id) + 1
+    except Exception:
+        player_team_id = 1
 
     #first, get all teams in this league by querying Team table
     try:
@@ -561,16 +590,10 @@ def determine_draft_picks(league_id, season_id):
         return -1
 
     # here, we can finally start the actual drafting process.
-    overall_pick_number_to_player_id_dict = {}
-
-    overall_pick_number = 0
 
     for round_num in range(1, NUMBER_OF_DRAFT_ROUNDS + 1):
 
         for round_pick_number, this_team_id in enumerate(team_id_draft_order_list, 1):
-
-            overall_pick_number += 1
-            overall_pick_number_to_player_id_dict[overall_pick_number] = -1
 
             #go through all players in draft
             for this_draft_player_idx, this_draft_player_obj in enumerate(draft_player_obj_list, 1):
@@ -619,27 +642,29 @@ def determine_draft_picks(league_id, season_id):
             #we need to update draft_player_obj_list to indicate that this player has already been selected
             player_id_to_draft_availability[this_team_id_player_id_selected] = False
 
-            overall_pick_number_to_player_id_dict[overall_pick_number] = this_team_id_player_id_selected
-
             #we will need to perform an update on Player to make player_status = 0 for this player_id
-            #we will need to insert a new row into PlayerTeam for this player_id
+            #try:
+            Player.objects.using("xactly_dev").filter(id=this_team_id_player_id_selected).update(playing_status=1)
+            #except Exception:
+            #    return -1
+
+            # we will need to insert a new row into PlayerTeam for this player_id
+            #try:
+            PlayerTeam.objects.using('xactly_dev').create(player_team_id=player_team_id, player_id=this_team_id_player_id_selected,
+                                                              team_id=this_team_id, season_id=season_id, league_id=league_id)
+
+            player_team_id += 1
+            #except Exception:
+            #    return -1
+
             #we will need to insert a new row into draft pick for this pick
+            #try:
+            DraftPick.objects.using('xactly_dev').create(id=draft_pick_id, draft_id=draft_id,
+                                                              round=round_num, pick_number=round_pick_number, team_id=this_team_id,
+                                                             player_id=this_team_id_player_id_selected)
 
-    dffdfdfdfdf
+            draft_pick_id += 1
+            #except Exception:
+            #    return -1
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    return 1
