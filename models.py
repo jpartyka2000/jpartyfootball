@@ -805,6 +805,7 @@ class PlayerTeam(models.Model):
     player = models.ForeignKey(Player)
     team = models.ForeignKey(Team)
     season_id = models.IntegerField()
+    league = models.ForeignKey(League)
 
     class Meta:
         managed = True
