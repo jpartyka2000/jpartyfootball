@@ -643,28 +643,28 @@ def determine_draft_picks(league_id, season_id):
             player_id_to_draft_availability[this_team_id_player_id_selected] = False
 
             #we will need to perform an update on Player to make player_status = 0 for this player_id
-            #try:
-            Player.objects.using("xactly_dev").filter(id=this_team_id_player_id_selected).update(playing_status=1)
-            #except Exception:
-            #    return -1
+            try:
+                Player.objects.using("xactly_dev").filter(id=this_team_id_player_id_selected).update(playing_status=1)
+            except Exception:
+                return -1
 
             # we will need to insert a new row into PlayerTeam for this player_id
-            #try:
-            PlayerTeam.objects.using('xactly_dev').create(player_team_id=player_team_id, player_id=this_team_id_player_id_selected,
+            try:
+                PlayerTeam.objects.using('xactly_dev').create(player_team_id=player_team_id, player_id=this_team_id_player_id_selected,
                                                               team_id=this_team_id, season_id=season_id, league_id=league_id)
 
-            player_team_id += 1
-            #except Exception:
-            #    return -1
+                player_team_id += 1
+            except Exception:
+                return -1
 
             #we will need to insert a new row into draft pick for this pick
-            #try:
-            DraftPick.objects.using('xactly_dev').create(id=draft_pick_id, draft_id=draft_id,
+            try:
+                DraftPick.objects.using('xactly_dev').create(id=draft_pick_id, draft_id=draft_id,
                                                               round=round_num, pick_number=round_pick_number, team_id=this_team_id,
                                                              player_id=this_team_id_player_id_selected)
 
-            draft_pick_id += 1
-            #except Exception:
-            #    return -1
+                draft_pick_id += 1
+            except Exception:
+                return -1
 
     return 1
