@@ -649,7 +649,8 @@ CREATE TABLE public.player (
     weight integer NOT NULL,
     league_id integer NOT NULL,
     playing_status integer,
-    draft_value real
+    draft_value real,
+    draft_rank integer
 );
 
 
