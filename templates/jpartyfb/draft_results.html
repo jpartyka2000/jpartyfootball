@@ -1,0 +1,98 @@
+{% extends "backendBase.html" %}
+
+{% load staticfiles %}
+{% load static %}
+
+{%block mainContent%}	
+	<div class="container" style="border:1px solid #C0C0C0;" align="center">
+          {% csrf_token %}
+		<div class='row' style='text-align:center;'>
+            <div style="float:left;">
+			</div>
+			<h1>{{ welcome_message }}: {{ league_abbrev }} - Season {{ season_year }}</h1></div><br>
+            <div class='breadcrumb' style='text-color: blue; background-color: white;'>
+                <a href="{% url 'jpartyfb:index' %}">Home</a>
+            </div>
+
+
+{% if Error_message %}
+    <p style="color: red;">
+        {{ Error_message }}
+    </p>
+{% endif %}
+
+    <table align="center">
+        <tr>
+            <img style="border-radius:1px;height:160px; width:160px;" src="{% static 'jpartyfb/images/league_logo.png' %}"/>
+        </tr>
+    </table>
+
+    <table border="0" width="100%">
+        <tr>
+            <td align="left" width="15%">
+                <b>Filter by Position:</b>
+                <select id="position_filter_select" onchange="window.location.href='/jpartyfb/view_draft_results?position_filter=' + this.value">
+                    {% for this_position in position_list %}
+                        {% ifequal this_position position_filter %}
+                            <option value="{{ this_position }}" SELECTED>{{ this_position }}</option>
+                        {% else %}
+                            <option value="{{ this_position }}">{{ this_position }}</option>
+                        {% endifequal %}
+
+                    {% endfor %}
+                </select>
+            </td>
+            <td width="65%"></td>
+            <td width="20%">
+                <b>Filter by Team:</b>
+                <select id="team_filter_select" onchange="window.location.href='/jpartyfb/view_draft_results?team_filter=' + this.value">
+                    {% for this_team in team_list %}
+                        {% ifequal this_team team_filter %}
+                            <option value="{{ this_team }}" SELECTED>{{ this_team }}</option>
+                        {% else %}
+                            <option value="{{ this_team }}">{{ this_team }}</option>
+                        {% endifequal %}
+
+                    {% endfor %}
+                </select>
+            </td>
+        </tr>
+    </table>
+
+    <div style="height: 25px;"></div>
+
+    {% for round_number, player_info_lol in round_number_to_player_info_list_dict.items %}
+
+        <h3>Round {{ round_number }}</h3>
+
+        <table width="100%" border="1">
+            <tr align="center">
+                <td width="5%" style="background-color: #dddddd; font-weight: bold;">#</td>
+                <td width="20%" style="background-color: #dddddd; font-weight: bold;">Name</td>
+                <td width="15%" style="background-color: #dddddd; font-weight: bold;">Pos</td>
+                <td width="15%" style="background-color: #dddddd; font-weight: bold;">Height</td>
+                <td width="15%" style="background-color: #dddddd; font-weight: bold;">Weight</td>
+                <td width="20%" style="background-color: #dddddd; font-weight: bold;">Team</td>
+                <td width="10%" style="background-color: #dddddd; font-weight: bold;">Draft Rank</td>
+
+            </tr>
+            {% for this_player_list in player_info_lol %}
+                <tr align="center" style="background-color: {% cycle '#ebfffe' '#99f2ec' %};">
+                    <td>{{ this_player_list.0 }}</td>
+                    <td>{{ this_player_list.1 }}</td>
+                    <td>{{ this_player_list.2 }}</td>
+                    <td>{{ this_player_list.3 }}</td>
+                    <td>{{ this_player_list.4 }}</td>
+                    <td>{{ this_player_list.5 }}</td>
+                    <td>{{ this_player_list.6 }}</td>
+                </tr>
+            {% endfor %}
+        </table>
+        <div style="height: 25px;"></div>
+
+    {% endfor %}
+
+</div>
+<div style="height: 75px;"></div>
+
+{% endblock%}
