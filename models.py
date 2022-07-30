@@ -488,6 +488,7 @@ class Player(models.Model):
     league = models.ForeignKey(League)
     playing_status = models.IntegerField()
     draft_value = models.FloatField()
+    draft_rank = models.IntegerField()
 
     class Meta:
         managed = True
