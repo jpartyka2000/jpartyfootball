@@ -144,7 +144,7 @@ def create_draft_players(league_id):
 
     #we will create 12 rounds worth of draftable players
 
-    status_code, exception_str, db_commit_to_delete_id_dict = create_players(team_name_list[:12], team_name_to_team_id_dict,
+    status_code, exception_str, db_commit_to_delete_id_dict = create_players(team_name_list, team_name_to_team_id_dict,
                                                                              league_id, female_setting,
                                                                              db_commit_to_delete_id_dict, "draft")
     if exception_str != "":
@@ -410,7 +410,7 @@ def create_draft_list(request, source=None):
             context['welcome_message'] = "Draft Options"
             return render(request, 'jpartyfb/draft_options.html', context)
 
-        #we now need to calculate player ranks
+        #we now need to calculate player draft values and draft ranks
         player_query_dict = {'league_id': league_id, 'playing_status': 0}
 
         try:
@@ -434,15 +434,62 @@ def create_draft_list(request, source=None):
                 context['welcome_message'] = "Draft Options"
                 return render(request, 'jpartyfb/draft_options.html', context)
 
+        #finally, we have to insert draft_ranks into Player
+        try:
+            player_obj_list = Player.objects.using("xactly_dev").filter(league_id=league_id, playing_status=0).order_by("-draft_value")
+        except Exception:
+            context['error_msg'] = "Failed to query for players before assigning draft rank"
+            context['welcome_message'] = "Draft Options"
+            return render(request, 'jpartyfb/draft_options.html', context)
+
+        player_obj_sorted_list = sorted(player_obj_list, key=lambda x: x.draft_value, reverse=True)
+
+        for player_rank_idx, this_player_obj in enumerate(player_obj_sorted_list, 1):
+
+            this_player_id = this_player_obj.id
+
+            try:
+                Player.objects.using("xactly_dev").filter(id=this_player_id).update(draft_rank=player_rank_idx)
+            except Exception:
+                context['error_msg'] = "Failed to assign player draft rank"
+                context['welcome_message'] = "Draft Options"
+                return render(request, 'jpartyfb/draft_options.html', context)
+
     #the draft is actually conducted entirely in the backend before the user even starts watching it
     #for both fast forward draft and watch draft, we need to conduct the draft first
-    status_code = determine_draft_picks(league_id, season_id)
+    status_code, draft_id = determine_draft_picks(league_id, season_id)
 
     if status_code == -1:
-        sddadsda
+        context['error_msg'] = "Failure occurred during the drafting process"
+        context['welcome_message'] = "Draft Options"
+        return render(request, 'jpartyfb/draft_options.html', context)
 
-    #depending on whether user selected fast forward draft or watch draft, we will go to those respective views
-    #....
+    #any players not selected need to have their player_status values changed to indicate that they are free agents
+    try:
+        Player.objects.using("xactly_dev").filter(league_id=league_id, playing_status=0).update(playing_status=-1)
+    except Exception:
+        context['error_msg'] = "Failed to convert undrafted players into free agents"
+        context['welcome_message'] = "Draft Options"
+        return render(request, 'jpartyfb/draft_options.html', context)
+
+    #officially start the season here by setting a start time
+    try:
+        Season.objects.using("xactly_dev").filter(id=season_id).update(start_time=datetime.datetime.now())
+    except Exception:
+        context['error_msg'] = "Failed to set the season start time"
+        context['welcome_message'] = "Draft Options"
+        return render(request, 'jpartyfb/draft_options.html', context)
+
+    #if we fast forwarded the draft, then we will go to a page showing the selected picks
+    if source == 'fast_forward_draft':
+
+        #we will need to store league_id and season_id as session variables
+        request.session['league_id'] = league_id
+        request.session['season_id'] = season_id
+        request.session['draft_id'] = draft_id
+
+        return HttpResponseRedirect('/jpartyfb/view_draft_results/')
+
 
     return render(request, 'jpartyfb/draft_options.html', context)
 
@@ -1095,8 +1142,107 @@ def process_create_league_form_final(request):
 def watch_draft(request):
     pass
 
-def fast_forward_draft(request):
-    pass
+
+def view_draft_results(request):
+
+    #get league_id and season_id from session
+    league_id = request.session['league_id']
+    season_id = request.session['season_id']
+    draft_id = request.session['draft_id']
+
+    position_filter = None
+    team_filter = None
+
+    #obtain GET parameter, if any
+    if 'position_filter' in request.GET:
+        position_filter = request.GET['position_filter']
+
+    if 'team_filter' in request.GET:
+        team_filter = request.GET['team_filter']
+
+    #query the draft_pick table for all players selected with this league_id and season_id
+    try:
+        draft_pick_obj_list = DraftPick.objects.using("xactly_dev").filter(draft_id=draft_id)
+    except Exception:
+        draft_pick_obj_list = None
+
+    #get the number of teams in the league by querying Team
+    try:
+        team_list = list(Team.objects.using("xactly_dev").filter(league_id=league_id).values_list('nickname', flat=True))
+    except Exception:
+        team_list = []
+
+    #add the all entry to team_list
+    team_list = ["all"] + team_list
+
+    league_team_count = len(team_list)
+
+    #info list will contain: [pick_number, full_name, primary_position, height, weight, team_name]
+    round_number_to_player_info_list_dict = {}
+    round_number = 1
+
+    for pick_idx, this_draft_pick_obj in enumerate(draft_pick_obj_list, 1):
+
+        if pick_idx % league_team_count == 0:
+            round_number += 1
+
+        if round_number not in round_number_to_player_info_list_dict:
+            round_number_to_player_info_list_dict[round_number] = []
+
+        this_pick_number = this_draft_pick_obj.pick_number
+        this_team_name = this_draft_pick_obj.team.nickname
+        this_primary_position = this_draft_pick_obj.player.primary_position
+
+        if position_filter != "all" and position_filter is not None and position_filter != this_primary_position:
+            continue
+
+        if team_filter != "all" and team_filter is not None and team_filter != this_team_name:
+            continue
+
+        this_first_name = this_draft_pick_obj.player.first_name
+        this_last_name = this_draft_pick_obj.player.last_name
+        this_middle_initial = this_draft_pick_obj.player.middle_initial
+
+        if this_middle_initial == "":
+            this_middle_initial = " "
+        else:
+            this_middle_initial = " " + this_middle_initial + " "
+
+        this_full_name = this_first_name + this_middle_initial + this_last_name
+
+        this_height = this_draft_pick_obj.player.height
+        this_weight = this_draft_pick_obj.player.weight
+        this_draft_rank = this_draft_pick_obj.player.draft_rank
+
+        this_pick_info_list = [this_pick_number, this_full_name, this_primary_position, this_height, this_weight, this_team_name, this_draft_rank]
+        round_number_to_player_info_list_dict[round_number].append(this_pick_info_list)
+
+    #get season year for display
+    try:
+        season_year = Season.objects.using("xactly_dev").filter(id=season_id).values_list('season_year', flat=True)[0]
+    except Exception:
+        season_year = -1
+
+    #get league name abbreviation for display
+    try:
+        league_abbrev = League.objects.using("xactly_dev").filter(id=league_id).values_list('abbreviation', flat=True)[0]
+    except Exception:
+        league_abbrev = "Error"
+
+    context = {}
+
+    context['position_filter'] = position_filter
+    context['position_list'] = ['all','qb','rb','wr','te','fb','ol','dl','lb','cb','sf','k','p','sto','std']
+    context['team_list'] = team_list
+    context['team_filter'] = team_filter
+    context['welcome_message'] = "Draft Results"
+    context['league_abbrev'] = league_abbrev
+    context['season_year'] = season_year
+    context['round_number_to_player_info_list_dict'] = round_number_to_player_info_list_dict
+
+    return render(request, 'jpartyfb/draft_results.html', context)
+
+
 
 def view_draft_list(request):
 
@@ -1201,10 +1347,23 @@ def view_draft_list(request):
         else:
             this_player_draft_value = this_player_obj.draft_value
 
-        player_info_lol.append([this_player_full_name, this_player_primary_position, this_player_alma_mater, this_player_height, this_player_weight, this_player_draft_value])
+        player_info_lol.append([this_player_full_name, this_player_primary_position, this_player_alma_mater, this_player_height, this_player_weight, this_player_draft_value, this_player_id])
 
     # sort lists in player_info_lol by this_player_draft_value
     player_info_lol.sort(key=itemgetter(5), reverse=True)
+
+    #finally, iterate through player_info_lol and assign draft_rank value to each player in Player table
+    for player_rank_idx, this_player_info_list in enumerate(player_info_lol, 1):
+
+        this_player_id = this_player_info_list[-1]
+
+        try:
+            Player.objects.using("xactly_dev").filter(id=this_player_id).update(draft_rank=player_rank_idx)
+        except Exception:
+            context['error_msg'] = "Failed to update player draft rank"
+            context['welcome_message'] = "Draft Options"
+            return render(request, 'jpartyfb/draft_options.html', context)
+
 
     context['welcome_message'] = "Draft List"
     context['player_info_lol'] = player_info_lol
