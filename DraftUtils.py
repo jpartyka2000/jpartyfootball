@@ -24,7 +24,24 @@ DRAFT_VALUE_BASELINE_P = 35
 DRAFT_VALUE_BASELINE_STD = 30
 DRAFT_VALUE_BASELINE_STO = 30
 
+position_to_draft_value_baseline_dict = {}
+position_to_draft_value_baseline_dict['qb'] = DRAFT_VALUE_BASELINE_QB
+position_to_draft_value_baseline_dict['rb'] = DRAFT_VALUE_BASELINE_RB
+position_to_draft_value_baseline_dict['wr'] = DRAFT_VALUE_BASELINE_WR
+position_to_draft_value_baseline_dict['te'] = DRAFT_VALUE_BASELINE_TE
+position_to_draft_value_baseline_dict['fb'] = DRAFT_VALUE_BASELINE_FB
+position_to_draft_value_baseline_dict['ol'] = DRAFT_VALUE_BASELINE_OL
+position_to_draft_value_baseline_dict['dl'] = DRAFT_VALUE_BASELINE_DL
+position_to_draft_value_baseline_dict['lb'] = DRAFT_VALUE_BASELINE_LB
+position_to_draft_value_baseline_dict['cb'] = DRAFT_VALUE_BASELINE_CB
+position_to_draft_value_baseline_dict['sf'] = DRAFT_VALUE_BASELINE_SF
+position_to_draft_value_baseline_dict['k'] = DRAFT_VALUE_BASELINE_K
+position_to_draft_value_baseline_dict['p'] = DRAFT_VALUE_BASELINE_P
+position_to_draft_value_baseline_dict['std'] = DRAFT_VALUE_BASELINE_STD
+position_to_draft_value_baseline_dict['sto'] = DRAFT_VALUE_BASELINE_STO
+
 NUMBER_OF_DRAFT_ROUNDS = 8
+POSITION_INFLUENCE_MULTIPLIER = .75
 
 #we need this to help teams draft the best players according to their biggest position needs
 player_position_to_starter_count_dict = {}
@@ -42,6 +59,23 @@ player_position_to_starter_count_dict['cb'] = 2
 player_position_to_starter_count_dict['sf'] = 2
 player_position_to_starter_count_dict['sto'] = 2
 player_position_to_starter_count_dict['std'] = 2
+
+#this dictionary contains limits on the numbers of each position that a team can draft
+player_position_to_draft_count_limit_dict = {}
+player_position_to_draft_count_limit_dict['qb'] = 1
+player_position_to_draft_count_limit_dict['rb'] = 2
+player_position_to_draft_count_limit_dict['wr'] = 2
+player_position_to_draft_count_limit_dict['te'] = 1
+player_position_to_draft_count_limit_dict['fb'] = 1
+player_position_to_draft_count_limit_dict['ol'] = 4
+player_position_to_draft_count_limit_dict['dl'] = 4
+player_position_to_draft_count_limit_dict['lb'] = 2
+player_position_to_draft_count_limit_dict['cb'] = 2
+player_position_to_draft_count_limit_dict['sf'] = 2
+player_position_to_draft_count_limit_dict['k'] = 1
+player_position_to_draft_count_limit_dict['p'] = 1
+player_position_to_draft_count_limit_dict['sto'] = 1
+player_position_to_draft_count_limit_dict['std'] = 1
 
 ROUND_1_PLAYER_SEARCH_LIMIT = 50
 ROUND_2_PLAYER_SEARCH_LIMIT = 100
@@ -606,11 +640,21 @@ def determine_draft_picks(league_id, season_id):
     else:
         return -1, draft_id
 
+    #we need this data structure to ensure that teams only select, at most, 1 k, p, fb, sto and/or std per draft
+    team_id_to_drafted_position_count_dict_dict = {}
+
     # here, we can finally start the actual drafting process.
 
     for round_num in range(1, NUMBER_OF_DRAFT_ROUNDS + 1):
 
         for round_pick_number, this_team_id in enumerate(team_id_draft_order_list, 1):
+
+            if this_team_id not in team_id_to_drafted_position_count_dict_dict:
+                team_id_to_drafted_position_count_dict_dict[this_team_id] = {}
+
+                #initialize counts for all positions
+                for this_position in player_position_to_draft_count_limit_dict.keys():
+                    team_id_to_drafted_position_count_dict_dict[this_team_id][this_position] = 0
 
             #go through all players in draft
             for this_draft_player_idx, this_draft_player_obj in enumerate(draft_player_obj_list, 1):
@@ -634,6 +678,11 @@ def determine_draft_picks(league_id, season_id):
                 this_draft_player_value = this_draft_player_obj.draft_value
                 this_draft_player_primary_position = this_draft_player_obj.primary_position
 
+                #this will ensure that we cannot exceed the maximum count for drafting a particular position
+                if team_id_to_drafted_position_count_dict_dict[this_team_id][this_draft_player_primary_position] == player_position_to_draft_count_limit_dict[this_draft_player_primary_position]:
+                    team_id_to_player_improvement_score_dict_dict[this_team_id][this_draft_player_id] = -9998
+                    continue
+
                 if this_draft_player_id not in team_id_to_player_improvement_score_dict_dict[this_team_id]:
                     team_id_to_player_improvement_score_dict_dict[this_team_id][this_draft_player_id] = -9999
 
@@ -650,7 +699,7 @@ def determine_draft_picks(league_id, season_id):
                 this_team_draft_player_score = team_id_to_draft_player_score_dict_dict[this_team_id][this_draft_player_id]
 
                 if team_id_to_player_improvement_score_dict_dict[this_team_id][this_draft_player_id] == -9999:
-                    this_draft_player_improvement_score = this_team_draft_player_score - this_team_worst_starter_player_score
+                    this_draft_player_improvement_score = (this_team_draft_player_score - this_team_worst_starter_player_score) + (POSITION_INFLUENCE_MULTIPLIER * position_to_draft_value_baseline_dict[this_draft_player_primary_position])
                     team_id_to_player_improvement_score_dict_dict[this_team_id][this_draft_player_id] = this_draft_player_improvement_score
 
             #we will look at the draft player with the highest improvement score and select them
@@ -665,6 +714,9 @@ def determine_draft_picks(league_id, season_id):
 
             team_id_to_position_player_info_list_dict_dict[this_team_id][drafted_player_primary_position].append(drafted_player_info_dict)
             team_id_to_position_player_info_list_dict_dict[this_team_id][drafted_player_primary_position] = sorted(team_id_to_position_player_info_list_dict_dict[this_team_id][drafted_player_primary_position],key=lambda x: x['player_value'], reverse=True)
+
+            #add 1 to the count of this position player type for this team
+            team_id_to_drafted_position_count_dict_dict[this_team_id][drafted_player_primary_position] += 1
 
             #we will need to perform an update on Player to make player_status = 0 for this player_id
             try:
