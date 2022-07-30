@@ -1172,10 +1172,10 @@ def view_draft_results(request):
     except Exception:
         team_list = []
 
-    #add the all entry to team_list
-    team_list = ["all"] + team_list
-
     league_team_count = len(team_list)
+
+    # add the all entry to team_list
+    team_list = ["all"] + team_list
 
     #info list will contain: [pick_number, full_name, primary_position, height, weight, team_name]
     round_number_to_player_info_list_dict = {}
@@ -1183,7 +1183,7 @@ def view_draft_results(request):
 
     for pick_idx, this_draft_pick_obj in enumerate(draft_pick_obj_list, 1):
 
-        if pick_idx % league_team_count == 0:
+        if pick_idx > (league_team_count * round_number):
             round_number += 1
 
         if round_number not in round_number_to_player_info_list_dict:
@@ -1216,6 +1216,7 @@ def view_draft_results(request):
 
         this_pick_info_list = [this_pick_number, this_full_name, this_primary_position, this_height, this_weight, this_team_name, this_draft_rank]
         round_number_to_player_info_list_dict[round_number].append(this_pick_info_list)
+
 
     #get season year for display
     try:
