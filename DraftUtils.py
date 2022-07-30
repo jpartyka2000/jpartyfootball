@@ -278,6 +278,17 @@ def determine_draft_picks(league_id, season_id):
     # over the worst starter at a given position
     team_id_to_player_improvement_score_dict_dict = {}
 
+    #check to see if this draft has already been created - if so, then return 1. This may only be a relevant
+    #check for debugging purposes
+    try:
+        draft_exists_obj = Draft.objects.using('xactly_dev').filter(league_id=league_id, season_id=season_id)
+    except Exception:
+        return -1, None
+
+    if len(draft_exists_obj) == 1:
+        draft_id = draft_exists_obj[0].id
+        return 1, draft_id
+
     #first, create a row in the Draft table - this officially starts the draft
     try:
         draft_id = int(Draft.objects.using('xactly_dev').latest('id').id) + 1
@@ -288,14 +299,14 @@ def determine_draft_picks(league_id, season_id):
     try:
         city_id_list = City.objects.using("xactly_dev").all().values_list('city_id', flat=True)
     except Exception:
-        return -1
+        return -1, draft_id
 
     draft_host_city_id = random.choice(city_id_list)
 
     try:
         Draft.objects.using('xactly_dev').create(id=draft_id, host_city_id=draft_host_city_id, season_id=season_id, num_rounds=NUMBER_OF_DRAFT_ROUNDS, league_id=league_id)
     except Exception:
-        return -1
+        return -1, draft_id
 
     try:
         draft_pick_id = int(DraftPick.objects.using('xactly_dev').latest('id').id) + 1
@@ -330,7 +341,7 @@ def determine_draft_picks(league_id, season_id):
             for i in range(1, NUMBER_OF_DRAFT_ROUNDS + 1):
                 team_id_to_draft_pick_dict_dict[this_team_id][i] = -1
     else:
-        return -1
+        return -1, draft_id
 
     #next, get season number of this season. If we are in season 1 of this league, then we will randomly determine
     #drafting order for teams. Otherwise, it will be determined by league rankings of the teams.
@@ -358,7 +369,7 @@ def determine_draft_picks(league_id, season_id):
             #we will need to query for the previous season's records and set draft order based on team rankings
             pass
     else:
-        return -1
+        return -1, draft_id
 
     #next, we need to get each team's score of the draftable players. I will calculate this by taking the player rank and deviating from
     #it randomly by +- 6
@@ -371,12 +382,18 @@ def determine_draft_picks(league_id, season_id):
     #we need to make sure that any selected players are taken off the board immediately
     player_id_to_draft_availability = {}
 
+    # we need this to ensure that newly draft players get compared against layers in later draft rounds
+    player_id_to_primary_position_dict = {}
+
     if draft_player_obj_list is not None:
 
         for this_draft_player in draft_player_obj_list:
 
             this_draft_player_base_value = this_draft_player.draft_value
             this_draft_player_id = this_draft_player.id
+            this_draft_player_primary_position = this_draft_player.primary_position
+
+            player_id_to_primary_position_dict[this_draft_player_id] = this_draft_player_primary_position
 
             player_id_to_draft_availability[this_draft_player_id] = True
 
@@ -387,7 +404,7 @@ def determine_draft_picks(league_id, season_id):
                 team_id_to_draft_player_score_dict_dict[this_team_id][this_draft_player_id] = this_draft_player_base_value + team_based_deviation
 
     else:
-        return -1
+        return -1, draft_id
 
     #get all players in this league that are already on teams and create data structure to hold their information
 
@@ -413,7 +430,7 @@ def determine_draft_picks(league_id, season_id):
                 try:
                     player_stats_obj = PlayerSpecsDl.objects.using('xactly_dev').filter(player_id=this_player_id)
                 except Exception:
-                    return -1
+                    return -1, draft_id
 
                 baseline_rank_value = DRAFT_VALUE_BASELINE_DL
                 critical_attribute_list = ['block_power_rating', 'tackle_rating']
@@ -423,7 +440,7 @@ def determine_draft_picks(league_id, season_id):
                 try:
                     player_stats_obj = PlayerSpecsCb.objects.using('xactly_dev').filter(player_id=this_player_id)
                 except Exception:
-                    return -1
+                    return -1, draft_id
 
                 baseline_rank_value = DRAFT_VALUE_BASELINE_CB
                 critical_attribute_list = ['speed_rating', 'route_rating']
@@ -433,7 +450,7 @@ def determine_draft_picks(league_id, season_id):
                 try:
                     player_stats_obj = PlayerSpecsFb.objects.using('xactly_dev').filter(player_id=this_player_id)
                 except Exception:
-                    return -1
+                    return -1, draft_id
 
                 baseline_rank_value = DRAFT_VALUE_BASELINE_FB
                 critical_attribute_list = ['speed_rating', 'strength_rating']
@@ -443,7 +460,7 @@ def determine_draft_picks(league_id, season_id):
                 try:
                     player_stats_obj = PlayerSpecsK.objects.using('xactly_dev').filter(player_id=this_player_id)
                 except Exception:
-                    return -1
+                    return -1, draft_id
 
                 baseline_rank_value = DRAFT_VALUE_BASELINE_K
                 critical_attribute_list = ['leg_rating', 'accuracy_rating']
@@ -453,7 +470,7 @@ def determine_draft_picks(league_id, season_id):
                 try:
                     player_stats_obj = PlayerSpecsLb.objects.using('xactly_dev').filter(player_id=this_player_id)
                 except Exception:
-                    return -1
+                    return -1, draft_id
 
                 baseline_rank_value = DRAFT_VALUE_BASELINE_LB
                 critical_attribute_list = ['speed_rating', 'tackle_rating']
@@ -463,7 +480,7 @@ def determine_draft_picks(league_id, season_id):
                 try:
                     player_stats_obj = PlayerSpecsOl.objects.using('xactly_dev').filter(player_id=this_player_id)
                 except Exception:
-                    return -1
+                    return -1, draft_id
 
                 baseline_rank_value = DRAFT_VALUE_BASELINE_OL
                 critical_attribute_list = ['block_power_rating', 'block_agility_rating']
@@ -473,7 +490,7 @@ def determine_draft_picks(league_id, season_id):
                 try:
                     player_stats_obj = PlayerSpecsP.objects.using('xactly_dev').filter(player_id=this_player_id)
                 except Exception:
-                    return -1
+                    return -1, draft_id
 
                 baseline_rank_value = DRAFT_VALUE_BASELINE_P
                 critical_attribute_list = ['leg_rating', 'hangtime_rating']
@@ -483,7 +500,7 @@ def determine_draft_picks(league_id, season_id):
                 try:
                     player_stats_obj = PlayerSpecsQb.objects.using('xactly_dev').filter(player_id=this_player_id)
                 except Exception:
-                    return -1
+                    return -1, draft_id
 
                 baseline_rank_value = DRAFT_VALUE_BASELINE_QB
                 critical_attribute_list = ['arm_strength_rating', 'arm_accuracy_rating']
@@ -493,7 +510,7 @@ def determine_draft_picks(league_id, season_id):
                 try:
                     player_stats_obj = PlayerSpecsRb.objects.using('xactly_dev').filter(player_id=this_player_id)
                 except Exception:
-                    return -1
+                    return -1, draft_id
 
                 baseline_rank_value = DRAFT_VALUE_BASELINE_RB
                 critical_attribute_list = ['speed_rating', 'elusiveness_rating']
@@ -503,7 +520,7 @@ def determine_draft_picks(league_id, season_id):
                 try:
                     player_stats_obj = PlayerSpecsSf.objects.using('xactly_dev').filter(player_id=this_player_id)
                 except Exception:
-                    return -1
+                    return -1, draft_id
 
                 baseline_rank_value = DRAFT_VALUE_BASELINE_SF
                 critical_attribute_list = ['speed_rating', 'route_rating']
@@ -513,7 +530,7 @@ def determine_draft_picks(league_id, season_id):
                 try:
                     player_stats_obj = PlayerSpecsStd.objects.using('xactly_dev').filter(player_id=this_player_id)
                 except Exception:
-                    return -1
+                    return -1, draft_id
 
                 baseline_rank_value = DRAFT_VALUE_BASELINE_STD
                 critical_attribute_list = ['agility_rating', 'tackle_rating']
@@ -523,7 +540,7 @@ def determine_draft_picks(league_id, season_id):
                 try:
                     player_stats_obj = PlayerSpecsSto.objects.using('xactly_dev').filter(player_id=this_player_id)
                 except Exception:
-                    return -1
+                    return -1, draft_id
 
                 baseline_rank_value = DRAFT_VALUE_BASELINE_STO
                 critical_attribute_list = ['speed_rating', 'elusiveness_rating']
@@ -533,7 +550,7 @@ def determine_draft_picks(league_id, season_id):
                 try:
                     player_stats_obj = PlayerSpecsTe.objects.using('xactly_dev').filter(player_id=this_player_id)
                 except Exception:
-                    return -1
+                    return -1, draft_id
 
                 baseline_rank_value = DRAFT_VALUE_BASELINE_TE
                 critical_attribute_list = ['catching_rating', 'block_power_rating']
@@ -543,7 +560,7 @@ def determine_draft_picks(league_id, season_id):
                 try:
                     player_stats_obj = PlayerSpecsWr.objects.using('xactly_dev').filter(player_id=this_player_id)
                 except Exception:
-                    return -1
+                    return -1, draft_id
 
                 baseline_rank_value = DRAFT_VALUE_BASELINE_WR
                 critical_attribute_list = ['catching_rating', 'route_rating']
@@ -587,7 +604,7 @@ def determine_draft_picks(league_id, season_id):
 
 
     else:
-        return -1
+        return -1, draft_id
 
     # here, we can finally start the actual drafting process.
 
@@ -642,29 +659,33 @@ def determine_draft_picks(league_id, season_id):
             #we need to update draft_player_obj_list to indicate that this player has already been selected
             player_id_to_draft_availability[this_team_id_player_id_selected] = False
 
+            #we also need to add the selected player to team_id_to_position_player_info_list_dict_dict
+            drafted_player_info_dict = {'player_id': this_team_id_player_id_selected, 'player_value': team_id_to_draft_player_score_dict_dict[this_team_id][this_team_id_player_id_selected] }
+            drafted_player_primary_position = player_id_to_primary_position_dict[this_team_id_player_id_selected]
+
+            team_id_to_position_player_info_list_dict_dict[this_team_id][drafted_player_primary_position].append(drafted_player_info_dict)
+            team_id_to_position_player_info_list_dict_dict[this_team_id][drafted_player_primary_position] = sorted(team_id_to_position_player_info_list_dict_dict[this_team_id][drafted_player_primary_position],key=lambda x: x['player_value'], reverse=True)
+
             #we will need to perform an update on Player to make player_status = 0 for this player_id
             try:
                 Player.objects.using("xactly_dev").filter(id=this_team_id_player_id_selected).update(playing_status=1)
             except Exception:
-                return -1
+                return -1, draft_id
 
             # we will need to insert a new row into PlayerTeam for this player_id
             try:
-                PlayerTeam.objects.using('xactly_dev').create(player_team_id=player_team_id, player_id=this_team_id_player_id_selected,
-                                                              team_id=this_team_id, season_id=season_id, league_id=league_id)
+                PlayerTeam.objects.using('xactly_dev').create(player_team_id=player_team_id, player_id=this_team_id_player_id_selected, team_id=this_team_id, season_id=season_id, league_id=league_id)
 
                 player_team_id += 1
             except Exception:
-                return -1
+                return -1, draft_id
 
             #we will need to insert a new row into draft pick for this pick
             try:
-                DraftPick.objects.using('xactly_dev').create(id=draft_pick_id, draft_id=draft_id,
-                                                              round=round_num, pick_number=round_pick_number, team_id=this_team_id,
-                                                             player_id=this_team_id_player_id_selected)
+                DraftPick.objects.using('xactly_dev').create(id=draft_pick_id, draft_id=draft_id, round=round_num, pick_number=round_pick_number, team_id=this_team_id, player_id=this_team_id_player_id_selected)
 
                 draft_pick_id += 1
             except Exception:
-                return -1
+                return -1, draft_id
 
-    return 1
+    return 1, draft_id
