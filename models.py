@@ -826,8 +826,9 @@ class TeamCity(models.Model):
 
 class TeamSeason(models.Model):
     id = models.IntegerField(primary_key=True)
-    team_id = models.IntegerField()
-    season_id = models.IntegerField()
+    team = models.ForeignKey(Team)
+    season = models.ForeignKey(Season)
+    league = models.ForeignKey(League)
 
     class Meta:
         managed = True
