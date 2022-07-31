@@ -1,0 +1,46 @@
+# coding: utf-8
+
+class PlayingStatus:
+    ROSTER = 1
+    DRAFT = 0
+    FREE_AGENT = -1
+
+class WeatherConditions:
+    SUNNY_WARM = 1
+    CLOUDY_WARM = 2
+    RAINY_WARM = 3
+    WINDY_WARM = 4
+    WINDY_RAINY_WARM = 5
+    SUNNY_MILD = 6
+    CLOUDY_MILD = 7
+    RAINY_MILD = 8
+    WINDY_MILD = 9
+    WINDY_RAINY_MILD = 10
+    SUNNY_COOL = 11
+    CLOUDY_COOL = 12
+    RAINY_COOL = 13
+    WINDY_COOL = 14
+    WINDY_RAINY_COOL = 15
+    SUNNY_COLD = 16
+    CLOUDY_COLD = 17
+    RAINY_COLD = 18
+    WINDY_COLD = 19
+    WINDY_RAINY_COLD = 20
+    SUNNY_FRIGID = 21
+    CLOUDY_FRIGID = 22
+    SNOWY_FRIGID = 23
+    WINDY_FRIGID = 24
+    WINDY_SNOWY_FRIGID = 25
+    SUNNY_ARCTIC = 26
+    CLOUDY_ARCTIC = 27
+    SNOWY_ARCTIC = 28
+    WINDY_ARCTIC = 29
+    WINDY_SNOWY_ARCTIC = 30
+
+    #extreme conditions
+    MONSOON = 31
+    BLIZZARD = 32
+    EXTREME_HEAT = 33
+    NOREASTERN = 34
+    SEVERE_COLD = 35
+
