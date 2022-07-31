@@ -21,6 +21,8 @@ from jpartyfb.models import *
 from PlayerCreation import PlayerCreation
 from PlayerCreation import create_player_career_arc, create_players
 
+from AssortedEnums import PlayingStatus
+
 from LeagueLayout import build_choose_teams_html
 from DraftUtils import calculate_player_draft_value, determine_draft_picks
 
@@ -411,7 +413,7 @@ def create_draft_list(request, source=None):
             return render(request, 'jpartyfb/draft_options.html', context)
 
         #we now need to calculate player draft values and draft ranks
-        player_query_dict = {'league_id': league_id, 'playing_status': 0}
+        player_query_dict = {'league_id': league_id, 'playing_status': PlayingStatus.DRAFT}
 
         try:
             player_obj_list = Player.objects.using("xactly_dev").filter(**player_query_dict)
@@ -436,7 +438,7 @@ def create_draft_list(request, source=None):
 
         #finally, we have to insert draft_ranks into Player
         try:
-            player_obj_list = Player.objects.using("xactly_dev").filter(league_id=league_id, playing_status=0).order_by("-draft_value")
+            player_obj_list = Player.objects.using("xactly_dev").filter(league_id=league_id, playing_status=PlayingStatus.DRAFT).order_by("-draft_value")
         except Exception:
             context['error_msg'] = "Failed to query for players before assigning draft rank"
             context['welcome_message'] = "Draft Options"
@@ -466,11 +468,36 @@ def create_draft_list(request, source=None):
 
     #any players not selected need to have their player_status values changed to indicate that they are free agents
     try:
-        Player.objects.using("xactly_dev").filter(league_id=league_id, playing_status=0).update(playing_status=-1)
+        Player.objects.using("xactly_dev").filter(league_id=league_id, playing_status=PlayingStatus.DRAFT).update(playing_status=PlayingStatus.FREE_AGENT)
     except Exception:
         context['error_msg'] = "Failed to convert undrafted players into free agents"
         context['welcome_message'] = "Draft Options"
         return render(request, 'jpartyfb/draft_options.html', context)
+
+    #populate the team_season table for this season
+    try:
+        team_obj_list = Team.objects.using("xactly_dev").filter(league_id=league_id)
+    except Exception:
+        context['error_msg'] = "Failed to get teams for populating TeamSeason table"
+        context['welcome_message'] = "Draft Options"
+        return render(request, 'jpartyfb/draft_options.html', context)
+
+    try:
+        team_season_id = int(TeamSeason.objects.using('xactly_dev').latest('id').id) + 1
+    except Exception:
+        team_season_id = 1
+
+    for this_team_obj in team_obj_list:
+        this_team_id = this_team_obj.id
+
+        try:
+            TeamSeason.objects.using("xactly_dev").create(id=team_season_id, team_id=this_team_id, season_id=season_id, league_id=league_id)
+        except Exception:
+            context['error_msg'] = "Failed in inserting rows into TeamSeason table"
+            context['welcome_message'] = "Draft Options"
+            return render(request, 'jpartyfb/draft_options.html', context)
+
+        team_season_id += 1
 
     #officially start the season here by setting a start time
     try:
@@ -873,8 +900,7 @@ def process_create_league_form_final(request):
     if source_page_hidden == 'cnl':
 
         try:
-            team_id = int(
-                Team.objects.using('xactly_dev').latest('id').id) + 1
+            team_id = int(Team.objects.using('xactly_dev').latest('id').id) + 1
         except Exception:
             team_id = 1
 
@@ -882,8 +908,7 @@ def process_create_league_form_final(request):
 
         #also insert team_city rows for this league
         try:
-            team_city_id = int(
-                TeamCity.objects.using('xactly_dev').latest('team_city_id').team_city_id) + 1
+            team_city_id = int(TeamCity.objects.using('xactly_dev').latest('team_city_id').team_city_id) + 1
         except Exception:
             team_city_id = 1
 
@@ -931,9 +956,7 @@ def process_create_league_form_final(request):
                 return HttpResponse(-4)
 
             try:
-                TeamCity.objects.using("xactly_dev").create(team_city_id=team_city_id, team_id=team_id,
-                                                        city_id=this_team_city_id,
-                                                        first_season_id=-1,stadium_id=this_team_stadium_id, league_id=league_id)
+                TeamCity.objects.using("xactly_dev").create(team_city_id=team_city_id, team_id=team_id,city_id=this_team_city_id,first_season_id=-1,stadium_id=this_team_stadium_id, league_id=league_id)
 
                 db_commit_to_delete_id_dict['TeamCity'] = first_team_city_id
             except Exception:
@@ -1073,10 +1096,7 @@ def process_create_league_form_final(request):
                         return HttpResponse("error: " + str(e))
 
                     try:
-                        TeamCity.objects.using("xactly_dev").create(team_city_id=insert_team_city_id, team_id=insert_team_id,
-                                                                    city_id=this_team_city_id,
-                                                                    first_season_id=-1, stadium_id=this_team_stadium_id,
-                                                                    league_id=league_id)
+                        TeamCity.objects.using("xactly_dev").create(team_city_id=insert_team_city_id, team_id=insert_team_id,city_id=this_team_city_id,first_season_id=-1, stadium_id=this_team_stadium_id,league_id=league_id)
                     except Exception as e:
                         return HttpResponse("error: " + str(e))
 
@@ -1285,7 +1305,7 @@ def view_draft_list(request):
         #if we just created the draft list, then we'll have to calculate player draft ranks
         # query for all the players in the draft list
         try:
-            player_obj_list = Player.objects.using("xactly_dev").filter(league_id=league_id, playing_status=0)
+            player_obj_list = Player.objects.using("xactly_dev").filter(league_id=league_id, playing_status=PlayingStatus.DRAFT)
         except Exception:
             context['error_msg'] = "Failed to load draft player list."
             context['welcome_message'] = "Draft Options"
@@ -1300,7 +1320,7 @@ def view_draft_list(request):
             return render(request, 'jpartyfb/draft_options.html', context)
     else:
 
-        player_query_dict = {'league_id': league_id, 'playing_status': 0}
+        player_query_dict = {'league_id': league_id, 'playing_status': PlayingStatus.DRAFT}
 
         if player_filter is not None:
             player_query_dict['primary_position'] = player_filter
