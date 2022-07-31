@@ -6,6 +6,7 @@ import names
 import copy
 
 from jpartyfb.models import *
+from AssortedEnums import PlayingStatus
 
 class PlayerCreation():
 
@@ -895,9 +896,9 @@ def create_players(team_name_list, team_name_to_team_id_dict, league_id, female_
             this_player_dict["draft_value"] = 0.0
 
             if mode == "league":
-                this_player_dict["playing_status"] = 1
+                this_player_dict["playing_status"] = PlayingStatus.ROSTER
             else:
-                this_player_dict["playing_status"] = 0
+                this_player_dict["playing_status"] = PlayingStatus.DRAFT
 
             #create Player db object
             try:
@@ -914,7 +915,7 @@ def create_players(team_name_list, team_name_to_team_id_dict, league_id, female_
 
                 #Create PlayerTeam db object
                 try:
-                    this_player_team_db_obj = PlayerTeam(player_team_id=player_team_id, player_id=player_id, team_id=this_team_id, season_id=1)
+                    this_player_team_db_obj = PlayerTeam(player_team_id=player_team_id, player_id=player_id, team_id=this_team_id, season_id=1, league_id=league_id)
                     this_player_team_db_obj.save(using="xactly_dev")
                     db_commit_to_delete_id_dict["PlayerTeam"] = first_player_team_id
                 except Exception as e:
