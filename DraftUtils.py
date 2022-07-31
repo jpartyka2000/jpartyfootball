@@ -409,7 +409,7 @@ def determine_draft_picks(league_id, season_id):
     #it randomly by +- 6
 
     try:
-        draft_player_obj_list = Player.objects.using("xactly_dev").filter(league_id=league_id, playing_status=0).order_by("-draft_value")
+        draft_player_obj_list = Player.objects.using("xactly_dev").filter(league_id=league_id, playing_status=PlayingStatus.DRAFT).order_by("-draft_value")
     except Exception:
         draft_player_obj_list = None
 
@@ -720,7 +720,7 @@ def determine_draft_picks(league_id, season_id):
 
             #we will need to perform an update on Player to make player_status = 0 for this player_id
             try:
-                Player.objects.using("xactly_dev").filter(id=this_team_id_player_id_selected).update(playing_status=1)
+                Player.objects.using("xactly_dev").filter(id=this_team_id_player_id_selected).update(playing_status=PlayingStatus.ROSTER)
             except Exception:
                 return -1, draft_id
 
