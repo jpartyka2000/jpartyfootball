@@ -1038,7 +1038,8 @@ ALTER TABLE public.team_city OWNER TO postgres;
 CREATE TABLE public.team_season (
     id integer NOT NULL,
     team_id integer NOT NULL,
-    season_id integer NOT NULL
+    season_id integer NOT NULL,
+    league_id integer
 );
 
 
