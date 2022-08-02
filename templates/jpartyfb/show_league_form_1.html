@@ -124,6 +124,16 @@
             return
         }
 
+        //if the number of games per season is an odd number, and the neutral site stadium checkbox is not checked,
+        //then alert the user
+        var neutral_site_setting = $("#neutral_site_checkbox").prop('checked')
+        var num_games_regular_season = $("#id_number_of_weeks_select").val()
+
+        if (num_games_regular_season % 2 == 1 && neutral_site_setting == false) {
+             alert("You must enable neutral site games when playing an odd number of regular season games")
+             return
+        }
+
         //if source page is els, then let user know that changing certain settings won't take effect
         //until the season is over. If user does not accept, then do not submit
 
