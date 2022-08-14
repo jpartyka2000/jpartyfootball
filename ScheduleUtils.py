@@ -7,9 +7,42 @@ import copy
 
 DEADLOCK_COUNT_LIMIT = 25
 
+def verify_scheduled_games(team_id_to_all_opponents_type_dict_list_dict, opponent_type_to_opponent_num_dict, team_id_to_division_id_dict, team_id_to_conference_id_dict):
+
+    #first check: make sure that the length of the opponent type list for each opponent type matches up with opponent_type_to_opponent_num_dict
+    #we will take into account duplicates in case the same team is listed twice
+    for this_team_id, this_team_opponent_type_dict_list in team_id_to_all_opponents_type_dict_list_dict.items():
+        for this_opponent_type_key, this_opponent_id_list in this_team_opponent_type_dict_list.items():
+            if len(list(set(team_id_to_all_opponents_type_dict_list_dict[this_team_id][this_opponent_type_key]))) != opponent_type_to_opponent_num_dict[this_opponent_type_key]:
+                return -1, "team_id_to_all_opponents_type_dict_list_dict opponent type list lengths != opponent_type_to_opponent_num_dict"
+
+    #initialize counting data structure for each team
+    team_id_to_opponent_type_count_dict_dict = {}
+
+    for this_team_id in list(team_id_to_all_opponents_type_dict_list_dict.keys()):
+        team_id_to_opponent_type_count_dict_dict[this_team_id] = {'same_division_twice':0, 'same_division_once':0, 'same_conference_twice':0, 'same_conference_once':0, 'different_conference_once':0 }
+
+    #count games from each team as indicated in team_id_to_all_opponents_type_dict_list_dict
+    for this_team_id, this_team_opponent_type_dict_list in team_id_to_all_opponents_type_dict_list_dict.items():
+
+        for this_opponent_type_key, this_opponent_id_list in this_team_opponent_type_dict_list.items():
+
+            for this_opponent_id in this_opponent_id_list:
+                team_id_to_opponent_type_count_dict_dict[this_team_id][this_opponent_type_key] += 1
+
+    #compare length of lists for each opponent type between team_id_to_all_opponents_type_dict_list_dict and team_id_to_opponent_type_count_dict_dict
+    for this_team_id, this_team_opponent_type_dict_list in team_id_to_all_opponents_type_dict_list_dict.items():
+        for this_opponent_type_key, this_opponent_id_list in this_team_opponent_type_dict_list.items():
+            if len(list(set(team_id_to_all_opponents_type_dict_list_dict[this_team_id][this_opponent_type_key]))) != team_id_to_opponent_type_count_dict_dict[this_team_id][this_opponent_type_key]:
+                return -1, "team_id_to_all_opponents_type_dict_list_dict opponent type list lengths != team_id_to_opponent_type_count_dict_dict"
+
+    return 1, "success"
+
 def get_opponents_times_played(num_divisions_per_conference, num_weeks_regular_season, num_teams_per_division):
 
     opponent_type_to_opponent_num_dict = {}
+
+    num_weeks_regular_season = 16
 
     if num_teams_per_division == 6 and num_divisions_per_conference == 2:
 
@@ -92,6 +125,7 @@ def create_season_schedule(league_id, season_id):
     num_teams_per_conference = league_obj[0].num_teams_per_conference
     num_divisions_per_conference = league_obj[0].num_divisions_per_conference
     neutral_site_setting = league_obj[0].neutral_site_setting
+    #neutral_site_setting = False
 
     num_teams_per_division = num_teams_per_conference / num_divisions_per_conference
 
@@ -112,6 +146,9 @@ def create_season_schedule(league_id, season_id):
     team_id_to_road_opponents_type_dict_list_dict = {}
     team_id_to_neutral_opponents_type_dict_list_dict = {}
 
+    team_id_to_division_id_dict = {}
+    team_id_to_conference_id_dict = {}
+
     for this_team_obj in team_obj_list:
 
         this_team_id = this_team_obj.id
@@ -120,6 +157,9 @@ def create_season_schedule(league_id, season_id):
 
         this_conference_id = this_team_obj.team.conference.id
         this_division_id = this_team_obj.team.division.id
+
+        team_id_to_division_id_dict[this_team_id] = this_division_id
+        team_id_to_conference_id_dict[this_team_id] = this_conference_id
 
         if this_conference_id not in conference_index_to_team_id_list_dict:
             conference_index_to_team_id_list_dict[this_conference_id] = []
@@ -136,8 +176,7 @@ def create_season_schedule(league_id, season_id):
         team_id_to_home_opponents_type_dict_list_dict[this_team_id] = {'same_division_twice':[], 'same_division_once':[], 'same_conference_once':[], 'same_conference_twice':[], 'different_conference_once':[]}
         team_id_to_road_opponents_type_dict_list_dict[this_team_id] = {'same_division_twice': [], 'same_division_once': [], 'same_conference_once': [], 'same_conference_twice': [], 'different_conference_once': []}
 
-        #only same_conference_once games can be neutral site games
-        team_id_to_neutral_opponents_type_dict_list_dict[this_team_id] = {'same_conference_once': []}
+        team_id_to_neutral_opponents_type_dict_list_dict[this_team_id] = {'same_conference_once': [], 'same_conference_twice':[]}
 
 
     #create a list of all team_ids in this league, ordered such that all ids of 1 conference appear before any of the ids from the other conference
@@ -694,303 +733,635 @@ def create_season_schedule(league_id, season_id):
                 all_games_scheduled = True
 
 
+
+    #status_code, message = verify_scheduled_games(team_id_to_all_opponents_type_dict_list_dict, opponent_type_to_opponent_num_dict, team_id_to_division_id_dict, team_id_to_conference_id_dict)
+
+    #if status_code == 1:
+    #    yeaaaahhhh
+    #else:
+    #    waaaaaahhhh
+
     #at this point, we have scheduled all opponents for all teams correctly. Now we will decide which of the games should
     #be home games, away games or neutral site, if applicable
     #team_id_to_home_away_neutral_opponents_dict_list_dict
+    with open("home_away_trace.txt", "w") as writefile_x:
 
-    num_same_division_once_home_games = num_same_division_once_road_games = opponent_type_to_opponent_num_dict['same_division_once'] / 2
+        scheduled_all_games = False
 
-    for this_team_id, all_opponents_dict in team_id_to_all_opponents_type_dict_list_dict.items():
+        while not scheduled_all_games:
 
-        #first, deal with same_division_twice_opponents. For each, I will assign the team_id to both home and road dicts
-        this_team_id_same_division_twice_list = all_opponents_dict['same_division_twice']
+            writefile_x.write("Back at the VERY TOP.." + "\n")
 
-        for this_opponent_id in this_team_id_same_division_twice_list:
-            team_id_to_home_opponents_type_dict_list_dict[this_team_id]['same_division_twice'].append(this_opponent_id)
-            team_id_to_road_opponents_type_dict_list_dict[this_team_id]['same_division_twice'].append(this_opponent_id)
+            is_deadlocked = False
+            deadlock_counter = 0
 
-        #we don't need to fill up the chosen opponents list for same_division_twice, since the opponents also have the correct teams scheduled
+            num_same_division_once_home_games = num_same_division_once_road_games = opponent_type_to_opponent_num_dict['same_division_once'] / 2
 
-        #next, process same_division_once opponents
-        this_team_id_same_division_once_list = all_opponents_dict['same_division_once']
+            #initialize all home/road/neutral site data structures for all teams
+            for this_team_id, all_opponents_dict in team_id_to_all_opponents_type_dict_list_dict.items():
 
-        #we will always have an even number of same_division_once opponents. If a team does not have any of these games assigned
-        #as home and road games, then so split them in half to assign home and road
-        #if they have from an opponent that scheduled earlier, then randomly choose remaining home and road games
-        #also, there are no neutral site division games
-        home_team_ids_added_list = []
+                writefile_x.write("this team_id = " + str(this_team_id) + " data structures being initialized..." + "\n")
 
-        while len(team_id_to_home_opponents_type_dict_list_dict[this_team_id]['same_division_once']) < num_same_division_once_home_games:
+                # initialize home,road and neutral opponent data structures in case we blew it up before
+                team_id_to_home_opponents_type_dict_list_dict[this_team_id]['same_division_twice'] = []
+                team_id_to_home_opponents_type_dict_list_dict[this_team_id]['same_division_once'] = []
+                team_id_to_home_opponents_type_dict_list_dict[this_team_id]['same_conference_twice'] = []
+                team_id_to_home_opponents_type_dict_list_dict[this_team_id]['same_conference_once'] = []
+                team_id_to_home_opponents_type_dict_list_dict[this_team_id]['different_conference_once'] = []
 
-            number_of_home_games_to_select = num_same_division_once_home_games - len(team_id_to_home_opponents_type_dict_list_dict[this_team_id]['same_division_once'])
-            selected_home_opponent_id_list = random.sample(this_team_id_same_division_once_list, number_of_home_games_to_select)
 
-            for this_selected_home_opponent_id in selected_home_opponent_id_list:
+                team_id_to_road_opponents_type_dict_list_dict[this_team_id]['same_division_twice'] = []
+                team_id_to_road_opponents_type_dict_list_dict[this_team_id]['same_division_once'] = []
+                team_id_to_road_opponents_type_dict_list_dict[this_team_id]['same_conference_twice'] = []
+                team_id_to_road_opponents_type_dict_list_dict[this_team_id]['same_conference_once'] = []
+                team_id_to_road_opponents_type_dict_list_dict[this_team_id]['different_conference_once'] = []
 
-                #first check - is this_selected_home_opponent_id already in team_id_to_home_opponents_type_dict_list_dict[this_selected_home_opponent_id]['same_division_once']?
-                if this_selected_home_opponent_id in team_id_to_home_opponents_type_dict_list_dict[this_team_id]['same_division_once']:
-                    continue
+                team_id_to_neutral_opponents_type_dict_list_dict[this_team_id]['same_conference_twice'] = []
+                team_id_to_neutral_opponents_type_dict_list_dict[this_team_id]['same_conference_once'] = []
 
-                #second check - is this_team_id already in team_id_to_road_opponents_type_dict_list_dict[this_selected_home_opponent_id]['same_division_once']?
-                if this_team_id in team_id_to_road_opponents_type_dict_list_dict[this_selected_home_opponent_id]['same_division_once']:
-                    continue
 
-                #final check - is len(team_id_to_road_opponents_type_dict_list_dict[this_selected_home_opponent_id]['same_division_once']) == num_same_division_once_road_games?
-                if len(team_id_to_road_opponents_type_dict_list_dict[this_selected_home_opponent_id]['same_division_once']) == num_same_division_once_road_games:
-                    continue
+            for this_team_id, all_opponents_dict in team_id_to_all_opponents_type_dict_list_dict.items():
 
-                #if we get here, it is a valid assignment, add game to both teams' appropriate data structures
-                team_id_to_home_opponents_type_dict_list_dict[this_team_id]['same_division_once'].append(this_selected_home_opponent_id)
-                team_id_to_road_opponents_type_dict_list_dict[this_selected_home_opponent_id]['same_division_once'].append(this_team_id)
+                writefile_x.write("*****************************************" + "\n")
+                writefile_x.write("Starting loop with new opponent: " + str(this_team_id) + "\n")
+                writefile_x.write("Assigning same_division_twice opponents...." + "\n")
 
-                home_team_ids_added_list.append(this_selected_home_opponent_id)
+                #first, deal with same_division_twice_opponents. For each, I will assign the team_id to both home and road dicts
+                this_team_id_same_division_twice_list = all_opponents_dict['same_division_twice']
 
-        #ensure that same_division_once home teams also can't be road teams for this_team_id
-        this_team_id_same_division_once_list_for_road = list(set(this_team_id_same_division_once_list) - set(home_team_ids_added_list))
+                for this_opponent_id in this_team_id_same_division_twice_list:
+                    team_id_to_home_opponents_type_dict_list_dict[this_team_id]['same_division_twice'].append(this_opponent_id)
+                    team_id_to_road_opponents_type_dict_list_dict[this_team_id]['same_division_twice'].append(this_opponent_id)
 
-        #do the same as above, but for road games
-        while len(team_id_to_road_opponents_type_dict_list_dict[this_team_id]['same_division_once']) < num_same_division_once_road_games:
+                writefile_x.write("Home opponents assigned are: " + str(team_id_to_home_opponents_type_dict_list_dict[this_team_id]['same_division_twice']) + "\n")
+                writefile_x.write("Road opponents assigned are: " + str(team_id_to_road_opponents_type_dict_list_dict[this_team_id]['same_division_twice']) + "\n")
 
-            number_of_road_games_to_select = num_same_division_once_road_games - len(team_id_to_road_opponents_type_dict_list_dict[this_team_id]['same_division_once'])
-            selected_road_opponent_id_list = random.sample(this_team_id_same_division_once_list_for_road, number_of_road_games_to_select)
+                #we don't need to fill up the chosen opponents list for same_division_twice, since the opponents also have the correct teams scheduled
 
-            for this_selected_road_opponent_id in selected_road_opponent_id_list:
+                writefile_x.write("-------------------------------------------" + "\n")
+                writefile_x.write("Assigning same_division_once opponents...." + "\n")
 
-                #first check - is this_selected_road_opponent_id already in team_id_to_road_opponents_type_dict_list_dict[this_selected_road_opponent_id]['same_division_once']?
-                if this_selected_road_opponent_id in team_id_to_road_opponents_type_dict_list_dict[this_team_id]['same_division_once']:
-                    continue
+                #next, process same_division_once opponents
+                this_team_id_same_division_once_list = all_opponents_dict['same_division_once']
 
-                #second check - is this_team_id already in team_id_to_home_opponents_type_dict_list_dict[this_selected_road_opponent_id]['same_division_once']?
-                if this_team_id in team_id_to_home_opponents_type_dict_list_dict[this_selected_road_opponent_id]['same_division_once']:
-                    continue
+                writefile_x.write("this_team_id_same_division_once_list is: " + str(this_team_id_same_division_once_list) + "\n")
 
-                #final check - is len(team_id_to_home_opponents_type_dict_list_dict[this_selected_road_opponent_id]['same_division_once']) == num_same_division_once_home_games?
-                if len(team_id_to_home_opponents_type_dict_list_dict[this_selected_road_opponent_id]['same_division_once']) == num_same_division_once_home_games:
-                    continue
+                #we will always have an even number of same_division_once opponents. If a team does not have any of these games assigned
+                #as home and road games, then so split them in half to assign home and road
+                #if they have from an opponent that scheduled earlier, then randomly choose remaining home and road games
+                #also, there are no neutral site division games
+                home_team_ids_added_list = []
 
-                #if we get here, it is a valid assignment, add game to both teams' appropriate data structures
-                team_id_to_road_opponents_type_dict_list_dict[this_team_id]['same_division_once'].append(this_selected_road_opponent_id)
-                team_id_to_home_opponents_type_dict_list_dict[this_selected_road_opponent_id]['same_division_once'].append(this_team_id)
+                while len(team_id_to_home_opponents_type_dict_list_dict[this_team_id]['same_division_once']) < num_same_division_once_home_games:
 
-        #next, assign same_conference_twice games. This is just like same_division_twice_games, except that it is not mandatory
-        this_team_id_same_conference_twice_list = all_opponents_dict['same_conference_twice']
+                    writefile_x.write("New while loop iteration: len(team_id_to_home_opponents_type_dict_list_dict[this_team_id]['same_division_once']) == " + str(len(team_id_to_home_opponents_type_dict_list_dict[this_team_id]['same_division_once'])) + "\n")
+                    writefile_x.write("num_same_division_once_home_games = " + str(num_same_division_once_home_games) + "\n")
 
-        if len(this_team_id_same_conference_twice_list) > 0:
+                    number_of_home_games_to_select = num_same_division_once_home_games - len(team_id_to_home_opponents_type_dict_list_dict[this_team_id]['same_division_once'])
+                    selected_home_opponent_id_list = random.sample(this_team_id_same_division_once_list, number_of_home_games_to_select)
 
-            #if we have neutral site games turned on AND 0 same_conference_once games, then we need to assign
-            #neutral site games here. Also, this could only happen if we have an even number of
-            #regular season games, so we will be assigning 2 neutral site games
+                    writefile_x.write("number_of_home_games_to_select = " + str(number_of_home_games_to_select) + "\n")
+                    writefile_x.write("selected_home_opponent_id_list = " + str(selected_home_opponent_id_list) + "\n")
 
-            if neutral_site_setting == True and opponent_type_to_opponent_num_dict['same_conference_once'] == 0 and len(team_id_to_neutral_opponents_type_dict_list_dict[this_team_id]) == 0:
+                    for this_selected_home_opponent_id in selected_home_opponent_id_list:
 
-                #we have to randomly pick one team among the same_conference_twice teams - both games will be
-                #neutral site games
-
-                for this_neutral_candidate_team_id in this_team_id_same_conference_twice_list:
-
-                    #check 1: is this_neutral_candidate_team_id already in team_id_to_neutral_opponents_type_dict_list_dict[this_team_id]?
-                    if this_neutral_candidate_team_id in team_id_to_neutral_opponents_type_dict_list_dict[this_team_id]:
-                        continue
-
-                    #check 2: is this_team_id already in team_id_to_neutral_opponents_type_dict_list_dict[this_neutral_candidate_team_id]?
-                    if this_team_id in team_id_to_neutral_opponents_type_dict_list_dict[this_neutral_candidate_team_id]:
-                        continue
-
-                    #check 3: is len(team_id_to_neutral_opponents_type_dict_list_dict[this_neutral_candidate_team_id]) > 0?
-                    if len(team_id_to_neutral_opponents_type_dict_list_dict[this_neutral_candidate_team_id]) > 0:
-                        continue
-
-                    #if we get here, then this is a valid team_id to select
-                    #add it twice for both this_team_id and this_neutral_candidate_team_id
-                    team_id_to_neutral_opponents_type_dict_list_dict[this_team_id].append(this_neutral_candidate_team_id)
-                    team_id_to_neutral_opponents_type_dict_list_dict[this_team_id].append(this_neutral_candidate_team_id)
-                    team_id_to_neutral_opponents_type_dict_list_dict[this_neutral_candidate_team_id].append(this_team_id)
-                    team_id_to_neutral_opponents_type_dict_list_dict[this_neutral_candidate_team_id].append(this_team_id)
-
-                    this_team_id_same_conference_twice_list.remove(this_neutral_candidate_team_id)
-
-                    #break out of loop if we got this far
-                    break
-
-            for this_opponent_id in this_team_id_same_conference_twice_list:
-                team_id_to_home_opponents_type_dict_list_dict[this_team_id]['same_conference_twice'].append(this_opponent_id)
-                team_id_to_road_opponents_type_dict_list_dict[this_team_id]['same_conference_twice'].append(this_opponent_id)
-
-        # we don't need to fill up the chosen opponents list for same_conference_twice, since they also have the correct teams scheduled
-
-        #assign same_conference_once_games. Neutral site games are assigned here
-        this_team_id_same_conference_once_list = all_opponents_dict['same_conference_once']
-
-        if len(this_team_id_same_conference_once_list) > 0:
-
-            neutral_site_team_ids_added_list = []
-
-            #if user has selected neutral site games, then we will assign 1-2 games of this type, depending on
-            #whether the number of games in the regular season is an odd number
-            if neutral_site_setting == True:
-
-                num_neutral_site_games = 0
-
-                if len(this_team_id_same_conference_once_list) % 2 == 1:
-                    num_neutral_site_games = 1
-                else:
-                    num_neutral_site_games = 2
-
-                #if a neutral site game has not been assigned for this_team_id...
-                if len(team_id_to_neutral_opponents_type_dict_list_dict[this_team_id]) < num_neutral_site_games:
-
-                    #a team may have had 1 of 2 neutral site games selected
-                    remaining_neutral_site_game_number = num_neutral_site_games - len(team_id_to_neutral_opponents_type_dict_list_dict[this_team_id])
-
-                    for this_neutral_candidate_team_id in this_team_id_same_conference_once_list:
-
-                        #check 1: is this_neutral_candidate_team_id already in team_id_to_neutral_opponents_type_dict_list_dict[this_team_id]?
-                        if this_neutral_candidate_team_id in team_id_to_neutral_opponents_type_dict_list_dict[this_team_id]['same_conference_once']:
-                            continue
-
-                        #check 2: is this_team_id already in team_id_to_neutral_opponents_type_dict_list_dict[this_neutral_candidate_team_id]?
-                        if this_team_id in team_id_to_neutral_opponents_type_dict_list_dict[this_neutral_candidate_team_id]['same_conference_once']:
-                            continue
-
-                        #check 3: is len(team_id_to_neutral_opponents_type_dict_list_dict[this_neutral_candidate_team_id]) == num_neutral_site_games?
-                        if len(team_id_to_neutral_opponents_type_dict_list_dict[this_neutral_candidate_team_id]['same_conference_once']) == num_neutral_site_games:
-                            continue
-
-                        #if we get here, it is a valid assignment
-                        team_id_to_neutral_opponents_type_dict_list_dict[this_team_id]['same_conference_once'].append(this_neutral_candidate_team_id)
-                        team_id_to_neutral_opponents_type_dict_list_dict[this_neutral_candidate_team_id]['same_conference_once'].append(this_team_id)
-
-                        neutral_site_team_ids_added_list.append(this_neutral_candidate_team_id)
-
-                        #if this_team_id has completed their neutral site game assignment, then leave
-                        if len(team_id_to_neutral_opponents_type_dict_list_dict[this_team_id]['same_conference_once']) == num_neutral_site_games:
+                        if deadlock_counter == DEADLOCK_COUNT_LIMIT:
+                            writefile_x.write("We reached deadlock limit, blow it up!" + "\n")
+                            is_deadlocked = True
                             break
 
+                        writefile_x.write("Considering this_selected_home_opponent_id = " + str(this_selected_home_opponent_id) + "\n")
 
-            #at this point, we need to assign the remaining home/road conference_once games
-            remaining_conference_once_team_ids_list = list(set(this_team_id_same_conference_once_list) - set(neutral_site_team_ids_added_list))
+                        #first check - is this_selected_home_opponent_id already in team_id_to_home_opponents_type_dict_list_dict[this_selected_home_opponent_id]['same_division_once']?
+                        if this_selected_home_opponent_id in team_id_to_home_opponents_type_dict_list_dict[this_team_id]['same_division_once']:
+                            writefile_x.write("this_selected_home_opponent_id is already in team_id_to_home_opponents_type_dict_list_dict[this_team_id]['same_division_once'] " + "\n")
+                            deadlock_counter += 1
+                            continue
 
-            num_same_conference_once_home_games = num_same_conference_once_road_games = len(remaining_conference_once_team_ids_list) / 2
+                        #second check - is this_team_id already in team_id_to_road_opponents_type_dict_list_dict[this_selected_home_opponent_id]['same_division_once']?
+                        if this_team_id in team_id_to_road_opponents_type_dict_list_dict[this_selected_home_opponent_id]['same_division_once']:
+                            writefile_x.write("this_team_id already in team_id_to_road_opponents_type_dict_list_dict[this_selected_home_opponent_id]['same_division_once']" + "\n")
+                            deadlock_counter += 1
+                            continue
 
-            home_team_ids_added_list = []
+                        #final check - is len(team_id_to_road_opponents_type_dict_list_dict[this_selected_home_opponent_id]['same_division_once']) == num_same_division_once_road_games?
+                        if len(team_id_to_road_opponents_type_dict_list_dict[this_selected_home_opponent_id]['same_division_once']) == num_same_division_once_road_games:
+                            writefile_x.write("len(team_id_to_road_opponents_type_dict_list_dict[this_selected_home_opponent_id]['same_division_once']) == num_same_division_once_road_games" + "\n")
+                            deadlock_counter += 1
+                            continue
 
-            #home games
+                        #if we get here, it is a valid assignment, add game to both teams' appropriate data structures
+                        team_id_to_home_opponents_type_dict_list_dict[this_team_id]['same_division_once'].append(this_selected_home_opponent_id)
+                        team_id_to_road_opponents_type_dict_list_dict[this_selected_home_opponent_id]['same_division_once'].append(this_team_id)
+                        writefile_x.write("adding home_opponent: " + str(this_selected_home_opponent_id) + "\n")
 
-            while len(team_id_to_home_opponents_type_dict_list_dict[this_team_id]['same_conference_once']) < num_same_conference_once_home_games:
+                        home_team_ids_added_list.append(this_selected_home_opponent_id)
 
-                selected_home_opponent_id_list = random.sample(remaining_conference_once_team_ids_list, num_same_conference_once_home_games)
+                        # it's possible that we could add 1 team through one while iteration, and then add 2 more the next time around
+                        # do a check here to prevent that from happening
+                        if len(team_id_to_home_opponents_type_dict_list_dict[this_team_id]['same_division_once']) == num_same_division_once_home_games:
+                            writefile_x.write("all home games of type assigned for this team!" + "\n")
+                            break
 
-                for this_selected_home_opponent_id in selected_home_opponent_id_list:
+                    if is_deadlocked:
+                        break
 
-                    # first check - is this_selected_home_opponent_id already in team_id_to_home_opponents_type_dict_list_dict[this_selected_home_opponent_id]['same_conference_once']?
-                    if this_selected_home_opponent_id in team_id_to_home_opponents_type_dict_list_dict[this_team_id]['same_conference_once']:
-                        continue
+                if is_deadlocked:
+                    break
 
-                    # second check - is this_team_id already in team_id_to_road_opponents_type_dict_list_dict[this_selected_home_opponent_id]['same_conference_once']?
-                    if this_team_id in team_id_to_road_opponents_type_dict_list_dict[this_selected_home_opponent_id]['same_conference_once']:
-                        continue
+                deadlock_counter = 0
 
-                    # final check - is len(team_id_to_road_opponents_type_dict_list_dict[this_selected_home_opponent_id]['same_conference_once']) == num_same_conference_once_road_games?
-                    if len(team_id_to_road_opponents_type_dict_list_dict[this_selected_home_opponent_id]['same_conference_once']) == num_same_conference_once_road_games:
-                        continue
+                #ensure that same_division_once home teams also can't be road teams for this_team_id
+                this_team_id_same_division_once_list_for_road = list(set(this_team_id_same_division_once_list) - set(home_team_ids_added_list))
 
-                    # if we get here, it is a valid assignment, add game to both teams' appropriate data structures
-                    team_id_to_home_opponents_type_dict_list_dict[this_team_id]['same_conference_once'].append(this_selected_home_opponent_id)
-                    team_id_to_road_opponents_type_dict_list_dict[this_selected_home_opponent_id]['same_conference_once'].append(this_team_id)
+                writefile_x.write("this_team_id_same_division_once_list_for_road: " + str(this_team_id_same_division_once_list_for_road) + "\n")
 
-                    home_team_ids_added_list.append(this_selected_home_opponent_id)
+                #do the same as above, but for road games
+                while len(team_id_to_road_opponents_type_dict_list_dict[this_team_id]['same_division_once']) < num_same_division_once_road_games:
 
-            final_conference_once_team_ids_list = list(set(remaining_conference_once_team_ids_list) - set(home_team_ids_added_list))
+                    writefile_x.write("New while loop iteration: len(team_id_to_road_opponents_type_dict_list_dict[this_team_id]['same_division_once']) == " + str(len(team_id_to_road_opponents_type_dict_list_dict[this_team_id]['same_division_once'])) + "\n")
+                    writefile_x.write("num_same_division_once_road_games = " + str(num_same_division_once_road_games) + "\n")
 
-            while len(team_id_to_road_opponents_type_dict_list_dict[this_team_id]['same_conference_once']) < num_same_conference_once_home_games:
+                    number_of_road_games_to_select = num_same_division_once_road_games - len(team_id_to_road_opponents_type_dict_list_dict[this_team_id]['same_division_once'])
+                    selected_road_opponent_id_list = random.sample(this_team_id_same_division_once_list_for_road, number_of_road_games_to_select)
 
-                selected_road_opponent_id_list = random.sample(final_conference_once_team_ids_list, num_same_conference_once_road_games)
+                    writefile_x.write("number_of_road_games_to_select = " + str(number_of_road_games_to_select) + "\n")
+                    writefile_x.write("selected_road_opponent_id_list =  " + str(selected_road_opponent_id_list) + "\n")
 
-                for this_selected_road_opponent_id in selected_road_opponent_id_list:
+                    for this_selected_road_opponent_id in selected_road_opponent_id_list:
 
-                    # first check - is this_selected_road_opponent_id already in team_id_to_road_opponents_type_dict_list_dict[this_selected_road_opponent_id]['same_conference_once']?
-                    if this_selected_road_opponent_id in team_id_to_road_opponents_type_dict_list_dict[this_team_id]['same_conference_once']:
-                        continue
+                        writefile_x.write("Considering this_selected_road_opponent_id = " + str(this_selected_road_opponent_id) + "\n")
 
-                    # second check - is this_team_id already in team_id_to_home_opponents_type_dict_list_dict[this_selected_road_opponent_id]['same_conference_once']?
-                    if this_team_id in team_id_to_home_opponents_type_dict_list_dict[this_selected_road_opponent_id]['same_conference_once']:
-                        continue
+                        if deadlock_counter == DEADLOCK_COUNT_LIMIT:
+                            writefile_x.write("We reached deadlock limit, blow it up!" + "\n")
+                            is_deadlocked = True
+                            break
 
-                    # final check - is len(team_id_to_home_opponents_type_dict_list_dict[this_selected_road_opponent_id]['same_conference_once']) == num_same_conference_once_home_games?
-                    if len(team_id_to_home_opponents_type_dict_list_dict[this_selected_road_opponent_id]['same_conference_once']) == num_same_conference_once_home_games:
-                        continue
+                        #first check - is this_selected_road_opponent_id already in team_id_to_road_opponents_type_dict_list_dict[this_selected_road_opponent_id]['same_division_once']?
+                        if this_selected_road_opponent_id in team_id_to_road_opponents_type_dict_list_dict[this_team_id]['same_division_once']:
+                            writefile_x.write("this_selected_road_opponent_id is already in team_id_to_road_opponents_type_dict_list_dict[this_team_id]['same_division_once'] " + "\n")
+                            deadlock_counter += 1
+                            continue
 
-                    # if we get here, it is a valid assignment, add game to both teams' appropriate data structures
-                    team_id_to_road_opponents_type_dict_list_dict[this_team_id]['same_conference_once'].append(this_selected_road_opponent_id)
-                    team_id_to_home_opponents_type_dict_list_dict[this_selected_road_opponent_id]['same_conference_once'].append(this_team_id)
+                        #second check - is this_team_id already in team_id_to_home_opponents_type_dict_list_dict[this_selected_road_opponent_id]['same_division_once']?
+                        if this_team_id in team_id_to_home_opponents_type_dict_list_dict[this_selected_road_opponent_id]['same_division_once']:
+                            writefile_x.write("this_team_id already in team_id_to_road_opponents_type_dict_list_dict[this_selected_road_opponent_id]['same_division_once']" + "\n")
+                            deadlock_counter += 1
+                            continue
 
-                    #home_team_ids_added_list.append(this_selected_home_opponent_id)
+                        #final check - is len(team_id_to_home_opponents_type_dict_list_dict[this_selected_road_opponent_id]['same_division_once']) == num_same_division_once_home_games?
+                        if len(team_id_to_home_opponents_type_dict_list_dict[this_selected_road_opponent_id]['same_division_once']) == num_same_division_once_home_games:
+                            writefile_x.write("len(team_id_to_home_opponents_type_dict_list_dict[this_selected_road_opponent_id]['same_division_once']) == num_same_division_once_home_games" + "\n")
+                            deadlock_counter += 1
+                            continue
 
-        #finally, let's assign interconference games. There will ALWAYS be 4 interconference games, no matter what the league
-        #alignment is. Also, there cannot be any neutral site games for interconference games, so we will always have
-        #2 home games and 2 away games assigned for every team
+                        #if we get here, it is a valid assignment, add game to both teams' appropriate data structures
+                        team_id_to_road_opponents_type_dict_list_dict[this_team_id]['same_division_once'].append(this_selected_road_opponent_id)
+                        team_id_to_home_opponents_type_dict_list_dict[this_selected_road_opponent_id]['same_division_once'].append(this_team_id)
+                        writefile_x.write("adding road_opponent: " + str(this_selected_road_opponent_id) + "\n")
 
-        this_team_id_different_conference_once_list = all_opponents_dict['different_conference_once']
+                        # it's possible that we could add 1 team through one while iteration, and then add 2 more the next time around
+                        # do a check here to prevent that from happening
+                        if len(team_id_to_road_opponents_type_dict_list_dict[this_team_id]['same_division_once']) == num_same_division_once_road_games:
+                            writefile_x.write("all road games of type assigned for this team!" + "\n")
+                            break
 
-        num_home_interconference_games = num_road_interconference_games = opponent_type_to_opponent_num_dict['different_conference_once'] / 2
+                    if is_deadlocked:
+                        break
 
-        interconference_home_ids_chosen_list = []
+                if is_deadlocked:
+                    break
 
-        while len(team_id_to_home_opponents_type_dict_list_dict[this_team_id]['different_conference_once']) < num_home_interconference_games:
+                deadlock_counter = 0
 
-            for this_selected_home_opponent_id in this_team_id_different_conference_once_list:
+                #next, assign same_conference_twice games. This is just like same_division_twice_games, except that it is not mandatory
+                writefile_x.write("-------------------------------------------" + "\n")
+                writefile_x.write("Assigning same_conference_twice opponents...." + "\n")
 
-                # first check - is this_selected_home_opponent_id already in team_id_to_home_opponents_type_dict_list_dict[this_selected_home_opponent_id]['different_conference_once']?
-                if this_selected_home_opponent_id in team_id_to_home_opponents_type_dict_list_dict[this_team_id]['different_conference_once']:
-                    continue
+                this_team_id_same_conference_twice_list = all_opponents_dict['same_conference_twice']
+                writefile_x.write("this_team_id_same_conference_twice_list = " + str(this_team_id_same_conference_twice_list) + "\n")
 
-                # second check - is this_team_id already in team_id_to_road_opponents_type_dict_list_dict[this_selected_home_opponent_id]['different_conference_once']?
-                if this_team_id in team_id_to_road_opponents_type_dict_list_dict[this_selected_home_opponent_id]['different_conference_once']:
-                    continue
+                if len(this_team_id_same_conference_twice_list) > 0:
 
-                # third check - is len(team_id_to_road_opponents_type_dict_list_dict[this_selected_home_opponent_id]['different_conference_once']) == num_road_interconference_games?
-                if len(team_id_to_road_opponents_type_dict_list_dict[this_selected_home_opponent_id]['different_conference_once']) == num_road_interconference_games:
-                    continue
+                    writefile_x.write("len(this_team_id_same_conference_twice_list) == " + str(len(this_team_id_same_conference_twice_list)) + "\n")
 
-                #final check - is len(team_id_to_home_opponents_type_dict_list_dict[this_team_id]['different_conference_once']) == num_home_interconference_games?
-                if len(team_id_to_home_opponents_type_dict_list_dict[this_team_id]['different_conference_once']) == num_home_interconference_games:
-                    continue
+                    #if we have neutral site games turned on AND 0 same_conference_once games, then we need to assign
+                    #neutral site games here. Also, this could only happen if we have an even number of
+                    #regular season games, so we will be assigning 2 neutral site games
 
-                # if we get here, it is a valid assignment, add game to both teams' appropriate data structures
-                team_id_to_home_opponents_type_dict_list_dict[this_team_id]['different_conference_once'].append(this_selected_home_opponent_id)
-                team_id_to_road_opponents_type_dict_list_dict[this_selected_home_opponent_id]['different_conference_once'].append(this_team_id)
+                    writefile_x.write("neutral_site_setting: " + str(neutral_site_setting) + "\n")
+                    writefile_x.write("opponent_type_to_opponent_num_dict['same_conference_twice']: " + str(opponent_type_to_opponent_num_dict['same_conference_twice']) + "\n")
+                    writefile_x.write("len(team_id_to_neutral_opponents_type_dict_list_dict[this_team_id]['same_conference_twice']): " + str(len(team_id_to_neutral_opponents_type_dict_list_dict[this_team_id]['same_conference_twice'])) + "\n")
 
-                interconference_home_ids_chosen_list.append(this_selected_home_opponent_id)
+                    if neutral_site_setting == True and opponent_type_to_opponent_num_dict['same_conference_twice'] > 0 and len(team_id_to_neutral_opponents_type_dict_list_dict[this_team_id]['same_conference_twice']) == 0:
 
-        #finally, assign the road interconference opponents
+                        writefile_x.write("We are assigning neutral site games!" + "\n")
 
-        remaining_interconference_opponent_id_list = list(set(this_team_id_different_conference_once_list) - set(interconference_home_ids_chosen_list))
+                        #we have to randomly pick one team among the same_conference_twice teams - both games will be
+                        #neutral site games
 
-        while len(team_id_to_road_opponents_type_dict_list_dict[this_team_id]['different_conference_once']) < num_road_interconference_games:
+                        for this_neutral_candidate_team_id in this_team_id_same_conference_twice_list:
 
-            for this_selected_road_opponent_id in remaining_interconference_opponent_id_list:
+                            writefile_x.write("Considering this_neutral_candidate_team_id: " + str(this_neutral_candidate_team_id) + "\n")
 
-                # first check - is this_selected_road_opponent_id already in team_id_to_road_opponents_type_dict_list_dict[this_selected_road_opponent_id]['different_conference_once']?
-                if this_selected_road_opponent_id in team_id_to_road_opponents_type_dict_list_dict[this_team_id]['different_conference_once']:
-                    continue
+                            if deadlock_counter == DEADLOCK_COUNT_LIMIT:
+                                writefile_x.write("We reached deadlock limit, blow it up!" + "\n")
+                                is_deadlocked = True
+                                break
 
-                # second check - is this_team_id already in team_id_to_home_opponents_type_dict_list_dict[this_selected_road_opponent_id]['different_conference_once']?
-                if this_team_id in team_id_to_home_opponents_type_dict_list_dict[this_selected_road_opponent_id]['different_conference_once']:
-                    continue
+                            #check 1: is this_neutral_candidate_team_id already in team_id_to_neutral_opponents_type_dict_list_dict[this_team_id]['same_conference_twice']?
+                            if this_neutral_candidate_team_id in team_id_to_neutral_opponents_type_dict_list_dict[this_team_id]['same_conference_twice']:
+                                writefile_x.write("this_neutral_candidate_team_id is already in team_id_to_neutral_opponents_type_dict_list_dict[this_team_id]['same_conference_twice'] " + "\n")
+                                deadlock_counter += 1
+                                continue
 
-                # third check - is len(team_id_to_home_opponents_type_dict_list_dict[this_selected_road_opponent_id]['different_conference_once']) == num_home_interconference_games?
-                if len(team_id_to_home_opponents_type_dict_list_dict[this_selected_road_opponent_id]['different_conference_once']) == num_home_interconference_games:
-                    continue
+                            #check 2: is this_team_id already in team_id_to_neutral_opponents_type_dict_list_dict[this_neutral_candidate_team_id]['same_conference_twice']?
+                            if this_team_id in team_id_to_neutral_opponents_type_dict_list_dict[this_neutral_candidate_team_id]['same_conference_twice']:
+                                writefile_x.write("this_team_id already in team_id_to_neutral_opponents_type_dict_list_dict[this_neutral_candidate_team_id]['same_conference_twice']" + "\n")
+                                deadlock_counter += 1
+                                continue
 
-                # final check - is len(team_id_to_road_opponents_type_dict_list_dict[this_team_id]['different_conference_once']) == num_road_interconference_games?
-                if len(team_id_to_road_opponents_type_dict_list_dict[this_team_id]['different_conference_once']) == num_road_interconference_games:
-                    continue
+                            #check 3: is len(team_id_to_neutral_opponents_type_dict_list_dict[this_neutral_candidate_team_id]['same_conference_twice']) > 0?
+                            if len(team_id_to_neutral_opponents_type_dict_list_dict[this_neutral_candidate_team_id]['same_conference_twice']) > 0:
+                                writefile_x.write("len(team_id_to_neutral_opponents_type_dict_list_dict[this_neutral_candidate_team_id]['same_conference_twice']) > 0" + "\n")
+                                deadlock_counter += 1
+                                continue
 
-                # if we get here, it is a valid assignment, add game to both teams' appropriate data structures
-                team_id_to_road_opponents_type_dict_list_dict[this_team_id]['different_conference_once'].append(this_selected_road_opponent_id)
-                team_id_to_home_opponents_type_dict_list_dict[this_selected_road_opponent_id]['different_conference_once'].append(this_team_id)
+                            #if we get here, then this is a valid team_id to select
+                            #add it twice for both this_team_id and this_neutral_candidate_team_id
+                            team_id_to_neutral_opponents_type_dict_list_dict[this_team_id]['same_conference_twice'].append(this_neutral_candidate_team_id)
+                            team_id_to_neutral_opponents_type_dict_list_dict[this_team_id]['same_conference_twice'].append(this_neutral_candidate_team_id)
+                            team_id_to_neutral_opponents_type_dict_list_dict[this_neutral_candidate_team_id]['same_conference_twice'].append(this_team_id)
+                            team_id_to_neutral_opponents_type_dict_list_dict[this_neutral_candidate_team_id]['same_conference_twice'].append(this_team_id)
 
-        tytytytytyt
+                            writefile_x.write("Adding this_neutral_candidate_team_id = " + str(this_neutral_candidate_team_id) + " as neutral opponent for 2 games" + "\n")
+
+                            this_team_id_same_conference_twice_list.remove(this_neutral_candidate_team_id)
+
+                            #break out of loop if we got this far
+                            break
+
+                    if is_deadlocked:
+                        break
+
+                    for this_opponent_id in this_team_id_same_conference_twice_list:
+                        writefile_x.write("Adding this_opponent_id = " + str(this_opponent_id) + " as home and road opponent..." + "\n")
+                        team_id_to_home_opponents_type_dict_list_dict[this_team_id]['same_conference_twice'].append(this_opponent_id)
+                        team_id_to_road_opponents_type_dict_list_dict[this_team_id]['same_conference_twice'].append(this_opponent_id)
+
+                # we don't need to fill up the chosen opponents list for same_conference_twice, since they also have the correct teams scheduled
+
+                #assign same_conference_once_games. Neutral site games are assigned here
+                writefile_x.write("-------------------------------------------" + "\n")
+                writefile_x.write("Assigning same_conference_once opponents...." + "\n")
+
+                this_team_id_same_conference_once_list = all_opponents_dict['same_conference_once']
+
+                writefile_x.write("this_team_id_same_conference_once_list = " + str(this_team_id_same_conference_once_list) + "\n")
+
+                if len(this_team_id_same_conference_once_list) > 0:
+
+                    writefile_x.write("we have at least 1 same_conference_once opponent..." + "\n")
+
+                    neutral_site_team_ids_added_list = []
+
+                    writefile_x.write("neutral_site_setting = " + str(neutral_site_setting) + "\n")
+                    writefile_x.write("opponent_type_to_opponent_num_dict['same_conference_twice'] = " + str(opponent_type_to_opponent_num_dict['same_conference_twice']) + "\n")
+
+                    #if user has selected neutral site games, then we will assign 1-2 games of this type, depending on
+                    #whether the number of games in the regular season is an odd number
+                    #also, we only assign neutral site games here if the team does not have any conference_twice opponents
+                    if neutral_site_setting == True and opponent_type_to_opponent_num_dict['same_conference_twice'] == 0:
+
+                        num_neutral_site_games = 0
+
+                        if len(this_team_id_same_conference_once_list) % 2 == 1:
+                            num_neutral_site_games = 1
+                        else:
+                            num_neutral_site_games = 2
+
+                        writefile_x.write("num_neutral_site_games = " + str(num_neutral_site_games) + "\n")
+                        writefile_x.write("len(team_id_to_neutral_opponents_type_dict_list_dict[this_team_id]['same_conference_once']) = " + str(len(team_id_to_neutral_opponents_type_dict_list_dict[this_team_id]['same_conference_once'])) + "\n")
+
+                        #if a neutral site game has not been assigned for this_team_id...
+                        if len(team_id_to_neutral_opponents_type_dict_list_dict[this_team_id]['same_conference_once']) < num_neutral_site_games:
+
+                            #a team may have had 1 of 2 neutral site games selected
+                            remaining_neutral_site_game_number = num_neutral_site_games - len(team_id_to_neutral_opponents_type_dict_list_dict[this_team_id]['same_conference_once'])
+
+                            writefile_x.write("remaining_neutral_site_game_number = " + str(remaining_neutral_site_game_number) + "\n")
+
+                            for this_neutral_candidate_team_id in this_team_id_same_conference_once_list:
+
+                                writefile_x.write("considering this_neutral_candidate_team_id = " + str(this_neutral_candidate_team_id) + "\n")
+
+                                if deadlock_counter == DEADLOCK_COUNT_LIMIT:
+                                    writefile_x.write("We reached deadlock limit, blow it up!" + "\n")
+                                    is_deadlocked = True
+                                    break
+
+                                #check 1: is this_neutral_candidate_team_id already in team_id_to_neutral_opponents_type_dict_list_dict[this_team_id]?
+                                if this_neutral_candidate_team_id in team_id_to_neutral_opponents_type_dict_list_dict[this_team_id]['same_conference_once']:
+                                    writefile_x.write("this_neutral_candidate_team_id is already in team_id_to_neutral_opponents_type_dict_list_dict[this_team_id]['same_conference_once'] " + "\n")
+                                    deadlock_counter += 1
+                                    continue
+
+                                #check 2: is this_team_id already in team_id_to_neutral_opponents_type_dict_list_dict[this_neutral_candidate_team_id]?
+                                if this_team_id in team_id_to_neutral_opponents_type_dict_list_dict[this_neutral_candidate_team_id]['same_conference_once']:
+                                    writefile_x.write("this_team_id already in team_id_to_neutral_opponents_type_dict_list_dict[this_neutral_candidate_team_id]['same_conference_once']" + "\n")
+                                    deadlock_counter += 1
+                                    continue
+
+                                #check 3: is len(team_id_to_neutral_opponents_type_dict_list_dict[this_neutral_candidate_team_id]['same_conference_once']) == num_neutral_site_games?
+                                if len(team_id_to_neutral_opponents_type_dict_list_dict[this_neutral_candidate_team_id]['same_conference_once']) == num_neutral_site_games:
+                                    writefile_x.write("len(team_id_to_neutral_opponents_type_dict_list_dict[this_neutral_candidate_team_id]['same_conference_once']) > 0" + "\n")
+                                    deadlock_counter += 1
+                                    continue
+
+                                #if we get here, it is a valid assignment
+                                team_id_to_neutral_opponents_type_dict_list_dict[this_team_id]['same_conference_once'].append(this_neutral_candidate_team_id)
+                                team_id_to_neutral_opponents_type_dict_list_dict[this_neutral_candidate_team_id]['same_conference_once'].append(this_team_id)
+
+                                writefile_x.write("Adding this_neutral_candidate_team_id = " + str(this_neutral_candidate_team_id) + " as neutral opponent 1 time." + "\n")
+
+                                neutral_site_team_ids_added_list.append(this_neutral_candidate_team_id)
+
+                                #if this_team_id has completed their neutral site game assignment, then leave
+                                if len(team_id_to_neutral_opponents_type_dict_list_dict[this_team_id]['same_conference_once']) == num_neutral_site_games:
+                                    writefile_x.write("We have completed neutral game assignment..." + "\n")
+                                    break
+
+                    if is_deadlocked:
+                        break
+
+                    #at this point, we need to assign the remaining home/road conference_once games
+                    remaining_conference_once_team_ids_list = list(set(this_team_id_same_conference_once_list) - set(neutral_site_team_ids_added_list))
+                    num_same_conference_once_home_games = num_same_conference_once_road_games = len(remaining_conference_once_team_ids_list) / 2
+
+                    writefile_x.write("remaining_conference_once_team_ids_list = " + str(remaining_conference_once_team_ids_list) + "\n")
+                    writefile_x.write("num_same_conference_once_home_games = " + str(num_same_conference_once_home_games) + "\n")
+                    writefile_x.write("num_same_conference_once_road_games = " + str(num_same_conference_once_road_games) + "\n")
+
+                    home_team_ids_added_list = []
+
+                    #home games
+
+                    while len(team_id_to_home_opponents_type_dict_list_dict[this_team_id]['same_conference_once']) < num_same_conference_once_home_games:
+
+                        writefile_x.write("Starting a new while loop iteration: " + "\n")
+                        writefile_x.write("len(team_id_to_home_opponents_type_dict_list_dict[this_team_id]['same_conference_once']) = " + str(len(team_id_to_home_opponents_type_dict_list_dict[this_team_id]['same_conference_once'])) + "\n")
+
+                        selected_home_opponent_id_list = random.sample(remaining_conference_once_team_ids_list, num_same_conference_once_home_games)
+                        writefile_x.write("selected_home_opponent_id_list = " + str(selected_home_opponent_id_list) + "\n")
+
+                        for this_selected_home_opponent_id in selected_home_opponent_id_list:
+
+                            writefile_x.write("Considering this_selected_home_opponent_id = " + str(this_selected_home_opponent_id) + "\n")
+
+                            if deadlock_counter == DEADLOCK_COUNT_LIMIT:
+                                writefile_x.write("We reached deadlock limit, blow it up!" + "\n")
+                                is_deadlocked = True
+                                break
+
+                            # first check - is this_selected_home_opponent_id already in team_id_to_home_opponents_type_dict_list_dict[this_selected_home_opponent_id]['same_conference_once']?
+                            if this_selected_home_opponent_id in team_id_to_home_opponents_type_dict_list_dict[this_team_id]['same_conference_once']:
+                                writefile_x.write("this_selected_home_opponent_id is already in team_id_to_home_opponents_type_dict_list_dict[this_team_id]['same_conference_once'] " + "\n")
+                                deadlock_counter += 1
+                                continue
+
+                            # second check - is this_team_id already in team_id_to_road_opponents_type_dict_list_dict[this_selected_home_opponent_id]['same_conference_once']?
+                            if this_team_id in team_id_to_road_opponents_type_dict_list_dict[this_selected_home_opponent_id]['same_conference_once']:
+                                writefile_x.write("this_team_id already in team_id_to_road_opponents_type_dict_list_dict[this_selected_home_opponent_id]['same_conference_once']" + "\n")
+                                deadlock_counter += 1
+                                continue
+
+                            # final check - is len(team_id_to_road_opponents_type_dict_list_dict[this_selected_home_opponent_id]['same_conference_once']) == num_same_conference_once_road_games?
+                            if len(team_id_to_road_opponents_type_dict_list_dict[this_selected_home_opponent_id]['same_conference_once']) == num_same_conference_once_road_games:
+                                writefile_x.write("len(team_id_to_road_opponents_type_dict_list_dict[this_selected_home_opponent_id]['same_conference_once']) == num_same_conference_once_road_games" + "\n")
+                                deadlock_counter += 1
+                                continue
+
+                            # if we get here, it is a valid assignment, add game to both teams' appropriate data structures
+                            team_id_to_home_opponents_type_dict_list_dict[this_team_id]['same_conference_once'].append(this_selected_home_opponent_id)
+                            team_id_to_road_opponents_type_dict_list_dict[this_selected_home_opponent_id]['same_conference_once'].append(this_team_id)
+                            writefile_x.write("Adding this_selected_home_opponent_id = " + str(this_selected_home_opponent_id) + "\n")
+
+                            home_team_ids_added_list.append(this_selected_home_opponent_id)
+
+                            #it's possible that we could add 1 team through one while iteration, and then add 2 more the next time around
+                            #do a check here to prevent that from happening
+                            if len(team_id_to_home_opponents_type_dict_list_dict[this_team_id]['same_conference_once']) == num_same_conference_once_home_games:
+                                writefile_x.write("all home games of type assigned for this team!" + "\n")
+                                break
+
+                        if is_deadlocked:
+                            break
+
+                    if is_deadlocked:
+                        break
+
+                    final_conference_once_team_ids_list = list(set(remaining_conference_once_team_ids_list) - set(home_team_ids_added_list))
+
+                    writefile_x.write("final_conference_once_team_ids_list = " + str(final_conference_once_team_ids_list) + "\n")
+
+                    while len(team_id_to_road_opponents_type_dict_list_dict[this_team_id]['same_conference_once']) < num_same_conference_once_home_games:
+
+                        writefile_x.write("Starting a new while loop iteration: " + "\n")
+                        writefile_x.write("len(team_id_to_road_opponents_type_dict_list_dict[this_team_id]['same_conference_once']) = " + str(len(team_id_to_road_opponents_type_dict_list_dict[this_team_id]['same_conference_once'])) + "\n")
+
+                        selected_road_opponent_id_list = random.sample(final_conference_once_team_ids_list, num_same_conference_once_road_games)
+
+                        writefile_x.write("selected_road_opponent_id_list = " + str(selected_road_opponent_id_list) + "\n")
+
+                        for this_selected_road_opponent_id in selected_road_opponent_id_list:
+
+                            writefile_x.write("Considering this_selected_road_opponent_id = " + str(this_selected_road_opponent_id) + "\n")
+
+                            if deadlock_counter == DEADLOCK_COUNT_LIMIT:
+                                writefile_x.write("We reached deadlock limit, blow it up!" + "\n")
+                                is_deadlocked = True
+                                break
+
+                            # first check - is this_selected_road_opponent_id already in team_id_to_road_opponents_type_dict_list_dict[this_selected_road_opponent_id]['same_conference_once']?
+                            if this_selected_road_opponent_id in team_id_to_road_opponents_type_dict_list_dict[this_team_id]['same_conference_once']:
+                                writefile_x.write("this_selected_road_opponent_id is already in team_id_to_road_opponents_type_dict_list_dict[this_team_id]['same_conference_once'] " + "\n")
+                                deadlock_counter += 1
+                                continue
+
+                            # second check - is this_team_id already in team_id_to_home_opponents_type_dict_list_dict[this_selected_road_opponent_id]['same_conference_once']?
+                            if this_team_id in team_id_to_home_opponents_type_dict_list_dict[this_selected_road_opponent_id]['same_conference_once']:
+                                writefile_x.write("this_team_id already in team_id_to_home_opponents_type_dict_list_dict[this_selected_road_opponent_id]['same_conference_once']" + "\n")
+                                deadlock_counter += 1
+                                continue
+
+                            # final check - is len(team_id_to_home_opponents_type_dict_list_dict[this_selected_road_opponent_id]['same_conference_once']) == num_same_conference_once_home_games?
+                            if len(team_id_to_home_opponents_type_dict_list_dict[this_selected_road_opponent_id]['same_conference_once']) == num_same_conference_once_home_games:
+                                writefile_x.write("len(team_id_to_home_opponents_type_dict_list_dict[this_selected_road_opponent_id]['same_conference_once']) == num_same_conference_once_home_games" + "\n")
+                                deadlock_counter += 1
+                                continue
+
+                            # if we get here, it is a valid assignment, add game to both teams' appropriate data structures
+                            team_id_to_road_opponents_type_dict_list_dict[this_team_id]['same_conference_once'].append(this_selected_road_opponent_id)
+                            team_id_to_home_opponents_type_dict_list_dict[this_selected_road_opponent_id]['same_conference_once'].append(this_team_id)
+
+                            writefile_x.write("Adding this_selected_road_opponent_id = " + str(this_selected_road_opponent_id) + " as road opponent.." + "\n")
+
+                            # it's possible that we could add 1 team through one while iteration, and then add 2 more the next time around
+                            # do a check here to prevent that from happening
+                            if len(team_id_to_road_opponents_type_dict_list_dict[this_team_id]['same_conference_once']) == num_same_conference_once_road_games:
+                                writefile_x.write("all road games of type assigned for this team!" + "\n")
+                                break
+
+                        if is_deadlocked:
+                            break
+
+                    if is_deadlocked:
+                        break
+
+                #finally, let's assign interconference games. There will ALWAYS be 4 interconference games, no matter what the league
+                #alignment is. Also, there cannot be any neutral site games for interconference games, so we will always have
+                #2 home games and 2 away games assigned for every team
+
+                writefile_x.write("-------------------------------------------" + "\n")
+                writefile_x.write("Assigning different_conference_once opponents...." + "\n")
+
+                this_team_id_different_conference_once_list = all_opponents_dict['different_conference_once']
+
+                writefile_x.write("this_team_id_different_conference_once_list = " + str(this_team_id_different_conference_once_list) + "\n")
+
+                num_home_interconference_games = num_road_interconference_games = opponent_type_to_opponent_num_dict['different_conference_once'] / 2
+
+                writefile_x.write("num_home_interconference_games = " + str(num_home_interconference_games) + "\n")
+                writefile_x.write("num_road_interconference_games = " + str(num_road_interconference_games) + "\n")
+
+                interconference_home_ids_chosen_list = []
+
+                while len(team_id_to_home_opponents_type_dict_list_dict[this_team_id]['different_conference_once']) < num_home_interconference_games:
+
+                    writefile_x.write("Starting a new while loop iteration: " + "\n")
+                    writefile_x.write("len(team_id_to_home_opponents_type_dict_list_dict[this_team_id]['different_conference_once']) = " + str(len(team_id_to_home_opponents_type_dict_list_dict[this_team_id]['different_conference_once'])) + "\n")
+
+                    selected_home_opponent_id_list = random.sample(this_team_id_different_conference_once_list, num_home_interconference_games)
+                    writefile_x.write("selected_home_opponent_id_list = " + str(selected_home_opponent_id_list) + "\n")
+
+                    for this_selected_home_opponent_id in selected_home_opponent_id_list:
+
+                        writefile_x.write("Considering this_selected_home_opponent_id = " + str(this_selected_home_opponent_id) + "\n")
+
+                        if deadlock_counter == DEADLOCK_COUNT_LIMIT:
+                            writefile_x.write("We reached deadlock limit, blow it up!" + "\n")
+                            is_deadlocked = True
+                            break
+
+                        # first check - is this_selected_home_opponent_id already in team_id_to_home_opponents_type_dict_list_dict[this_selected_home_opponent_id]['different_conference_once']?
+                        if this_selected_home_opponent_id in team_id_to_home_opponents_type_dict_list_dict[this_team_id]['different_conference_once']:
+                            writefile_x.write("this_selected_home_opponent_id is already in team_id_to_home_opponents_type_dict_list_dict[this_team_id]['different_conference_once'] " + "\n")
+                            deadlock_counter += 1
+                            continue
+
+                        # second check - is this_team_id already in team_id_to_road_opponents_type_dict_list_dict[this_selected_home_opponent_id]['different_conference_once']?
+                        if this_team_id in team_id_to_road_opponents_type_dict_list_dict[this_selected_home_opponent_id]['different_conference_once']:
+                            writefile_x.write("this_team_id already in team_id_to_road_opponents_type_dict_list_dict[this_selected_home_opponent_id]['different_conference_once']" + "\n")
+                            deadlock_counter += 1
+                            continue
+
+                        # third check - is len(team_id_to_road_opponents_type_dict_list_dict[this_selected_home_opponent_id]['different_conference_once']) == num_road_interconference_games?
+                        if len(team_id_to_road_opponents_type_dict_list_dict[this_selected_home_opponent_id]['different_conference_once']) == num_road_interconference_games:
+                            writefile_x.write("len(team_id_to_road_opponents_type_dict_list_dict[this_selected_home_opponent_id]['different_conference_once']) == num_road_interconference_games" + "\n")
+                            writefile_x.write("len(team_id_to_road_opponents_type_dict_list_dict[this_selected_home_opponent_id]['different_conference_once']) = " + str(len(team_id_to_road_opponents_type_dict_list_dict[this_selected_home_opponent_id]['different_conference_once']))  + "\n")
+                            deadlock_counter += 1
+                            continue
+
+                        #final check - is len(team_id_to_home_opponents_type_dict_list_dict[this_team_id]['different_conference_once']) == num_home_interconference_games?
+                        if len(team_id_to_home_opponents_type_dict_list_dict[this_team_id]['different_conference_once']) == num_home_interconference_games:
+                            writefile_x.write("len(team_id_to_home_opponents_type_dict_list_dict[this_team_id]['different_conference_once']) == num_home_interconference_games" + "\n")
+                            writefile_x.write("len(team_id_to_home_opponents_type_dict_list_dict[this_team_id]['different_conference_once']) == " + str(len(team_id_to_home_opponents_type_dict_list_dict[this_team_id]['different_conference_once'])) + "\n")
+                            deadlock_counter += 1
+                            continue
+
+                        # if we get here, it is a valid assignment, add game to both teams' appropriate data structures
+                        team_id_to_home_opponents_type_dict_list_dict[this_team_id]['different_conference_once'].append(this_selected_home_opponent_id)
+                        team_id_to_road_opponents_type_dict_list_dict[this_selected_home_opponent_id]['different_conference_once'].append(this_team_id)
+                        writefile_x.write("Adding this_selected_home_opponent_id = " + str(this_selected_home_opponent_id) + " as home opponent" + "\n")
+
+                        interconference_home_ids_chosen_list.append(this_selected_home_opponent_id)
+
+                        # it's possible that we could add 1 team through one while iteration, and then add 2 more the next time around
+                        # do a check here to prevent that from happening
+                        if len(team_id_to_home_opponents_type_dict_list_dict[this_team_id]['different_conference_once']) == num_home_interconference_games:
+                            writefile_x.write("all home games of type assigned for this team!" + "\n")
+                            break
+
+                    if is_deadlocked:
+                        break
+
+                if is_deadlocked:
+                    break
+
+                #finally, assign the road interconference opponents
+
+                remaining_interconference_opponent_id_list = list(set(this_team_id_different_conference_once_list) - set(interconference_home_ids_chosen_list))
+                writefile_x.write("remaining_interconference_opponent_id_list = " + str(remaining_interconference_opponent_id_list) + "\n")
+
+                while len(team_id_to_road_opponents_type_dict_list_dict[this_team_id]['different_conference_once']) < num_road_interconference_games:
+
+                    writefile_x.write("Starting a new while loop iteration: " + "\n")
+                    writefile_x.write("len(team_id_to_road_opponents_type_dict_list_dict[this_team_id]['different_conference_once']) = " + str(len(team_id_to_road_opponents_type_dict_list_dict[this_team_id]['different_conference_once'])) + "\n")
+
+                    for this_selected_road_opponent_id in remaining_interconference_opponent_id_list:
+
+                        writefile_x.write("Considering this_selected_road_opponent_id = " + str(this_selected_road_opponent_id) + "\n")
+
+                        if deadlock_counter == DEADLOCK_COUNT_LIMIT:
+                            writefile_x.write("We reached deadlock limit, blow it up!" + "\n")
+                            is_deadlocked = True
+                            break
+
+                        # first check - is this_selected_road_opponent_id already in team_id_to_road_opponents_type_dict_list_dict[this_selected_road_opponent_id]['different_conference_once']?
+                        if this_selected_road_opponent_id in team_id_to_road_opponents_type_dict_list_dict[this_team_id]['different_conference_once']:
+                            writefile_x.write("this_selected_road_opponent_id is already in team_id_to_road_opponents_type_dict_list_dict[this_team_id]['different_conference_once'] " + "\n")
+                            deadlock_counter += 1
+                            continue
+
+                        # second check - is this_team_id already in team_id_to_home_opponents_type_dict_list_dict[this_selected_road_opponent_id]['different_conference_once']?
+                        if this_team_id in team_id_to_home_opponents_type_dict_list_dict[this_selected_road_opponent_id]['different_conference_once']:
+                            writefile_x.write("this_team_id already in team_id_to_home_opponents_type_dict_list_dict[this_selected_road_opponent_id]['different_conference_once']" + "\n")
+                            deadlock_counter += 1
+                            continue
+
+                        # third check - is len(team_id_to_home_opponents_type_dict_list_dict[this_selected_road_opponent_id]['different_conference_once']) == num_home_interconference_games?
+                        if len(team_id_to_home_opponents_type_dict_list_dict[this_selected_road_opponent_id]['different_conference_once']) == num_home_interconference_games:
+                            writefile_x.write("len(team_id_to_home_opponents_type_dict_list_dict[this_selected_road_opponent_id]['different_conference_once']) == num_home_interconference_games" + "\n")
+                            writefile_x.write("len(team_id_to_home_opponents_type_dict_list_dict[this_selected_road_opponent_id]['different_conference_once']) == " + str(len(team_id_to_home_opponents_type_dict_list_dict[this_selected_road_opponent_id]['different_conference_once'])) + "\n")
+                            deadlock_counter += 1
+                            continue
+
+                        # final check - is len(team_id_to_road_opponents_type_dict_list_dict[this_team_id]['different_conference_once']) == num_road_interconference_games?
+                        if len(team_id_to_road_opponents_type_dict_list_dict[this_team_id]['different_conference_once']) == num_road_interconference_games:
+                            writefile_x.write("len(team_id_to_road_opponents_type_dict_list_dict[this_team_id]['different_conference_once']) == num_road_interconference_games" + "\n")
+                            writefile_x.write("len(team_id_to_road_opponents_type_dict_list_dict[this_team_id]['different_conference_once']) == " + str(len(team_id_to_road_opponents_type_dict_list_dict[this_team_id]['different_conference_once'])) + "\n")
+                            deadlock_counter += 1
+                            continue
+
+                        # if we get here, it is a valid assignment, add game to both teams' appropriate data structures
+                        team_id_to_road_opponents_type_dict_list_dict[this_team_id]['different_conference_once'].append(this_selected_road_opponent_id)
+                        team_id_to_home_opponents_type_dict_list_dict[this_selected_road_opponent_id]['different_conference_once'].append(this_team_id)
+                        writefile_x.write("Adding this_selected_road_opponent_id = " + str(this_selected_road_opponent_id) + " as road opponent" + "\n")
+
+                        # it's possible that we could add 1 team through one while iteration, and then add 2 more the next time around
+                        # do a check here to prevent that from happening
+                        if len(team_id_to_road_opponents_type_dict_list_dict[this_team_id]['different_conference_once']) == num_road_interconference_games:
+                            writefile_x.write("all road games of type assigned for this team!" + "\n")
+                            break
+
+                    if is_deadlocked:
+                        break
+
+                if is_deadlocked:
+                    break
+
+            if not is_deadlocked:
+                scheduled_all_games = True
 
     endyyyyy
     return 1
