@@ -121,7 +121,8 @@ def create_season_schedule(league_id, season_id):
     except Exception:
         return -1
 
-    num_weeks_regular_season = league_obj[0].num_weeks_regular_season
+    #num_weeks_regular_season = league_obj[0].num_weeks_regular_season
+    num_weeks_regular_season = 16
     num_teams_per_conference = league_obj[0].num_teams_per_conference
     num_divisions_per_conference = league_obj[0].num_divisions_per_conference
     neutral_site_setting = league_obj[0].neutral_site_setting
@@ -393,7 +394,7 @@ def create_season_schedule(league_id, season_id):
 
                 while this_selection_once_list_valid == False or this_selection_twice_list_valid == False:
 
-                    if deadlock_counter == DEADLOCK_COUNT_LIMIT:
+                    if deadlock_counter >= DEADLOCK_COUNT_LIMIT:
                         break
 
                     writefile2.write("New Iteration through while loop...\n")
@@ -436,8 +437,6 @@ def create_season_schedule(league_id, season_id):
                         for this_opponent_id_to_remove in twice_opponent_ids_to_remove_list:
                             this_twice_team_opponents_id_list_copy.remove(this_opponent_id_to_remove)
 
-
-                        #same_conference_twice_candidate_id_list = list(set(this_team_opponents_id_list_copy) - set(selected_team_id_list))
                         writefile2.write("same_conference_twice_candidate_id_list: " + str(this_twice_team_opponents_id_list_copy) + "\n")
 
                         try:
@@ -452,10 +451,7 @@ def create_season_schedule(league_id, season_id):
 
                     writefile2.write("same_conference_twice team_id selected: " + str(same_conference_twice_team_id_list) + '\n')
 
-                    # if this_team_id has had all of their same conference once opponents already selected, then
-                    # skip this step
                     if opponent_type_to_opponent_num_dict['same_conference_once'] > 0:
-                        #if len(team_id_to_all_opponents_type_dict_list_dict[this_team_id]['same_conference_once']) < opponent_type_to_opponent_num_dict['same_conference_once']:
 
                         # we need to make sure that the teams selected can fit this_team_id into their schedule
                         for this_selected_id in selected_team_id_list:
@@ -474,8 +470,7 @@ def create_season_schedule(league_id, season_id):
                     else:
                         this_selection_once_list_valid = True
 
-                    # if this_team_id has had all of their same conference twice opponents already selected, then
-                    # skip this step
+
                     if opponent_type_to_opponent_num_dict['same_conference_twice'] > 0:
 
                         # we need to make sure that the teams selected can fit this_team_id into their schedule
@@ -497,7 +492,7 @@ def create_season_schedule(league_id, season_id):
                     else:
                         this_selection_twice_list_valid = True
 
-                if deadlock_counter == DEADLOCK_COUNT_LIMIT:
+                if deadlock_counter >= DEADLOCK_COUNT_LIMIT:
 
                     writefile2.write("We've hit the deadlock count limit: reset everything and start again\n")
                     # we will reset everything
@@ -506,8 +501,6 @@ def create_season_schedule(league_id, season_id):
 
                     for this_team_id in team_id_list:
                         team_id_to_all_opponents_type_dict_list_dict[this_team_id]['same_conference_once'] = []
-                        team_id_to_all_opponents_type_dict_list_dict[this_team_id]['same_conference_once'] = []
-                        team_id_to_all_opponents_type_dict_list_dict[this_team_id]['same_conference_twice'] = []
                         team_id_to_all_opponents_type_dict_list_dict[this_team_id]['same_conference_twice'] = []
                     break
 
@@ -586,7 +579,6 @@ def create_season_schedule(league_id, season_id):
             deadlock_counter = 0
             blow_it_up = False
 
-            #first, set opponent games for teams in the same division
             for this_team_id in team_id_by_conference_list:
 
                 conference_team_id += 1
@@ -732,18 +724,8 @@ def create_season_schedule(league_id, season_id):
             if deadlock_counter < DEADLOCK_COUNT_LIMIT and blow_it_up == False:
                 all_games_scheduled = True
 
-
-
-    #status_code, message = verify_scheduled_games(team_id_to_all_opponents_type_dict_list_dict, opponent_type_to_opponent_num_dict, team_id_to_division_id_dict, team_id_to_conference_id_dict)
-
-    #if status_code == 1:
-    #    yeaaaahhhh
-    #else:
-    #    waaaaaahhhh
-
     #at this point, we have scheduled all opponents for all teams correctly. Now we will decide which of the games should
     #be home games, away games or neutral site, if applicable
-    #team_id_to_home_away_neutral_opponents_dict_list_dict
     with open("home_away_trace.txt", "w") as writefile_x:
 
         scheduled_all_games = False
@@ -768,7 +750,6 @@ def create_season_schedule(league_id, season_id):
                 team_id_to_home_opponents_type_dict_list_dict[this_team_id]['same_conference_twice'] = []
                 team_id_to_home_opponents_type_dict_list_dict[this_team_id]['same_conference_once'] = []
                 team_id_to_home_opponents_type_dict_list_dict[this_team_id]['different_conference_once'] = []
-
 
                 team_id_to_road_opponents_type_dict_list_dict[this_team_id]['same_division_twice'] = []
                 team_id_to_road_opponents_type_dict_list_dict[this_team_id]['same_division_once'] = []
@@ -939,6 +920,7 @@ def create_season_schedule(league_id, season_id):
                 writefile_x.write("Assigning same_conference_twice opponents...." + "\n")
 
                 this_team_id_same_conference_twice_list = all_opponents_dict['same_conference_twice']
+                this_team_id_same_conference_twice_list_copy = copy.deepcopy(this_team_id_same_conference_twice_list)
                 writefile_x.write("this_team_id_same_conference_twice_list = " + str(this_team_id_same_conference_twice_list) + "\n")
 
                 if len(this_team_id_same_conference_twice_list) > 0:
@@ -953,58 +935,67 @@ def create_season_schedule(league_id, season_id):
                     writefile_x.write("opponent_type_to_opponent_num_dict['same_conference_twice']: " + str(opponent_type_to_opponent_num_dict['same_conference_twice']) + "\n")
                     writefile_x.write("len(team_id_to_neutral_opponents_type_dict_list_dict[this_team_id]['same_conference_twice']): " + str(len(team_id_to_neutral_opponents_type_dict_list_dict[this_team_id]['same_conference_twice'])) + "\n")
 
-                    if neutral_site_setting == True and opponent_type_to_opponent_num_dict['same_conference_twice'] > 0 and len(team_id_to_neutral_opponents_type_dict_list_dict[this_team_id]['same_conference_twice']) == 0:
+                    if neutral_site_setting == True and opponent_type_to_opponent_num_dict['same_conference_twice'] > 0 and num_weeks_regular_season % 2 == 0:
 
                         writefile_x.write("We are assigning neutral site games!" + "\n")
 
-                        #we have to randomly pick one team among the same_conference_twice teams - both games will be
-                        #neutral site games
+                        #we are always picking just one opponent to play twice in this case - there are always <= 2 neutral site games
+                        while len(team_id_to_neutral_opponents_type_dict_list_dict[this_team_id]['same_conference_twice']) < 2:
 
-                        for this_neutral_candidate_team_id in this_team_id_same_conference_twice_list:
+                            selected_neutral_opponent_id_list = random.sample(this_team_id_same_conference_twice_list_copy, 1)
+                            writefile_x.write("selected_neutral_opponent_id_list = " + str(selected_neutral_opponent_id_list) + "\n")
 
-                            writefile_x.write("Considering this_neutral_candidate_team_id: " + str(this_neutral_candidate_team_id) + "\n")
+                            #we have to randomly pick one team among the same_conference_twice teams - both games will be
+                            #neutral site games
 
-                            if deadlock_counter == DEADLOCK_COUNT_LIMIT:
-                                writefile_x.write("We reached deadlock limit, blow it up!" + "\n")
-                                is_deadlocked = True
+                            for this_neutral_candidate_team_id in selected_neutral_opponent_id_list:
+
+                                writefile_x.write("Considering this_neutral_candidate_team_id: " + str(this_neutral_candidate_team_id) + "\n")
+
+                                if deadlock_counter == DEADLOCK_COUNT_LIMIT:
+                                    writefile_x.write("We reached deadlock limit, blow it up!" + "\n")
+                                    is_deadlocked = True
+                                    break
+
+                                #check 1: is this_neutral_candidate_team_id already in team_id_to_neutral_opponents_type_dict_list_dict[this_team_id]['same_conference_twice']?
+                                if this_neutral_candidate_team_id in team_id_to_neutral_opponents_type_dict_list_dict[this_team_id]['same_conference_twice']:
+                                    writefile_x.write("this_neutral_candidate_team_id is already in team_id_to_neutral_opponents_type_dict_list_dict[this_team_id]['same_conference_twice'] " + "\n")
+                                    deadlock_counter += 1
+                                    continue
+
+                                #check 2: is this_team_id already in team_id_to_neutral_opponents_type_dict_list_dict[this_neutral_candidate_team_id]['same_conference_twice']?
+                                if this_team_id in team_id_to_neutral_opponents_type_dict_list_dict[this_neutral_candidate_team_id]['same_conference_twice']:
+                                    writefile_x.write("this_team_id already in team_id_to_neutral_opponents_type_dict_list_dict[this_neutral_candidate_team_id]['same_conference_twice']" + "\n")
+                                    deadlock_counter += 1
+                                    continue
+
+                                #check 3: is len(team_id_to_neutral_opponents_type_dict_list_dict[this_neutral_candidate_team_id]['same_conference_twice']) > 0?
+                                if len(team_id_to_neutral_opponents_type_dict_list_dict[this_neutral_candidate_team_id]['same_conference_twice']) > 0:
+                                    writefile_x.write("len(team_id_to_neutral_opponents_type_dict_list_dict[this_neutral_candidate_team_id]['same_conference_twice']) > 0" + "\n")
+                                    deadlock_counter += 1
+                                    continue
+
+                                #if we get here, then this is a valid team_id to select
+                                #add it twice for both this_team_id and this_neutral_candidate_team_id
+                                team_id_to_neutral_opponents_type_dict_list_dict[this_team_id]['same_conference_twice'].append(this_neutral_candidate_team_id)
+                                team_id_to_neutral_opponents_type_dict_list_dict[this_team_id]['same_conference_twice'].append(this_neutral_candidate_team_id)
+                                team_id_to_neutral_opponents_type_dict_list_dict[this_neutral_candidate_team_id]['same_conference_twice'].append(this_team_id)
+                                team_id_to_neutral_opponents_type_dict_list_dict[this_neutral_candidate_team_id]['same_conference_twice'].append(this_team_id)
+
+                                writefile_x.write("Adding this_neutral_candidate_team_id = " + str(this_neutral_candidate_team_id) + " as neutral opponent for 2 games" + "\n")
+
+                                this_team_id_same_conference_twice_list_copy.remove(this_neutral_candidate_team_id)
+
+                                #break out of loop if we got this far
                                 break
 
-                            #check 1: is this_neutral_candidate_team_id already in team_id_to_neutral_opponents_type_dict_list_dict[this_team_id]['same_conference_twice']?
-                            if this_neutral_candidate_team_id in team_id_to_neutral_opponents_type_dict_list_dict[this_team_id]['same_conference_twice']:
-                                writefile_x.write("this_neutral_candidate_team_id is already in team_id_to_neutral_opponents_type_dict_list_dict[this_team_id]['same_conference_twice'] " + "\n")
-                                deadlock_counter += 1
-                                continue
-
-                            #check 2: is this_team_id already in team_id_to_neutral_opponents_type_dict_list_dict[this_neutral_candidate_team_id]['same_conference_twice']?
-                            if this_team_id in team_id_to_neutral_opponents_type_dict_list_dict[this_neutral_candidate_team_id]['same_conference_twice']:
-                                writefile_x.write("this_team_id already in team_id_to_neutral_opponents_type_dict_list_dict[this_neutral_candidate_team_id]['same_conference_twice']" + "\n")
-                                deadlock_counter += 1
-                                continue
-
-                            #check 3: is len(team_id_to_neutral_opponents_type_dict_list_dict[this_neutral_candidate_team_id]['same_conference_twice']) > 0?
-                            if len(team_id_to_neutral_opponents_type_dict_list_dict[this_neutral_candidate_team_id]['same_conference_twice']) > 0:
-                                writefile_x.write("len(team_id_to_neutral_opponents_type_dict_list_dict[this_neutral_candidate_team_id]['same_conference_twice']) > 0" + "\n")
-                                deadlock_counter += 1
-                                continue
-
-                            #if we get here, then this is a valid team_id to select
-                            #add it twice for both this_team_id and this_neutral_candidate_team_id
-                            team_id_to_neutral_opponents_type_dict_list_dict[this_team_id]['same_conference_twice'].append(this_neutral_candidate_team_id)
-                            team_id_to_neutral_opponents_type_dict_list_dict[this_team_id]['same_conference_twice'].append(this_neutral_candidate_team_id)
-                            team_id_to_neutral_opponents_type_dict_list_dict[this_neutral_candidate_team_id]['same_conference_twice'].append(this_team_id)
-                            team_id_to_neutral_opponents_type_dict_list_dict[this_neutral_candidate_team_id]['same_conference_twice'].append(this_team_id)
-
-                            writefile_x.write("Adding this_neutral_candidate_team_id = " + str(this_neutral_candidate_team_id) + " as neutral opponent for 2 games" + "\n")
-
-                            this_team_id_same_conference_twice_list.remove(this_neutral_candidate_team_id)
-
-                            #break out of loop if we got this far
-                            break
+                            if is_deadlocked:
+                                break
 
                     if is_deadlocked:
                         break
 
-                    for this_opponent_id in this_team_id_same_conference_twice_list:
+                    for this_opponent_id in this_team_id_same_conference_twice_list_copy:
                         writefile_x.write("Adding this_opponent_id = " + str(this_opponent_id) + " as home and road opponent..." + "\n")
                         team_id_to_home_opponents_type_dict_list_dict[this_team_id]['same_conference_twice'].append(this_opponent_id)
                         team_id_to_road_opponents_type_dict_list_dict[this_team_id]['same_conference_twice'].append(this_opponent_id)
@@ -1031,7 +1022,7 @@ def create_season_schedule(league_id, season_id):
                     #if user has selected neutral site games, then we will assign 1-2 games of this type, depending on
                     #whether the number of games in the regular season is an odd number
                     #also, we only assign neutral site games here if the team does not have any conference_twice opponents
-                    if neutral_site_setting == True and opponent_type_to_opponent_num_dict['same_conference_twice'] == 0:
+                    if neutral_site_setting == True and (opponent_type_to_opponent_num_dict['same_conference_twice'] == 0 or num_weeks_regular_season % 2 == 1):
 
                         num_neutral_site_games = 0
 
@@ -1044,14 +1035,16 @@ def create_season_schedule(league_id, season_id):
                         writefile_x.write("len(team_id_to_neutral_opponents_type_dict_list_dict[this_team_id]['same_conference_once']) = " + str(len(team_id_to_neutral_opponents_type_dict_list_dict[this_team_id]['same_conference_once'])) + "\n")
 
                         #if a neutral site game has not been assigned for this_team_id...
-                        if len(team_id_to_neutral_opponents_type_dict_list_dict[this_team_id]['same_conference_once']) < num_neutral_site_games:
+                        while len(team_id_to_neutral_opponents_type_dict_list_dict[this_team_id]['same_conference_once']) < num_neutral_site_games:
 
                             #a team may have had 1 of 2 neutral site games selected
                             remaining_neutral_site_game_number = num_neutral_site_games - len(team_id_to_neutral_opponents_type_dict_list_dict[this_team_id]['same_conference_once'])
-
                             writefile_x.write("remaining_neutral_site_game_number = " + str(remaining_neutral_site_game_number) + "\n")
 
-                            for this_neutral_candidate_team_id in this_team_id_same_conference_once_list:
+                            selected_neutral_opponent_id_list = random.sample(this_team_id_same_conference_once_list, remaining_neutral_site_game_number)
+                            writefile_x.write("selected_neutral_opponent_id_list = " + str(selected_neutral_opponent_id_list) + "\n")
+
+                            for this_neutral_candidate_team_id in selected_neutral_opponent_id_list:
 
                                 writefile_x.write("considering this_neutral_candidate_team_id = " + str(this_neutral_candidate_team_id) + "\n")
 
@@ -1090,6 +1083,9 @@ def create_season_schedule(league_id, season_id):
                                 if len(team_id_to_neutral_opponents_type_dict_list_dict[this_team_id]['same_conference_once']) == num_neutral_site_games:
                                     writefile_x.write("We have completed neutral game assignment..." + "\n")
                                     break
+
+                            if is_deadlocked:
+                                break
 
                     if is_deadlocked:
                         break
