@@ -121,8 +121,7 @@ def create_season_schedule(league_id, season_id):
     except Exception:
         return -1
 
-    #num_weeks_regular_season = league_obj[0].num_weeks_regular_season
-    num_weeks_regular_season = 16
+    num_weeks_regular_season = league_obj[0].num_weeks_regular_season
     num_teams_per_conference = league_obj[0].num_teams_per_conference
     num_divisions_per_conference = league_obj[0].num_divisions_per_conference
     neutral_site_setting = league_obj[0].neutral_site_setting
@@ -1016,6 +1015,9 @@ def create_season_schedule(league_id, season_id):
 
                     neutral_site_team_ids_added_list = []
 
+                    for this_neutral_team_id in team_id_to_neutral_opponents_type_dict_list_dict[this_team_id]['same_conference_once']:
+                        neutral_site_team_ids_added_list.append(this_neutral_team_id)
+
                     writefile_x.write("neutral_site_setting = " + str(neutral_site_setting) + "\n")
                     writefile_x.write("opponent_type_to_opponent_num_dict['same_conference_twice'] = " + str(opponent_type_to_opponent_num_dict['same_conference_twice']) + "\n")
 
@@ -1155,6 +1157,9 @@ def create_season_schedule(league_id, season_id):
 
                     if is_deadlocked:
                         break
+
+                    writefile_x.write("team_id_to_home_opponents_type_dict_list_dict[this_team_id]['same_conference_once'] == " + str(team_id_to_home_opponents_type_dict_list_dict[this_team_id]['same_conference_once']) + "\n")
+                    writefile_x.write("team_id_to_road_opponents_type_dict_list_dict[this_team_id]['same_conference_once'] == " + str(team_id_to_road_opponents_type_dict_list_dict[this_team_id]['same_conference_once']) + "\n")
 
                     final_conference_once_team_ids_list = list(set(remaining_conference_once_team_ids_list) - set(home_team_ids_added_list))
 
