@@ -6,6 +6,7 @@ import random
 import copy
 
 DEADLOCK_COUNT_LIMIT = 25
+MAX_NUM_CONSECUTIVE_SCHEDULED_HOME_ROAD_GAMES = 4
 
 def verify_scheduled_games(team_id_to_all_opponents_type_dict_list_dict, opponent_type_to_opponent_num_dict, team_id_to_division_id_dict, team_id_to_conference_id_dict):
 
@@ -1364,5 +1365,203 @@ def create_season_schedule(league_id, season_id):
             if not is_deadlocked:
                 scheduled_all_games = True
 
-    endyyyyy
+
+    #at this point, we have assigned all opponents and home/away/neutral site assignments to each team
+    #now assign the games for each team across each week of the regular season
+    #there will be no bye weeks in jparty football
+
+    #also, the only constraint we have is that no two teams can play each other 2 straight weeks
+
+    team_id_to_weekly_matchups_dict = {}
+    all_games_time_scheduled = False
+
+    with open("time_schedule_log.txt", "w") as writefile_time:
+
+        while all_games_time_scheduled == False:
+
+            writefile_time.write("At the very top, resetting variables...." + "\n")
+
+            #reset variables
+            team_id_to_weekly_matchups_dict = {}
+            deadlock_counter = 0
+
+            for this_team_id in team_id_to_all_opponents_type_dict_list_dict.keys():
+
+                writefile_time.write("this_team_id = " + str(this_team_id) + "\n")
+
+                num_home_games_scheduled = 0
+                num_road_games_scheduled = 0
+                num_neutral_games_scheduled = 0
+
+                this_team_home_opponents_dict = team_id_to_home_opponents_type_dict_list_dict[this_team_id]
+                this_team_road_opponents_dict = team_id_to_road_opponents_type_dict_list_dict[this_team_id]
+                this_team_neutral_opponents_dict = team_id_to_neutral_opponents_type_dict_list_dict[this_team_id]
+
+                home_game_team_id_list = [this_opponent_id for this_opponent_list in this_team_home_opponents_dict.values() for this_opponent_id in this_opponent_list ]
+                road_game_team_id_list = [this_opponent_id for this_opponent_list in this_team_road_opponents_dict.values() for this_opponent_id in this_opponent_list ]
+                neutral_game_team_id_list = [this_opponent_id for this_opponent_list in this_team_neutral_opponents_dict.values() for this_opponent_id in this_opponent_list ]
+
+                writefile_time.write("home_game_team_id_list = " + str(home_game_team_id_list) + "\n")
+                writefile_time.write("road_game_team_id_list = " + str(road_game_team_id_list) + "\n")
+                writefile_time.write("neutral_game_team_id_list = " + str(neutral_game_team_id_list) + "\n")
+
+                max_home_games_to_schedule = len(home_game_team_id_list)
+                max_road_games_to_schedule = len(road_game_team_id_list)
+                max_neutral_games_to_schedule = len(neutral_game_team_id_list)
+
+                #create copies of team_id_list data structures above to prepare for deadlock events
+                home_game_team_id_list_copy = copy.deepcopy(home_game_team_id_list)
+                road_game_team_id_list_copy = copy.deepcopy(road_game_team_id_list)
+                neutral_game_team_id_list_copy = copy.deepcopy(neutral_game_team_id_list)
+
+                team_id_to_weekly_matchups_dict[this_team_id] = {}
+
+                #we need this to make sure that we don't play the same team two weeks in a row
+                previous_opponent_id = -1
+                blow_it_up = False
+                deadlock_counter = 0
+
+                for week_number in range(1, num_weeks_regular_season + 1):
+
+                    writefile_time.write("week_number = " + str(week_number) + "\n")
+
+                    #randomly choose home/away/neutral game, if possible
+                    valid_choice = False
+
+                    if neutral_site_setting == True:
+                        num_game_types = 3
+                    else:
+                        num_game_types = 2
+
+                    num_consecutive_home_games = 0
+                    num_consecutive_road_games = 0
+
+                    while not valid_choice:
+
+                        writefile_time.write("Starting while loop iteration... " + "\n")
+
+                        if deadlock_counter == DEADLOCK_COUNT_LIMIT:
+                            #blow it up
+
+                            writefile_time.write("We reached the deadlock count limit! Blowing it up!..." + "\n")
+                            blow_it_up = True
+                            break
+
+                        game_type_choice = random.randint(1, num_game_types)
+                        writefile_time.write("game_type_choice = " + str(game_type_choice) + "\n")
+
+                        if game_type_choice == 1 and num_home_games_scheduled < max_home_games_to_schedule:
+
+                            writefile_time.write("game_type_choice = 1, looking to schedule home game..." + "\n")
+
+                            #now choose a random opponent
+                            selected_opponent_id = random.sample(home_game_team_id_list_copy, 1)[0]
+
+                            writefile_time.write("selected_opponent_id = " + str(selected_opponent_id) + "\n")
+                            writefile_time.write("previous_opponent_id = " + str(previous_opponent_id) + "\n")
+
+                            #check if previously selected opponent = selected_opponent_id
+                            if selected_opponent_id != previous_opponent_id and num_consecutive_home_games <= MAX_NUM_CONSECUTIVE_SCHEDULED_HOME_ROAD_GAMES:
+
+                                writefile_time.write("about to schedule home game!" + "\n")
+
+                                #we have a valid selection
+                                team_id_to_weekly_matchups_dict[this_team_id][week_number] = [selected_opponent_id, "home"]
+                                writefile_time.write("team_id_to_weekly_matchups_dict[this_team_id] = " + str(team_id_to_weekly_matchups_dict[this_team_id]) + "\n")
+
+                                #remove selected_opponent_id from home_game_team_id_list
+                                home_game_team_id_list_copy.remove(selected_opponent_id)
+                                writefile_time.write("home_game_team_id_list_copy = " + str(home_game_team_id_list_copy) + "\n")
+                                num_home_games_scheduled += 1
+                                writefile_time.write("num_home_games_scheduled = " + str(num_home_games_scheduled) + "\n")
+                                num_consecutive_home_games += 1
+                                writefile_time.write("num_consecutive_home_games_scheduled = " + str(num_consecutive_home_games) + "\n")
+                                num_consecutive_road_games = 0
+                                writefile_time.write("num_consecutive_road_games_scheduled = " + str(num_consecutive_road_games) + "\n")
+                                previous_opponent_id = selected_opponent_id
+                                deadlock_counter = 0
+                                break
+
+                        if game_type_choice == 2 and num_road_games_scheduled < max_road_games_to_schedule:
+
+                            writefile_time.write("game_type_choice = 2, looking to schedule road game..." + "\n")
+
+                            #now choose a random opponent
+                            selected_opponent_id = random.sample(road_game_team_id_list_copy, 1)[0]
+
+                            writefile_time.write("selected_opponent_id = " + str(selected_opponent_id) + "\n")
+                            writefile_time.write("previous_opponent_id = " + str(previous_opponent_id) + "\n")
+
+                            if selected_opponent_id != previous_opponent_id and num_consecutive_road_games <= MAX_NUM_CONSECUTIVE_SCHEDULED_HOME_ROAD_GAMES:
+
+                                writefile_time.write("about to schedule road game!" + "\n")
+
+                                #we have a valid selection
+                                team_id_to_weekly_matchups_dict[this_team_id][week_number] = [selected_opponent_id, "road"]
+                                writefile_time.write("team_id_to_weekly_matchups_dict[this_team_id] = " + str(team_id_to_weekly_matchups_dict[this_team_id]) + "\n")
+
+                                #remove selected_opponent_id from road_game_team_id_list
+                                road_game_team_id_list_copy.remove(selected_opponent_id)
+                                writefile_time.write("road_game_team_id_list_copy = " + str(road_game_team_id_list_copy) + "\n")
+                                num_road_games_scheduled += 1
+                                writefile_time.write("num_road_games_scheduled = " + str(num_road_games_scheduled) + "\n")
+                                num_consecutive_road_games += 1
+                                writefile_time.write("num_consecutive_road_games = " + str(num_consecutive_road_games) + "\n")
+                                num_consecutive_home_games = 0
+                                writefile_time.write("num_consecutive_home_games = " + str(num_consecutive_home_games) + "\n")
+                                previous_opponent_id = selected_opponent_id
+                                deadlock_counter = 0
+                                break
+
+                        if game_type_choice == 3 and num_neutral_games_scheduled < max_neutral_games_to_schedule:
+
+                            writefile_time.write("game_type_choice = 3, looking to schedule neutral game..." + "\n")
+
+                            #now choose a random opponent
+                            selected_opponent_id = random.sample(neutral_game_team_id_list_copy, 1)[0]
+
+                            writefile_time.write("selected_opponent_id = " + str(selected_opponent_id) + "\n")
+                            writefile_time.write("previous_opponent_id = " + str(previous_opponent_id) + "\n")
+
+                            #check if previously selected opponent = selected_opponent_id
+                            if selected_opponent_id != previous_opponent_id:
+
+                                writefile_time.write("about to schedule neutral game!" + "\n")
+
+                                #we have a valid selection
+                                team_id_to_weekly_matchups_dict[this_team_id][week_number] = [selected_opponent_id, "neutral"]
+                                writefile_time.write("team_id_to_weekly_matchups_dict[this_team_id] = " + str(team_id_to_weekly_matchups_dict[this_team_id]) + "\n")
+
+                                #remove selected_opponent_id from road_game_team_id_list
+                                neutral_game_team_id_list_copy.remove(selected_opponent_id)
+                                writefile_time.write("neutral_game_team_id_list_copy = " + str(neutral_game_team_id_list_copy) + "\n")
+                                num_neutral_games_scheduled += 1
+                                writefile_time.write("num_neutral_games_scheduled = " + str(num_neutral_games_scheduled) + "\n")
+                                num_consecutive_road_games = 0
+                                writefile_time.write("num_consecutive_road_games = " + str(num_consecutive_road_games) + "\n")
+                                num_consecutive_home_games = 0
+                                writefile_time.write("num_consecutive_home_games = " + str(num_consecutive_home_games) + "\n")
+                                previous_opponent_id = selected_opponent_id
+                                deadlock_counter = 0
+                                break
+
+                        #if we get here, we are stuck for another while loop iteration
+                        writefile_time.write("No choice made, incrementing deadlock counter..." + "\n")
+                        deadlock_counter += 1
+
+                    if blow_it_up == True:
+                        writefile_time.write("blowing it up..." + "\n")
+                        break
+
+                if blow_it_up == True:
+                    break
+
+            if blow_it_up == False:
+                #all games have been scheduled correctly up to now - but I need to check if any team has 4 consecutive home/road
+                #games - if they do, we will blow it up.
+                all_games_time_scheduled = True
+
+
+    dfsfdfdsfsf
+
     return 1
