@@ -40,6 +40,23 @@ def verify_scheduled_games(team_id_to_all_opponents_type_dict_list_dict, opponen
 
     return 1, "success"
 
+
+def contiguity_check_successful(games_weeks_list):
+
+    #first, sort the weeks
+    games_weeks_list_sorted = sorted(games_weeks_list)
+
+    previous_week_number = -1
+
+    for this_week_number in games_weeks_list_sorted:
+        if this_week_number - previous_week_number == 1:
+            return False
+
+        previous_week_number = this_week_number
+
+    return True
+
+
 def get_opponents_times_played(num_divisions_per_conference, num_weeks_regular_season, num_teams_per_division):
 
     opponent_type_to_opponent_num_dict = {}
@@ -1383,18 +1400,64 @@ def create_season_schedule(league_id, season_id):
             team_id_to_weekly_matchups_dict[this_team_id][week_number] = None
 
     #decide which weeks divisonal games, intraconference games and interconference games will be played
-    regular_season_weeks_list = range(1, 17)
+    regular_season_weeks_list = range(1, num_weeks_regular_season + 1)
 
-    num_divisional_games = (opponent_type_to_opponent_num_dict['same_division_twice'] * 2) + (opponent_type_to_opponent_num_dict['same_division_once'])
-    num_intraconference_games = (opponent_type_to_opponent_num_dict['same_conference_twice'] * 2) + (opponent_type_to_opponent_num_dict['same_conference_once'])
+    num_same_division_twice_games = opponent_type_to_opponent_num_dict['same_division_twice'] * 2
+    num_same_division_once_games = opponent_type_to_opponent_num_dict['same_division_once']
+    num_same_conference_twice_games = opponent_type_to_opponent_num_dict['same_conference_twice'] * 2
+    num_same_conference_once_games = opponent_type_to_opponent_num_dict['same_conference_once']
     num_interconference_games = opponent_type_to_opponent_num_dict['different_conference_once']
 
-    divisional_games_weeks_list = random.sample(regular_season_weeks_list, num_divisional_games)
+    same_division_twice_games_weeks_list = []
+    same_division_once_games_weeks_list = []
+    same_conference_twice_games_weeks_list = []
+    same_conference_once_games_weeks_list = []
+    different_conference_once_games_weeks_list = []
+
+    #we need to ensure that same division twice games are all separated by at least 2 weeks
+    consecutive_weeks_same_opponent_constraint_verified = False
+
+    while not consecutive_weeks_same_opponent_constraint_verified:
+
+        same_division_twice_games_weeks_list = random.sample(regular_season_weeks_list, num_same_division_twice_games)
+
+        #perform contiguity check
+        if contiguity_check_successful(same_division_twice_games_weeks_list):
+            consecutive_weeks_same_opponent_constraint_verified = True
+
+    remaining_games_weeks_list = list(set(regular_season_weeks_list) - set(same_division_twice_games_weeks_list))
+
+    #choose same_division_once games - these can be contiguous
+    same_division_once_games_weeks_list = random.sample(remaining_games_weeks_list, num_same_division_once_games)
+
+    #combine same_division_twice_games_weeks_list and same_division_once_games_weeks_list
+    divisional_games_weeks_list = same_division_twice_games_weeks_list + same_division_once_games_weeks_list
+
+    # we need to ensure that the same conference twice weeks selected are all separated by at least 2 weeks - so I'll just do that for all
+    #intraconference games
+
     remaining_games_weeks_list = list(set(regular_season_weeks_list) - set(divisional_games_weeks_list))
 
-    intraconference_games_weeks_list = random.sample(remaining_games_weeks_list, num_intraconference_games)
-    interconference_games_weeks_list = list(set(remaining_games_weeks_list) - set(intraconference_games_weeks_list))
+    if num_same_conference_twice_games > 0:
 
+        consecutive_weeks_same_opponent_constraint_verified = False
+
+        while not consecutive_weeks_same_opponent_constraint_verified:
+
+            same_conference_twice_games_weeks_list = random.sample(remaining_games_weeks_list, num_same_conference_twice_games)
+
+            # perform contiguity check
+            if contiguity_check_successful(same_conference_twice_games_weeks_list):
+                consecutive_weeks_same_opponent_constraint_verified = True
+
+    remaining_games_weeks_list = list(set(remaining_games_weeks_list) - set(same_conference_twice_games_weeks_list))
+
+    #choose same conference once games
+    same_conference_once_games_weeks_list = random.sample(remaining_games_weeks_list, num_same_conference_once_games)
+
+    intraconference_games_weeks_list = same_conference_twice_games_weeks_list + same_conference_once_games_weeks_list
+
+    interconference_games_weeks_list = list(set(remaining_games_weeks_list) - set(same_conference_once_games_weeks_list))
 
     with open("time_schedule_log_divisional_games.txt", "w") as writefile_time:
 
