@@ -2118,8 +2118,8 @@ def create_season_schedule(league_id, season_id):
 
                 this_game_obj_dict['week'] = this_week_number
                 this_game_obj_dict['game_type_id'] = 2
-                this_game_obj_dict['visiting_team_points'] = 0
-                this_game_obj_dict['home_team_points'] = 0
+                this_game_obj_dict['first_team_points'] = 0
+                this_game_obj_dict['second_team_points'] = 0
                 this_game_obj_dict['num_overtimes'] = 0
                 this_game_obj_dict['attendance'] = 0
                 this_game_obj_dict['league_id'] = league_id
