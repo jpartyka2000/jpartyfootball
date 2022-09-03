@@ -65,27 +65,6 @@ class DjangoMigrations(models.Model):
         db_table = 'django_migrations'
 
 
-class Game(models.Model):
-    id = models.IntegerField(primary_key=True)
-    season_id = models.IntegerField()
-    gamedate = models.DateField()
-    visiting_team_id = models.IntegerField()
-    home_team_id = models.IntegerField()
-    home_team_city_id = models.IntegerField()
-    week = models.IntegerField()
-    game_type_id = models.IntegerField()
-    visiting_team_points = models.IntegerField()
-    home_team_points = models.IntegerField()
-    num_overtimes = models.IntegerField()
-    stadium_id = models.IntegerField()
-    attendance = models.IntegerField()
-    league_id = models.IntegerField()
-
-    class Meta:
-        managed = True
-        db_table = 'game'
-
-
 class GameDlStats(models.Model):
     id = models.IntegerField(primary_key=True)
     game_id = models.IntegerField()
@@ -426,6 +405,7 @@ class GameTeamStats(models.Model):
 class GameType(models.Model):
     id = models.IntegerField(primary_key=True)
     type_id = models.IntegerField()
+    type_name = models.CharField(max_length=50)
 
     class Meta:
         managed = True
@@ -776,6 +756,27 @@ class Team(models.Model):
     class Meta:
         managed = True
         db_table = 'team'
+
+class Game(models.Model):
+    id = models.IntegerField(primary_key=True)
+    season = models.ForeignKey(Season)
+    gamedate = models.DateField()
+    first_team_id = models.IntegerField()
+    second_team_id = models.IntegerField()
+    home_team_city_id = models.ForeignKey(City, db_column='home_team_city_id')
+    week = models.IntegerField()
+    game_type = models.ForeignKey(GameType)
+    visiting_team_points = models.IntegerField()
+    home_team_points = models.IntegerField()
+    num_overtimes = models.IntegerField()
+    stadium = models.ForeignKey(Stadium)
+    attendance = models.IntegerField()
+    league = models.ForeignKey(League)
+    is_neutral_site_game = models.BooleanField()
+
+    class Meta:
+        managed = True
+        db_table = 'game'
 
 class Draft(models.Model):
     id = models.IntegerField(primary_key=True)
