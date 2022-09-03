@@ -1,9 +1,10 @@
 # coding: utf-8
 
-from jpartyfb.models import League, Season, TeamSeason, Game
+from jpartyfb.models import League, Season, TeamSeason, Game, City, TeamCity, Stadium
 
 import random
 import copy
+from datetime import datetime
 
 DEADLOCK_COUNT_LIMIT = 25
 DEADLOCK_COUNT_LIMIT_WEEKLY_SCHEDULING = 50
@@ -1995,6 +1996,144 @@ def create_season_schedule(league_id, season_id):
             if start_over == False:
                 all_interconference_games_scheduled = True
 
+        #at long last, insert the games into the DB
+        #first, we need a data structure that determines when a game has been inserted, since each game is recorded
+        #twice within team_id_to_weekly_matchups_dict
+
+        team_id_to_game_inserted_dict = {}
+
+        for this_team_id, weekly_matchups_dict in team_id_to_weekly_matchups_dict.items():
+            team_id_to_game_inserted_dict[this_team_id] = {}
+
+            for this_week_number in weekly_matchups_dict.keys():
+                team_id_to_game_inserted_dict[this_team_id][this_week_number] = False
+
+        try:
+            game_id = int(Game.objects.using('xactly_dev').latest('id').id) + 1
+        except Exception:
+            game_id = 1
+
+        #create neutral_site_city_id_list
+        try:
+            neutral_site_city_obj_list = City.objects.using('xactly_dev').filter(city_id__gte=33)
+        except Exception:
+            neutral_site_city_obj_list = []
+
+        neutral_city_id_to_obj_dict = {}
+        neutral_site_city_id_list = []
+
+        #we will need to create a neutral_city_id_to_obj_dict for proper Game db object insertion below
+        for this_neutral_site_city_obj in neutral_site_city_obj_list:
+            this_neutral_city_id = this_neutral_site_city_obj.city_id
+            neutral_site_city_id_list.append(this_neutral_city_id)
+
+            neutral_city_id_to_obj_dict[this_neutral_city_id] = this_neutral_site_city_obj
+
+
+        #create team_id_to_city_id_dict
+
+        team_id_to_city_obj_dict = {}
+        team_id_to_city_id_dict = {}
+
+        try:
+            team_city_obj_list = TeamCity.objects.using('xactly_dev').filter(league_id=league_id)
+        except Exception:
+            team_city_obj_list = []
+
+        city_id_to_stadium_obj_dict = {}
+
+        for this_team_city_obj in team_city_obj_list:
+
+            this_team_id = this_team_city_obj.team_id
+            this_city = this_team_city_obj.city
+            this_city_id = this_team_city_obj.city_id
+
+            team_id_to_city_obj_dict[this_team_id] = this_city
+            team_id_to_city_id_dict[this_team_id] = this_city_id
+            city_id_to_stadium_obj_dict[this_city_id] = None
+
+        #finally, finish mapping city_id_to_stadium_id_dict
+        try:
+            stadium_obj_list = Stadium.objects.using('xactly_dev').all()
+        except Exception:
+            stadium_obj_list = []
+
+        for this_stadium_obj in stadium_obj_list:
+            this_city_id = this_stadium_obj.city_id
+
+            city_id_to_stadium_obj_dict[this_city_id] = this_stadium_obj
+
+        #insert games
+        for this_team_id, weekly_matchups_dict in team_id_to_weekly_matchups_dict.items():
+
+            for this_week_number, this_week_game_info_list in weekly_matchups_dict.items():
+
+                #check to see if this game has already been inserted into the DB
+                if team_id_to_game_inserted_dict[this_team_id][this_week_number] == True:
+                    continue
+
+                #start constructing dict that will contain all info about this game to be inserted into DB
+                this_game_obj_dict = {}
+
+                this_game_obj_dict['id'] = game_id
+                this_game_obj_dict['season_id'] = season_id
+                this_game_obj_dict['gamedate'] = datetime.now()
+
+                this_game_opponent_id = this_week_game_info_list[0]
+                this_game_home_away_str = this_week_game_info_list[1]
+
+                home_team_id = -1
+                visiting_team_id = -1
+
+                if this_game_home_away_str == "home":
+                    home_team_id = this_team_id
+                    visiting_team_id = this_game_opponent_id
+
+                    this_game_obj_dict['first_team_id'] = visiting_team_id
+                    this_game_obj_dict['second_team_id'] = home_team_id
+
+                elif this_game_home_away_str == "road":
+                    home_team_id = this_game_opponent_id
+                    visiting_team_id = this_team_id
+
+                    this_game_obj_dict['first_team_id'] = visiting_team_id
+                    this_game_obj_dict['second_team_id'] = home_team_id
+
+                else:
+                    this_game_obj_dict['first_team_id'] = this_team_id
+                    this_game_obj_dict['second_team_id'] = this_game_opponent_id
+
+
+                if this_game_home_away_str != "neutral":
+                    this_game_obj_dict['home_team_city_id'] = team_id_to_city_obj_dict[home_team_id]
+                    this_game_obj_dict['is_neutral_site_game'] = False
+                    this_game_obj_dict['stadium'] = city_id_to_stadium_obj_dict[team_id_to_city_id_dict[home_team_id]]
+                else:
+                    neutral_city_id = random.sample(neutral_site_city_id_list, 1)[0]
+                    this_game_obj_dict['home_team_city_id'] = neutral_city_id_to_obj_dict[neutral_city_id]
+                    this_game_obj_dict['is_neutral_site_game'] = True
+
+                    neutral_site_stadium_obj = city_id_to_stadium_obj_dict[neutral_city_id]
+                    this_game_obj_dict['stadium'] = neutral_site_stadium_obj
+
+                this_game_obj_dict['week'] = this_week_number
+                this_game_obj_dict['game_type_id'] = 2
+                this_game_obj_dict['visiting_team_points'] = 0
+                this_game_obj_dict['home_team_points'] = 0
+                this_game_obj_dict['num_overtimes'] = 0
+                this_game_obj_dict['attendance'] = 0
+                this_game_obj_dict['league_id'] = league_id
+
+                this_game_db_obj = Game(**this_game_obj_dict)
+                this_game_db_obj.save(using="xactly_dev")
+
+                #mark this game as inserted into DB
+                team_id_to_game_inserted_dict[this_team_id][this_week_number] = True
+
+                #do the same for the opponent
+                team_id_to_game_inserted_dict[this_game_opponent_id][this_week_number] = True
+
+                game_id += 1
 
 
         dfdfffdfdfdfddfdfdfdfdff
