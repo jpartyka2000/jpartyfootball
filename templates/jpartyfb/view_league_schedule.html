@@ -1,0 +1,103 @@
+{% extends "backendBase.html" %}
+
+{% load staticfiles %}
+{% load static %}
+
+{%block mainContent%}	
+	<div class="container" style="border:1px solid #C0C0C0;" align="center">
+          {% csrf_token %}
+		<div class='row' style='text-align:center;'>
+            <div style="float:left;">
+			</div>
+			<h1>{{ welcome_message }}: {{ league_abbrev }} - Season {{ season_year }}</h1></div><br>
+            <div class='breadcrumb' style='text-color: blue; background-color: white;'>
+                <a href="{% url 'jpartyfb:index' %}">Home</a>
+            </div>
+
+
+{% if Error_message %}
+    <p style="color: red;">
+        {{ Error_message }}
+    </p>
+{% endif %}
+
+    <table align="center">
+        <tr>
+            <img style="border-radius:1px;height:160px; width:160px;" src="{% static 'jpartyfb/images/league_logo.png' %}"/>
+        </tr>
+    </table>
+
+    <table border="0" width="100%">
+        <tr>
+            <td align="left" width="15%">
+                <b>Filter by Week:</b>
+                <select id="week_filter_select" onchange="window.location.href='/jpartyfb/view_league_schedule?week_filter=' + this.value">
+                    {% for this_week_entry in week_list %}
+                        {% ifequal this_week_entry week_filter %}
+                            <option value="{{ this_week_entry }}" SELECTED>{{ this_week_entry }}</option>
+                        {% else %}
+                            <option value="{{ this_week_entry }}">{{ this_week_entry }}</option>
+                        {% endifequal %}
+
+                    {% endfor %}
+                </select>
+            </td>
+            <td width="65%"></td>
+            <td width="20%">
+                <b>Filter by Team:</b>
+                <select id="team_filter_select" onchange="window.location.href='/jpartyfb/view_league_schedule?team_filter=' + this.value">
+                    {% for this_team in team_list %}
+                        {% ifequal this_team team_filter %}
+                            <option value="{{ this_team }}" SELECTED>{{ this_team }}</option>
+                        {% else %}
+                            <option value="{{ this_team }}">{{ this_team }}</option>
+                        {% endifequal %}
+
+                    {% endfor %}
+                </select>
+            </td>
+        </tr>
+    </table>
+
+    <div style="height: 25px;"></div>
+
+    {% for week_number, game_info_lol in week_number_to_game_info_list_dict.items %}
+
+        {% if week_number == week_filter or week_filter == 'all' %}
+
+            <h2>Week {{ week_number }}</h2>
+
+            <table width="100%" border="0">
+                <!--                <tr align="center">-->
+                <!--                    <td width="15%" style="background-color: #dddddd; font-weight: bold;">Away Logo</td>-->
+                <!--                    <td width="15%" style="background-color: #dddddd; font-weight: bold;">Away Team</td>-->
+                <!--                    <td width="10%" style="background-color: #dddddd; font-weight: bold;">Away Points</td>-->
+                <!--                    <td width="10%" style="background-color: #dddddd; font-weight: bold;">Game Status</td>-->
+                <!--                    <td width="10%" style="background-color: #dddddd; font-weight: bold;">Home Points</td>-->
+                <!--                    <td width="15%" style="background-color: #dddddd; font-weight: bold;">Home Team</td>-->
+                <!--                    <td width="15%" style="background-color: #dddddd; font-weight: bold;">Home Logo</td>-->
+                <!--                    <td width="10%" style="background-color: #dddddd; font-weight: bold;">At</td>-->
+
+                <!--                </tr>-->
+                {% for this_game_info_list in game_info_lol %}
+                    <tr align="center" style="background-color: {% cycle '#ebfffe' '#99f2ec' %};">
+                        <td width="15%" style="font-size: 18px; font-weight: oblique;"><img style="border-radius:1px;height:120px; width:120px;" src="{% static 'jpartyfb/images/team_logos/' %}{{ this_game_info_list.9 }}"/></td>
+                        <td width="15%" style="font-size: 18px; font-weight: oblique;">{{ this_game_info_list.1 }}</td>
+                        <td width="10%" style="font-size: 18px; font-weight: oblique;">{{ this_game_info_list.3 }}</td>
+                        <td width="10%" style="font-size: 18px; font-weight: oblique;">{{ this_game_info_list.8 }}</td>
+                        <td width="10%" style="font-size: 18px; font-weight: oblique;">{{ this_game_info_list.4 }}</td>
+                        <td width="15%" style="font-size: 18px; font-weight: oblique;">{{ this_game_info_list.2 }}</td>
+                        <td width="15%" style="font-size: 18px; font-weight: oblique;"><img style="border-radius:1px;height:120px; width:120px;" src="{% static 'jpartyfb/images/team_logos/' %}{{ this_game_info_list.10 }}"/></td>
+                        <td width="15%" style="font-size: 18px; font-weight: oblique;">{{ this_game_info_list.7 }}</td>
+                    </tr>
+                {% endfor %}
+            </table>
+            <div style="height: 25px;"></div>
+        {% endif %}
+
+    {% endfor %}
+
+</div>
+<div style="height: 75px;"></div>
+
+{% endblock%}
