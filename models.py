@@ -752,6 +752,7 @@ class Team(models.Model):
     conference = models.ForeignKey(Conference)
     division = models.ForeignKey(Division)
     league = models.ForeignKey(League)
+    logo_file_path = models.TextField()
 
     class Meta:
         managed = True
@@ -763,7 +764,7 @@ class Game(models.Model):
     gamedate = models.DateField()
     first_team_id = models.IntegerField()
     second_team_id = models.IntegerField()
-    home_team_city_id = models.ForeignKey(City, db_column='home_team_city_id')
+    host_city_id = models.ForeignKey(City, db_column='host_city_id')
     week = models.IntegerField()
     game_type = models.ForeignKey(GameType)
     first_team_points = models.IntegerField()
@@ -773,6 +774,7 @@ class Game(models.Model):
     attendance = models.IntegerField()
     league = models.ForeignKey(League)
     is_neutral_site_game = models.BooleanField()
+    game_status = models.IntegerField()
 
     class Meta:
         managed = True

@@ -22,6 +22,8 @@ urlpatterns = patterns('',
     url(r'^watch_draft/$', views.watch_draft, name='watch_draft'),
     url(r'^view_draft_results/$', views.view_draft_results, name='view_draft_results'),
     url(r'^view_draft_list/$', views.view_draft_list, name='view_draft_list'),
+    url(r'^view_league_schedule/$', views.view_league_schedule, name='view_league_schedule'),
+
 
 
 )

@@ -22,7 +22,7 @@ from PlayerCreation import PlayerCreation
 from PlayerCreation import create_player_career_arc, create_players
 
 from AssortedEnums import PlayingStatus
-
+from ScheduleUtils import create_season_schedule
 from LeagueLayout import build_choose_teams_html
 from DraftUtils import calculate_player_draft_value, determine_draft_picks
 
@@ -487,17 +487,27 @@ def create_draft_list(request, source=None):
     except Exception:
         team_season_id = 1
 
-    for this_team_obj in team_obj_list:
-        this_team_id = this_team_obj.id
+    if team_season_id == 1:
 
-        try:
-            TeamSeason.objects.using("xactly_dev").create(id=team_season_id, team_id=this_team_id, season_id=season_id, league_id=league_id)
-        except Exception:
-            context['error_msg'] = "Failed in inserting rows into TeamSeason table"
-            context['welcome_message'] = "Draft Options"
-            return render(request, 'jpartyfb/draft_options.html', context)
+        for this_team_obj in team_obj_list:
+            this_team_id = this_team_obj.id
 
-        team_season_id += 1
+            try:
+                TeamSeason.objects.using("xactly_dev").create(id=team_season_id, team_id=this_team_id, season_id=season_id, league_id=league_id)
+            except Exception:
+                context['error_msg'] = "Failed in inserting rows into TeamSeason table"
+                context['welcome_message'] = "Draft Options"
+                return render(request, 'jpartyfb/draft_options.html', context)
+
+            team_season_id += 1
+
+    #create season schedule here
+    schedule_code = create_season_schedule(league_id, season_id)
+
+    if schedule_code == -1:
+        context['error_msg'] = "Failure occurred during the scheduling process"
+        context['welcome_message'] = "Draft Options"
+        return render(request, 'jpartyfb/draft_options.html', context)
 
     #officially start the season here by setting a start time
     try:
@@ -506,6 +516,7 @@ def create_draft_list(request, source=None):
         context['error_msg'] = "Failed to set the season start time"
         context['welcome_message'] = "Draft Options"
         return render(request, 'jpartyfb/draft_options.html', context)
+
 
     #if we fast forwarded the draft, then we will go to a page showing the selected picks
     if source == 'fast_forward_draft':
@@ -519,6 +530,172 @@ def create_draft_list(request, source=None):
 
 
     return render(request, 'jpartyfb/draft_options.html', context)
+
+def view_league_schedule(request):
+
+    context = {}
+
+    # get league_id and season_id from session
+    league_id = request.session['league_id']
+    season_id = request.session['season_id']
+
+    team_filter = None
+    week_filter = None
+
+    # obtain GET parameter, if any
+
+    if 'team_filter' in request.GET:
+        team_filter = request.GET['team_filter']
+        week_filter = "all"
+
+    if 'week_filter' in request.GET:
+        try:
+            week_filter = int(request.GET['week_filter'])
+        except Exception:
+            week_filter = "all"
+
+        team_filter = "all"
+
+    if team_filter is None and week_filter is None:
+        week_filter = "all"
+        team_filter = "all"
+
+    # query the game table for all games associated with this league_id and season_id
+    try:
+        game_obj_list = Game.objects.using("xactly_dev").filter(league_id=league_id, season_id=season_id).order_by("week")
+    except Exception:
+        game_obj_list = None
+
+    # get the number of teams in the league by querying Team
+    try:
+        team_obj_list = Team.objects.using("xactly_dev").filter(league_id=league_id)
+    except Exception:
+        team_obj_list = []
+
+    #create team_id_to_nickname_dict
+    team_id_to_nickname_dict = {}
+    team_id_to_logo_path_dict = {}
+
+    for this_team_obj in team_obj_list:
+
+        this_team_id = this_team_obj.id
+        this_team_nickname = this_team_obj.nickname
+        this_team_logo_path = this_team_obj.logo_file_path
+
+        team_id_to_nickname_dict[this_team_id] = this_team_nickname
+        team_id_to_logo_path_dict[this_team_id] = this_team_logo_path
+
+    # get the number of teams in the league by querying City
+    try:
+        city_obj_list = City.objects.using("xactly_dev").all()
+    except Exception:
+        city_obj_list = []
+
+    city_id_to_city_name_dict = {}
+
+    for this_city_obj in city_obj_list:
+        this_city_id = this_city_obj.city_id
+        this_city_name = this_city_obj.city_name
+
+        city_id_to_city_name_dict[this_city_id] = this_city_name
+
+    league_team_count = len(team_obj_list)
+
+    # add the all entry to team_list
+    team_list = ["all"] + team_id_to_nickname_dict.values()
+
+    # game list will contain: [pick_number, full_name, primary_position, height, weight, team_name]
+    week_number_to_game_info_list_dict = {}
+    week_number = 1
+
+    for game_idx, this_game_obj in enumerate(game_obj_list, 1):
+
+        if game_idx > (league_team_count / 2 * week_number):
+            week_number += 1
+
+        if week_number not in week_number_to_game_info_list_dict:
+            week_number_to_game_info_list_dict[week_number] = []
+
+        this_week_number = this_game_obj.week
+
+        first_team_id = this_game_obj.first_team_id
+        second_team_id = this_game_obj.second_team_id
+        first_team_nickname = team_id_to_nickname_dict[first_team_id]
+        second_team_nickname = team_id_to_nickname_dict[second_team_id]
+
+        if week_filter != "all" and week_filter is not None and week_filter != this_week_number:
+            continue
+
+        if team_filter != "all" and team_filter is not None and team_filter != first_team_nickname and team_filter != second_team_nickname:
+            continue
+
+        first_team_points = this_game_obj.first_team_points
+        second_team_points = this_game_obj.second_team_points
+        num_overtimes = this_game_obj.second_team_points
+        is_neutral_site_game = this_game_obj.is_neutral_site_game
+        host_city_id = this_game_obj.host_city_id.city_id
+        host_city_name = city_id_to_city_name_dict[host_city_id]
+        game_status = this_game_obj.game_status
+
+        #get team logos
+        first_team_logo_path = team_id_to_logo_path_dict[first_team_id]
+        second_team_logo_path = team_id_to_logo_path_dict[second_team_id]
+
+        if game_status == 0 or game_status is None:
+            game_status = "Not Started"
+        elif game_status == 1:
+            game_status = "1st"
+        elif game_status == 2:
+            game_status = "2nd"
+        elif game_status == 3:
+            game_status = "3rd"
+        elif game_status == 4:
+            game_status = "4th"
+        elif game_status > 4:
+            num_overtimes = game_status - 4
+
+            if num_overtimes == 1:
+                game_status = "OT"
+            else:
+                game_status = str(num_overtimes) + "OT"
+
+        elif game_status == -1:
+            game_status = "Final"
+
+        this_game_info_list = [this_week_number, first_team_nickname, second_team_nickname, first_team_points, second_team_points,
+                               num_overtimes, is_neutral_site_game, host_city_name, game_status, first_team_logo_path, second_team_logo_path]
+
+        week_number_to_game_info_list_dict[week_number].append(this_game_info_list)
+
+    # get season year for display
+    try:
+        season_year = Season.objects.using("xactly_dev").filter(id=season_id).values_list('season_year', flat=True)[0]
+    except Exception:
+        season_year = -1
+
+    # get league name abbreviation for display
+    try:
+        league_obj = League.objects.using("xactly_dev").filter(id=league_id)
+    except Exception:
+        league_obj = "Error"
+
+    league_abbrev = league_obj[0].abbreviation
+    num_weeks_regular_season = league_obj[0].num_weeks_regular_season
+
+    context = {}
+
+    context['week_filter'] = week_filter
+    context['week_list'] = ['all'] + range(1, num_weeks_regular_season + 1)
+    context['team_list'] = team_list
+    context['team_filter'] = team_filter
+    context['welcome_message'] = "League Schedule"
+    context['league_abbrev'] = league_abbrev
+    context['season_year'] = season_year
+    context['week_number_to_game_info_list_dict'] = week_number_to_game_info_list_dict
+
+    #dfsdsdsds
+
+    return render(request, 'jpartyfb/view_league_schedule.html', context)
 
 
 @ensure_csrf_cookie
@@ -892,6 +1069,20 @@ def process_create_league_form_final(request):
 
         division_id += 1
 
+    #get all default teams, so that we can associate a logo with each team. This is a first cut impl
+    try:
+        default_team_obj_list = DefaultTeams.objects.using("xactly_dev").all()
+    except Exception:
+        default_team_obj_list = []
+
+    default_team_name_to_logo_path_dict = {}
+
+    for this_default_team_obj in default_team_obj_list:
+
+        this_team_nickname = this_default_team_obj.nickname
+        this_team_logo_file_name = this_default_team_obj.logo_file_name
+        default_team_name_to_logo_path_dict[this_team_nickname] = this_team_logo_file_name
+
     # declare variables for player creation associated with any new teams added to the league
     team_name_els_list = []
     team_name_to_team_id_els_dict = {}
@@ -944,11 +1135,14 @@ def process_create_league_form_final(request):
 
             team_id_to_city_stadium_id_list_dict[team_id] = [this_team_city_id, this_team_stadium_id]
 
+            #get logo file name
+            this_team_logo_file_name = default_team_name_to_logo_path_dict[this_team_nickname]
+
             try:
                 Team.objects.using("xactly_dev").create(id=team_id, nickname=this_team_nickname,
                                                         first_season_id=-1, current_season_wins=0, current_season_losses=0,
                                                         stadium_id=this_team_stadium_id, conference_id=this_team_conference_id,
-                                                        division_id=this_team_division_id,league_id=league_id)
+                                                        division_id=this_team_division_id,league_id=league_id, logo_file_path=this_team_logo_file_name)
 
                 db_commit_to_delete_id_dict['Team'] = first_team_id
             except Exception:
@@ -1087,11 +1281,14 @@ def process_create_league_form_final(request):
                     except Exception:
                         return HttpResponse("Getting stadium id..." + str(this_team_city_id) + " " + str(this_team_nickname) + str(this_city_name))
 
+                    # get logo file name
+                    this_team_logo_file_name = default_team_name_to_logo_path_dict[this_team_nickname]
+
                     #create new Team and TeamCity objects for the new team
                     try:
                         Team.objects.using("xactly_dev").create(id=insert_team_id, nickname=this_team_nickname, first_season_id=-1, current_season_wins=0, current_season_losses=0,
                                                         stadium_id=this_team_stadium_id, conference_id=this_team_new_conference_id,
-                                                        division_id=this_team_new_division_id,league_id=league_id)
+                                                        division_id=this_team_new_division_id,league_id=league_id, logo_file_path=this_team_logo_file_name)
                     except Exception as e:
                         return HttpResponse("error: " + str(e))
 
