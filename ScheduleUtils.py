@@ -57,6 +57,28 @@ def contiguity_check_successful(games_weeks_list):
 
     return True
 
+def assigned_opponents_pass_contiguity_check(team_id_to_weekly_matchups_dict):
+
+    #it is still possible to play the same opponent 2 straight weeks. Perform this final check
+    for this_team_id, weekly_opponent_dict in team_id_to_weekly_matchups_dict.items():
+
+        previous_week_opponent_id = -1
+
+        for week_number, game_info_list in weekly_opponent_dict.items():
+            try:
+                this_week_opponent_id = game_info_list[0]
+            except Exception:
+                this_week_opponent_id = None
+
+            if this_week_opponent_id is not None and this_week_opponent_id == previous_week_opponent_id:
+                return False
+
+            previous_week_opponent_id = this_week_opponent_id
+
+    else:
+        return True
+
+
 
 def get_opponents_times_played(num_divisions_per_conference, num_weeks_regular_season, num_teams_per_division):
 
@@ -1426,6 +1448,8 @@ def create_season_schedule(league_id, season_id):
         if contiguity_check_successful(same_division_twice_games_weeks_list):
             consecutive_weeks_same_opponent_constraint_verified = True
 
+    #sdsdsdds
+
     remaining_games_weeks_list = list(set(regular_season_weeks_list) - set(same_division_twice_games_weeks_list))
 
     #choose same_division_once games - these can be contiguous
@@ -1620,7 +1644,9 @@ def create_season_schedule(league_id, season_id):
                     break
 
             if start_over == False:
-                all_division_games_scheduled = True
+
+                if assigned_opponents_pass_contiguity_check(team_id_to_weekly_matchups_dict):
+                    all_division_games_scheduled = True
 
 
     with open("time_schedule_log_intraconference_games.txt", "w") as writefile_time:
@@ -1832,7 +1858,8 @@ def create_season_schedule(league_id, season_id):
                     break
 
             if start_over == False:
-                all_intraconference_games_scheduled = True
+                if assigned_opponents_pass_contiguity_check(team_id_to_weekly_matchups_dict):
+                    all_intraconference_games_scheduled = True
 
 
     with open("time_schedule_log_interconference_games.txt", "w") as writefile_time:
@@ -2105,12 +2132,12 @@ def create_season_schedule(league_id, season_id):
 
 
                 if this_game_home_away_str != "neutral":
-                    this_game_obj_dict['home_team_city_id'] = team_id_to_city_obj_dict[home_team_id]
+                    this_game_obj_dict['host_city_id'] = team_id_to_city_obj_dict[home_team_id]
                     this_game_obj_dict['is_neutral_site_game'] = False
                     this_game_obj_dict['stadium'] = city_id_to_stadium_obj_dict[team_id_to_city_id_dict[home_team_id]]
                 else:
                     neutral_city_id = random.sample(neutral_site_city_id_list, 1)[0]
-                    this_game_obj_dict['home_team_city_id'] = neutral_city_id_to_obj_dict[neutral_city_id]
+                    this_game_obj_dict['host_city_id'] = neutral_city_id_to_obj_dict[neutral_city_id]
                     this_game_obj_dict['is_neutral_site_game'] = True
 
                     neutral_site_stadium_obj = city_id_to_stadium_obj_dict[neutral_city_id]
@@ -2123,6 +2150,7 @@ def create_season_schedule(league_id, season_id):
                 this_game_obj_dict['num_overtimes'] = 0
                 this_game_obj_dict['attendance'] = 0
                 this_game_obj_dict['league_id'] = league_id
+                this_game_obj_dict['game_status'] = 0
 
                 this_game_db_obj = Game(**this_game_obj_dict)
                 this_game_db_obj.save(using="xactly_dev")
@@ -2136,6 +2164,6 @@ def create_season_schedule(league_id, season_id):
                 game_id += 1
 
 
-        dfdfffdfdfdfddfdfdfdfdff
+        #dfdfffdfdfdfddfdfdfdfdff
 
     return 1
