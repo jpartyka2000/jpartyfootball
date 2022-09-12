@@ -832,6 +832,7 @@ class TeamSeason(models.Model):
     team = models.ForeignKey(Team)
     season = models.ForeignKey(Season)
     league = models.ForeignKey(League)
+    preseason_power_ranking = models.DecimalField(max_digits=5, decimal_places=2)
 
     class Meta:
         managed = True

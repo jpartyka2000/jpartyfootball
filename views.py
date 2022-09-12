@@ -25,6 +25,7 @@ from AssortedEnums import PlayingStatus
 from ScheduleUtils import create_season_schedule
 from LeagueLayout import build_choose_teams_html
 from DraftUtils import calculate_player_draft_value, determine_draft_picks
+from StatsUtils import calculate_team_preseason_power_rankings
 
 def retract_prior_db_commits(db_commit_to_delete_id_dict):
 
@@ -501,6 +502,14 @@ def create_draft_list(request, source=None):
 
             team_season_id += 1
 
+    # calculate power rankings. We do this before scheduling so that we can guarantee top 4 matchups
+    status_code, team_id_to_power_ranking_dict = calculate_team_preseason_power_rankings(league_id, season_id)
+
+    if status_code == -1:
+        context['error_msg'] = "Failure occurred during the calculation of team preseason power rankings"
+        context['welcome_message'] = "Draft Options"
+        return render(request, 'jpartyfb/draft_options.html', context)
+
     #create season schedule here
     schedule_code = create_season_schedule(league_id, season_id)
 
@@ -530,6 +539,7 @@ def create_draft_list(request, source=None):
 
 
     return render(request, 'jpartyfb/draft_options.html', context)
+
 
 def view_league_schedule(request):
 
@@ -696,6 +706,50 @@ def view_league_schedule(request):
     #dfsdsdsds
 
     return render(request, 'jpartyfb/view_league_schedule.html', context)
+
+def view_preseason_power_rankings(request):
+
+    context = {}
+
+    # get league_id and season_id from session
+    league_id = request.session['league_id']
+    season_id = request.session['season_id']
+
+    #get list of TeamSeason objects for this league_id
+    try:
+        team_season_obj_list = TeamSeason.objects.using('xactly_dev').filter(league_id=league_id, season_id=season_id).order_by("-preseason_power_ranking")
+    except Exception:
+        team_season_obj_list = None
+
+    power_rankings_info_lol = []
+
+    for this_team_season_idx, this_team_season_obj in enumerate(team_season_obj_list, 1):
+        this_team_nickname = this_team_season_obj.team.nickname
+        this_team_logo_file_path = this_team_season_obj.team.logo_file_path
+        this_team_power_ranking = this_team_season_obj.preseason_power_ranking
+
+        power_rankings_info_lol.append([this_team_season_idx, this_team_nickname, this_team_logo_file_path, this_team_power_ranking])
+
+    # get season year for display
+    try:
+        season_year = Season.objects.using("xactly_dev").filter(id=season_id).values_list('season_year', flat=True)[0]
+    except Exception:
+        season_year = -1
+
+    # get league name abbreviation for display
+    try:
+        league_obj = League.objects.using("xactly_dev").filter(id=league_id)
+    except Exception:
+        league_obj = "Error"
+
+    league_abbrev = league_obj[0].abbreviation
+
+    context['welcome_message'] = "Preseason Power Rankings"
+    context['league_abbrev'] = league_abbrev
+    context['season_year'] = season_year
+    context['power_rankings_info_lol'] = power_rankings_info_lol
+
+    return render(request, 'jpartyfb/view_preseason_power_rankings.html', context)
 
 
 @ensure_csrf_cookie
