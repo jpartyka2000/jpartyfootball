@@ -42,7 +42,7 @@ def verify_scheduled_games(team_id_to_all_opponents_type_dict_list_dict, opponen
     return 1, "success"
 
 
-def contiguity_check_successful(games_weeks_list):
+def back_to_back_check_successful(games_weeks_list):
 
     #first, sort the weeks
     games_weeks_list_sorted = sorted(games_weeks_list)
@@ -57,7 +57,40 @@ def contiguity_check_successful(games_weeks_list):
 
     return True
 
-def assigned_opponents_pass_contiguity_check(team_id_to_weekly_matchups_dict):
+
+def assigned_opponents_five_consecutive_home_away_check_successful(team_id_to_weekly_matchups_dict):
+
+    num_consecutive_home_games = 0
+    num_consecutive_road_games = 0
+
+    for this_team_id, weekly_opponent_dict in team_id_to_weekly_matchups_dict.items():
+
+        for week_number, game_info_list in weekly_opponent_dict.items():
+            try:
+                this_week_home_road_neutral = game_info_list[1]
+            except Exception:
+                this_week_home_road_neutral = None
+
+            if this_week_home_road_neutral == "home":
+                num_consecutive_home_games += 1
+                num_consecutive_road_games = 0
+            elif this_week_home_road_neutral == "road":
+                num_consecutive_road_games += 1
+                num_consecutive_home_games = 0
+            else:
+                num_consecutive_road_games = 0
+                num_consecutive_home_games = 0
+
+            if num_consecutive_home_games > MAX_NUM_CONSECUTIVE_SCHEDULED_HOME_ROAD_GAMES or num_consecutive_road_games > MAX_NUM_CONSECUTIVE_SCHEDULED_HOME_ROAD_GAMES:
+                return False
+
+    else:
+        return True
+
+
+
+
+def assigned_opponents_back_to_back_check_successful(team_id_to_weekly_matchups_dict):
 
     #it is still possible to play the same opponent 2 straight weeks. Perform this final check
     for this_team_id, weekly_opponent_dict in team_id_to_weekly_matchups_dict.items():
@@ -287,7 +320,11 @@ def create_season_schedule(league_id, season_id):
 
                     writefile.write("New Iteration through while loop...\n")
 
-                    selected_team_id_list = random.sample(candidate_team_id_list, number_of_teams_to_select)
+                    try:
+                        selected_team_id_list = random.sample(candidate_team_id_list, number_of_teams_to_select)
+                    except Exception:
+                        # we may be in a deadlock situation
+                        deadlock_counter += 1
 
                     writefile.write("selected_team_id_list: " + str(selected_team_id_list) + '\n')
 
@@ -905,7 +942,11 @@ def create_season_schedule(league_id, season_id):
                     writefile_x.write("num_same_division_once_road_games = " + str(num_same_division_once_road_games) + "\n")
 
                     number_of_road_games_to_select = num_same_division_once_road_games - len(team_id_to_road_opponents_type_dict_list_dict[this_team_id]['same_division_once'])
-                    selected_road_opponent_id_list = random.sample(this_team_id_same_division_once_list_for_road, number_of_road_games_to_select)
+
+                    try:
+                        selected_road_opponent_id_list = random.sample(this_team_id_same_division_once_list_for_road, number_of_road_games_to_select)
+                    except Exception:
+                        deadlock_counter += 1
 
                     writefile_x.write("number_of_road_games_to_select = " + str(number_of_road_games_to_select) + "\n")
                     writefile_x.write("selected_road_opponent_id_list =  " + str(selected_road_opponent_id_list) + "\n")
@@ -1445,7 +1486,7 @@ def create_season_schedule(league_id, season_id):
         same_division_twice_games_weeks_list = random.sample(regular_season_weeks_list, num_same_division_twice_games)
 
         #perform contiguity check
-        if contiguity_check_successful(same_division_twice_games_weeks_list):
+        if back_to_back_check_successful(same_division_twice_games_weeks_list):
             consecutive_weeks_same_opponent_constraint_verified = True
 
     #sdsdsdds
@@ -1472,7 +1513,7 @@ def create_season_schedule(league_id, season_id):
             same_conference_twice_games_weeks_list = random.sample(remaining_games_weeks_list, num_same_conference_twice_games)
 
             # perform contiguity check
-            if contiguity_check_successful(same_conference_twice_games_weeks_list):
+            if back_to_back_check_successful(same_conference_twice_games_weeks_list):
                 consecutive_weeks_same_opponent_constraint_verified = True
 
     remaining_games_weeks_list = list(set(remaining_games_weeks_list) - set(same_conference_twice_games_weeks_list))
@@ -1483,6 +1524,45 @@ def create_season_schedule(league_id, season_id):
     intraconference_games_weeks_list = same_conference_twice_games_weeks_list + same_conference_once_games_weeks_list
 
     interconference_games_weeks_list = list(set(remaining_games_weeks_list) - set(same_conference_once_games_weeks_list))
+
+    #we want to make sure that the last 2 weeks of the schedule do not consist of intraconference games if we have neutral site
+    #games turned on. The reason is that neutral site games are more likely to have extreme weather conditions, and playoff fortunes
+    #should not be decided based on such games
+
+    if neutral_site_setting == True:
+
+        if num_weeks_regular_season in intraconference_games_weeks_list:
+
+            divisional_week_number = -1
+
+            #randomly choose a divisional game week to swap out with and switch
+            for this_week_number in divisional_games_weeks_list:
+                if this_week_number != num_weeks_regular_season and this_week_number != (num_weeks_regular_season - 1):
+                    divisional_week_number = this_week_number
+                    break
+
+            divisional_games_weeks_list.remove(divisional_week_number)
+            intraconference_games_weeks_list.remove(num_weeks_regular_season)
+
+            divisional_games_weeks_list.append(num_weeks_regular_season)
+            intraconference_games_weeks_list.append(divisional_week_number)
+
+        if (num_weeks_regular_season - 1) in intraconference_games_weeks_list:
+
+            interconference_week_number = -1
+
+            #randomly choose an interconference game week to swap out with and switch
+            for this_week_number in interconference_games_weeks_list:
+                if this_week_number != num_weeks_regular_season and this_week_number != (num_weeks_regular_season - 1):
+                    interconference_week_number = this_week_number
+                    break
+
+            interconference_games_weeks_list.remove(interconference_week_number)
+            intraconference_games_weeks_list.remove(num_weeks_regular_season - 1)
+
+            interconference_games_weeks_list.append(num_weeks_regular_season - 1)
+            intraconference_games_weeks_list.append(interconference_week_number)
+
 
     with open("time_schedule_log_divisional_games.txt", "w") as writefile_time:
 
@@ -1645,7 +1725,7 @@ def create_season_schedule(league_id, season_id):
 
             if start_over == False:
 
-                if assigned_opponents_pass_contiguity_check(team_id_to_weekly_matchups_dict):
+                if assigned_opponents_back_to_back_check_successful(team_id_to_weekly_matchups_dict):
                     all_division_games_scheduled = True
 
 
@@ -1858,7 +1938,7 @@ def create_season_schedule(league_id, season_id):
                     break
 
             if start_over == False:
-                if assigned_opponents_pass_contiguity_check(team_id_to_weekly_matchups_dict):
+                if assigned_opponents_back_to_back_check_successful(team_id_to_weekly_matchups_dict):
                     all_intraconference_games_scheduled = True
 
 
