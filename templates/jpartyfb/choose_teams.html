@@ -1,6 +1,5 @@
 {% extends "backendBase.html" %}
 
-{% load staticfiles %}
 {% load static %}
 
 {%block mainContent%}	
@@ -14,13 +13,13 @@
             <a href="{% url 'jpartyfb:index' %}">Home</a> >
             <a href="{% url 'jpartyfb:manage_leagues' %}">Manage Leagues</a> >
 
-            {% ifequal source_page "els" %}
+            {% if source_page == "els" %}
                 <a href="{% url 'jpartyfb:show_league_form_1' source='els' %}">Edit League</a> >
                 <a href="{% url 'jpartyfb:process_create_league_form_1' edit_from_breadcrumb='True' %}?league_id={{ league_id }}">Edit Teams</a>
             {% else %}
                 <a href="{% url 'jpartyfb:show_league_form_1' source='cnl' %}">Create New League</a> >
                 Choose Teams
-            {% endifequal %}
+            {% endif %}
 
         </div>
 

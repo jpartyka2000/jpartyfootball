@@ -1,6 +1,5 @@
 {% extends "backendBase.html" %}
 
-{% load staticfiles %}
 {% load static %}
 
 {%block mainContent%}	
@@ -47,11 +46,11 @@
                 <b>Filter by Team:</b>
                 <select id="team_filter_select" onchange="window.location.href='/jpartyfb/view_draft_results?team_filter=' + this.value">
                     {% for this_team in team_list %}
-                        {% ifequal this_team team_filter %}
+                        {% if this_team == team_filter %}
                             <option value="{{ this_team }}" SELECTED>{{ this_team }}</option>
                         {% else %}
                             <option value="{{ this_team }}">{{ this_team }}</option>
-                        {% endifequal %}
+                        {% endif %}
 
                     {% endfor %}
                 </select>

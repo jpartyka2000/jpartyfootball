@@ -1,6 +1,5 @@
 {% extends "backendBase.html" %}
 
-{% load staticfiles %}
 {% load static %}
 
 {%block mainContent%}	
@@ -13,11 +12,11 @@
         <div class='breadcrumb' style='text-color: blue; background-color: white;'>
             <a href="{% url 'jpartyfb:index' %}">Home</a> >
             <a href="{% url 'jpartyfb:manage_leagues' %}">Manage Leagues</a> >
-            {% ifequal source 'els' %}
+            {% if source == 'els' %}
                 <a href="{% url 'jpartyfb:show_league_form_1' source='els' %}">{{ source_page_title }}</a>
             {% else %}
                 <a href="{% url 'jpartyfb:show_league_form_1' source='cnl' %}">{{ source_page_title }}</a>
-            {% endifequal %}
+            {% endif %}
         </div>
 
 {% if Error_message %}
@@ -35,35 +34,35 @@
     <div style="height: 75px;"></div>
     <form name="create_league_form_1" action="{% url 'jpartyfb:process_create_league_form_1' edit_from_breadcrumb='False' %}" method="post">
 
-         {% ifequal source 'els' %}
+         {% if source == 'els' %}
              <input type="checkbox" id="injury_checkbox" name="injury_checkbox" style="margin-left: -142px;" {{ league_settings_dict.injury_setting }} />
          {% else %}
              <input type="checkbox" id="injury_checkbox" name="injury_checkbox" style="margin-left: -142px;" checked />
-         {% endifequal %}
+         {% endif %}
 
          <b>Toggle Injuries for League</b><br>
 
-         {% ifequal source 'els' %}
+         {% if source == 'els' %}
              <input type="checkbox" id="weather_checkbox" name="weather_checkbox" style="margin-left: -77px;" {{ league_settings_dict.weather_setting }} />
          {% else %}
              <input type="checkbox" id="weather_checkbox" name="weather_checkbox" style="margin-left: -77px;" checked />
-         {% endifequal %}
+         {% endif %}
 
          <b>Toggle In Game Weather for League</b><br>
 
-         {% ifequal source 'els' %}
+         {% if source == 'els' %}
              <input type="checkbox" id="female_checkbox" name="female_checkbox" style="margin-left: -33px;" {{ league_settings_dict.female_setting }} />
          {% else %}
              <input type="checkbox" id="female_checkbox" name="female_checkbox" style="margin-left: -33px;" checked />
-         {% endifequal %}
+         {% endif %}
 
          <b>Toggle Allowing Female Players in League</b><br>
 
-         {% ifequal source 'els' %}
+         {% if source == 'els' %}
              <input type="checkbox" id="neutral_site_checkbox" name="neutral_site_checkbox" style="margin-left: -9px;" {{ league_settings_dict.neutral_site_setting }} />
          {% else %}
             <input type="checkbox" id="neutral_site_checkbox" name="neutral_site_checkbox" style="margin-left: -9px;" checked />
-         {% endifequal %}
+         {% endif %}
 
         <b>Toggle Using Neutral Site Stadiums in League</b><br>
 
@@ -80,13 +79,13 @@
              </tr>
              {% endfor %}
               <tr><td><br></td></tr>
-             {% ifequal source 'els' %}
+             {% if source == 'els' %}
               <tr>
                 <td colspan="2" align="center">
                     <input type="button" id="save_and_leave_button" class='submit_button' value='Save Settings and Go Home' style="width: 215px;" />
                 </td>
               </tr>
-             {% endifequal %}
+             {% endif %}
              <tr><td><div style="height: 25px;"></div></td></tr>
               <tr>
                   <td colspan="2" align="center">
