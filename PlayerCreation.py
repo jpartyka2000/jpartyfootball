@@ -6,7 +6,7 @@ import names
 import copy
 
 from jpartyfb.models import *
-from AssortedEnums import PlayingStatus
+from jpartyfb.AssortedEnums import PlayingStatus
 
 class PlayerCreation():
 

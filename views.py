@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.http import HttpResponse, HttpResponseRedirect
-from django.core.servers.basehttp import FileWrapper
+from wsgiref.util import FileWrapper
 from django.views.static import serve
 from django.views.decorators.csrf import csrf_exempt
 
@@ -18,14 +18,14 @@ from operator import itemgetter
 from jpartyfb.forms import CreateLeagueForm1
 from jpartyfb.models import *
 
-from PlayerCreation import PlayerCreation
-from PlayerCreation import create_player_career_arc, create_players
+from jpartyfb.PlayerCreation import PlayerCreation
+from jpartyfb.PlayerCreation import create_player_career_arc, create_players
 
-from AssortedEnums import PlayingStatus
-from ScheduleUtils import create_season_schedule
-from LeagueLayout import build_choose_teams_html
-from DraftUtils import calculate_player_draft_value, determine_draft_picks
-from StatsUtils import calculate_team_preseason_power_rankings
+from jpartyfb.AssortedEnums import PlayingStatus
+from jpartyfb.ScheduleUtils import create_season_schedule
+from jpartyfb.LeagueLayout import build_choose_teams_html
+from jpartyfb.DraftUtils import calculate_player_draft_value, determine_draft_picks
+from jpartyfb.StatsUtils import calculate_team_preseason_power_rankings
 
 def retract_prior_db_commits(db_commit_to_delete_id_dict):
 
@@ -35,70 +35,70 @@ def retract_prior_db_commits(db_commit_to_delete_id_dict):
         for player_position, first_player_position_id in db_commit_to_delete_id_dict["PlayerSpec"].items():
 
             if player_position == 'qb':
-                PlayerSpecsQb.objects.using("xactly_dev").filter(id__gte=first_player_position_id).delete()
+                PlayerSpecsQb.objects.using("default").filter(id__gte=first_player_position_id).delete()
             elif player_position == 'rb':
-                PlayerSpecsRb.objects.using("xactly_dev").filter(id__gte=first_player_position_id).delete()
+                PlayerSpecsRb.objects.using("default").filter(id__gte=first_player_position_id).delete()
             elif player_position == 'fb':
-                PlayerSpecsFb.objects.using("xactly_dev").filter(id__gte=first_player_position_id).delete()
+                PlayerSpecsFb.objects.using("default").filter(id__gte=first_player_position_id).delete()
             elif player_position == 'wr':
-                PlayerSpecsWr.objects.using("xactly_dev").filter(id__gte=first_player_position_id).delete()
+                PlayerSpecsWr.objects.using("default").filter(id__gte=first_player_position_id).delete()
             elif player_position == 'te':
-                PlayerSpecsTe.objects.using("xactly_dev").filter(id__gte=first_player_position_id).delete()
+                PlayerSpecsTe.objects.using("default").filter(id__gte=first_player_position_id).delete()
             elif player_position == 'k':
-                PlayerSpecsK.objects.using("xactly_dev").filter(id__gte=first_player_position_id).delete()
+                PlayerSpecsK.objects.using("default").filter(id__gte=first_player_position_id).delete()
             elif player_position == 'lb':
-                PlayerSpecsLb.objects.using("xactly_dev").filter(id__gte=first_player_position_id).delete()
+                PlayerSpecsLb.objects.using("default").filter(id__gte=first_player_position_id).delete()
             elif player_position == 'ol':
-                PlayerSpecsOl.objects.using("xactly_dev").filter(id__gte=first_player_position_id).delete()
+                PlayerSpecsOl.objects.using("default").filter(id__gte=first_player_position_id).delete()
             elif player_position == 'p':
-                PlayerSpecsP.objects.using("xactly_dev").filter(id__gte=first_player_position_id).delete()
+                PlayerSpecsP.objects.using("default").filter(id__gte=first_player_position_id).delete()
             elif player_position == 'cb':
-                PlayerSpecsCb.objects.using("xactly_dev").filter(id__gte=first_player_position_id).delete()
+                PlayerSpecsCb.objects.using("default").filter(id__gte=first_player_position_id).delete()
             elif player_position == 'dl':
-                PlayerSpecsDl.objects.using("xactly_dev").filter(id__gte=first_player_position_id).delete()
+                PlayerSpecsDl.objects.using("default").filter(id__gte=first_player_position_id).delete()
             elif player_position == 'sf':
-                PlayerSpecsSf.objects.using("xactly_dev").filter(id__gte=first_player_position_id).delete()
+                PlayerSpecsSf.objects.using("default").filter(id__gte=first_player_position_id).delete()
             elif player_position == 'sto':
-                PlayerSpecsSto.objects.using("xactly_dev").filter(id__gte=first_player_position_id).delete()
+                PlayerSpecsSto.objects.using("default").filter(id__gte=first_player_position_id).delete()
             elif player_position == 'std':
-                PlayerSpecsStd.objects.using("xactly_dev").filter(id__gte=first_player_position_id).delete()
+                PlayerSpecsStd.objects.using("default").filter(id__gte=first_player_position_id).delete()
 
     if "PlayerTeam" in db_commit_to_delete_id_dict:
         first_player_team_id = db_commit_to_delete_id_dict["PlayerTeam"]
-        PlayerTeam.objects.using("xactly_dev").filter(player_team_id__gte=first_player_team_id).delete()
+        PlayerTeam.objects.using("default").filter(player_team_id__gte=first_player_team_id).delete()
 
     if "Player" in db_commit_to_delete_id_dict:
         first_player_id = db_commit_to_delete_id_dict["Player"]
-        Player.objects.using("xactly_dev").filter(id__gte=first_player_id).delete()
+        Player.objects.using("default").filter(id__gte=first_player_id).delete()
 
     if "Season" in db_commit_to_delete_id_dict:
         first_season_id = db_commit_to_delete_id_dict["Season"]
-        Season.objects.using("xactly_dev").filter(id__gte=first_season_id).delete()
+        Season.objects.using("default").filter(id__gte=first_season_id).delete()
 
     if "TeamCity" in db_commit_to_delete_id_dict:
 
         first_team_city_id = db_commit_to_delete_id_dict["TeamCity"]
-        TeamCity.objects.using("xactly_dev").filter(team_city_id__gte=first_team_city_id).delete()
+        TeamCity.objects.using("default").filter(team_city_id__gte=first_team_city_id).delete()
 
     if "Team" in db_commit_to_delete_id_dict:
 
         first_team_id = db_commit_to_delete_id_dict["Team"]
-        Team.objects.using("xactly_dev").filter(id__gte=first_team_id).delete()
+        Team.objects.using("default").filter(id__gte=first_team_id).delete()
 
     if "Division" in db_commit_to_delete_id_dict:
 
         first_division_id = db_commit_to_delete_id_dict["Division"]
-        Division.objects.using("xactly_dev").filter(id__gte=first_division_id).delete()
+        Division.objects.using("default").filter(id__gte=first_division_id).delete()
 
     if "Conference" in db_commit_to_delete_id_dict:
 
         first_conference_id = db_commit_to_delete_id_dict["Conference"]
-        Conference.objects.using("xactly_dev").filter(id__gte=first_conference_id).delete()
+        Conference.objects.using("default").filter(id__gte=first_conference_id).delete()
 
     if "League" in db_commit_to_delete_id_dict:
 
         first_league_id = db_commit_to_delete_id_dict["League"]
-        League.objects.using("xactly_dev").filter(id__gte=first_league_id).delete()
+        League.objects.using("default").filter(id__gte=first_league_id).delete()
 
 
 def create_draft_players(league_id):
@@ -106,7 +106,7 @@ def create_draft_players(league_id):
     # first, query the Team table to construct team_name_list and team_name_to_team_id_dict
 
     try:
-        team_obj_list = Team.objects.using("xactly_dev").filter(league_id=league_id)
+        team_obj_list = Team.objects.using("default").filter(league_id=league_id)
     except Exception:
         team_obj_list = None
 
@@ -120,7 +120,7 @@ def create_draft_players(league_id):
 
         # we need to get the city
         try:
-            team_city_obj = TeamCity.objects.using("xactly_dev").filter(team_id=this_team_id, league_id=league_id)
+            team_city_obj = TeamCity.objects.using("default").filter(team_id=this_team_id, league_id=league_id)
         except Exception:
             team_city_obj = None
 
@@ -134,7 +134,7 @@ def create_draft_players(league_id):
 
     # get female setting for this league_id
     try:
-        league_obj = League.objects.using("xactly_dev").filter(id=league_id)
+        league_obj = League.objects.using("default").filter(id=league_id)
     except Exception:
         league_obj = None
 
@@ -214,7 +214,7 @@ def show_league_form_1(request, source=None):
         league_settings_dict = {}
 
         try:
-            league_obj = League.objects.using("xactly_dev").filter(id=league_id)
+            league_obj = League.objects.using("default").filter(id=league_id)
 
             league_name = league_obj[0].name
             weather_setting = league_obj[0].weather_setting
@@ -238,7 +238,7 @@ def show_league_form_1(request, source=None):
         #get latest season associated with this league_id and determine whether it is active or not
 
         try:
-            season_obj = Season.objects.using("xactly_dev").filter(league_id=league_id).order_by("-id")
+            season_obj = Season.objects.using("default").filter(league_id=league_id).order_by("-id")
 
             if season_obj[0].start_time is None:
                 is_league_season_active = False
@@ -356,7 +356,7 @@ def draft_options(request):
 
     #create a session variable to store the latest season_id for this league
     try:
-        season_obj = Season.objects.using("xactly_dev").filter(league_id=league_id).order_by("-id")
+        season_obj = Season.objects.using("default").filter(league_id=league_id).order_by("-id")
     except Exception:
         season_obj = None
 
@@ -380,14 +380,14 @@ def create_draft_list(request, source=None):
     #the draft list is officially created when a row for this season's draft in the league exists
 
     try:
-        draft_obj = Draft.objects.using("xactly_dev").filter(season_id=season_id, league_id=league_id)
+        draft_obj = Draft.objects.using("default").filter(season_id=season_id, league_id=league_id)
     except Exception:
         draft_obj = None
 
     #we also need to check if we have created the draft list already
 
     try:
-        current_season_obj = Season.objects.using("xactly_dev").filter(league_id=league_id).order_by("-id")
+        current_season_obj = Season.objects.using("default").filter(league_id=league_id).order_by("-id")
     except Exception:
         context['error_msg'] = "Failed to load current season."
         context['welcome_message'] = "Draft Options"
@@ -407,7 +407,7 @@ def create_draft_list(request, source=None):
 
         # indicate that draft player list has been created by updating the Season obj's created_draft_list property
         try:
-            Season.objects.using("xactly_dev").filter(id=season_id).update(created_draft_list=True)
+            Season.objects.using("default").filter(id=season_id).update(created_draft_list=True)
         except Exception:
             context['error_msg'] = "Failed to mark player list as created in Season db table"
             context['welcome_message'] = "Draft Options"
@@ -417,7 +417,7 @@ def create_draft_list(request, source=None):
         player_query_dict = {'league_id': league_id, 'playing_status': PlayingStatus.DRAFT}
 
         try:
-            player_obj_list = Player.objects.using("xactly_dev").filter(**player_query_dict)
+            player_obj_list = Player.objects.using("default").filter(**player_query_dict)
         except Exception:
             context['error_msg'] = "Failed to load draft player list."
             context['welcome_message'] = "Draft Options"
@@ -431,7 +431,7 @@ def create_draft_list(request, source=None):
 
             # finally, insert this_player_draft_value into the Player table
             try:
-                Player.objects.using("xactly_dev").filter(id=this_player_id).update(draft_value=this_player_draft_value)
+                Player.objects.using("default").filter(id=this_player_id).update(draft_value=this_player_draft_value)
             except Exception:
                 context['error_msg'] = "Failed to update player draft value"
                 context['welcome_message'] = "Draft Options"
@@ -439,7 +439,7 @@ def create_draft_list(request, source=None):
 
         #finally, we have to insert draft_ranks into Player
         try:
-            player_obj_list = Player.objects.using("xactly_dev").filter(league_id=league_id, playing_status=PlayingStatus.DRAFT).order_by("-draft_value")
+            player_obj_list = Player.objects.using("default").filter(league_id=league_id, playing_status=PlayingStatus.DRAFT).order_by("-draft_value")
         except Exception:
             context['error_msg'] = "Failed to query for players before assigning draft rank"
             context['welcome_message'] = "Draft Options"
@@ -452,7 +452,7 @@ def create_draft_list(request, source=None):
             this_player_id = this_player_obj.id
 
             try:
-                Player.objects.using("xactly_dev").filter(id=this_player_id).update(draft_rank=player_rank_idx)
+                Player.objects.using("default").filter(id=this_player_id).update(draft_rank=player_rank_idx)
             except Exception:
                 context['error_msg'] = "Failed to assign player draft rank"
                 context['welcome_message'] = "Draft Options"
@@ -469,7 +469,7 @@ def create_draft_list(request, source=None):
 
     #any players not selected need to have their player_status values changed to indicate that they are free agents
     try:
-        Player.objects.using("xactly_dev").filter(league_id=league_id, playing_status=PlayingStatus.DRAFT).update(playing_status=PlayingStatus.FREE_AGENT)
+        Player.objects.using("default").filter(league_id=league_id, playing_status=PlayingStatus.DRAFT).update(playing_status=PlayingStatus.FREE_AGENT)
     except Exception:
         context['error_msg'] = "Failed to convert undrafted players into free agents"
         context['welcome_message'] = "Draft Options"
@@ -477,14 +477,14 @@ def create_draft_list(request, source=None):
 
     #populate the team_season table for this season
     try:
-        team_obj_list = Team.objects.using("xactly_dev").filter(league_id=league_id)
+        team_obj_list = Team.objects.using("default").filter(league_id=league_id)
     except Exception:
         context['error_msg'] = "Failed to get teams for populating TeamSeason table"
         context['welcome_message'] = "Draft Options"
         return render(request, 'jpartyfb/draft_options.html', context)
 
     try:
-        team_season_id = int(TeamSeason.objects.using('xactly_dev').latest('id').id) + 1
+        team_season_id = int(TeamSeason.objects.using('default').latest('id').id) + 1
     except Exception:
         team_season_id = 1
 
@@ -494,7 +494,7 @@ def create_draft_list(request, source=None):
             this_team_id = this_team_obj.id
 
             try:
-                TeamSeason.objects.using("xactly_dev").create(id=team_season_id, team_id=this_team_id, season_id=season_id, league_id=league_id)
+                TeamSeason.objects.using("default").create(id=team_season_id, team_id=this_team_id, season_id=season_id, league_id=league_id)
             except Exception:
                 context['error_msg'] = "Failed in inserting rows into TeamSeason table"
                 context['welcome_message'] = "Draft Options"
@@ -520,7 +520,7 @@ def create_draft_list(request, source=None):
 
     #officially start the season here by setting a start time
     try:
-        Season.objects.using("xactly_dev").filter(id=season_id).update(start_time=datetime.datetime.now())
+        Season.objects.using("default").filter(id=season_id).update(start_time=datetime.datetime.now())
     except Exception:
         context['error_msg'] = "Failed to set the season start time"
         context['welcome_message'] = "Draft Options"
@@ -572,13 +572,13 @@ def view_league_schedule(request):
 
     # query the game table for all games associated with this league_id and season_id
     try:
-        game_obj_list = Game.objects.using("xactly_dev").filter(league_id=league_id, season_id=season_id).order_by("week")
+        game_obj_list = Game.objects.using("default").filter(league_id=league_id, season_id=season_id).order_by("week")
     except Exception:
         game_obj_list = None
 
     # get the number of teams in the league by querying Team
     try:
-        team_obj_list = Team.objects.using("xactly_dev").filter(league_id=league_id)
+        team_obj_list = Team.objects.using("default").filter(league_id=league_id)
     except Exception:
         team_obj_list = []
 
@@ -597,7 +597,7 @@ def view_league_schedule(request):
 
     # get the number of teams in the league by querying City
     try:
-        city_obj_list = City.objects.using("xactly_dev").all()
+        city_obj_list = City.objects.using("default").all()
     except Exception:
         city_obj_list = []
 
@@ -679,13 +679,13 @@ def view_league_schedule(request):
 
     # get season year for display
     try:
-        season_year = Season.objects.using("xactly_dev").filter(id=season_id).values_list('season_year', flat=True)[0]
+        season_year = Season.objects.using("default").filter(id=season_id).values_list('season_year', flat=True)[0]
     except Exception:
         season_year = -1
 
     # get league name abbreviation for display
     try:
-        league_obj = League.objects.using("xactly_dev").filter(id=league_id)
+        league_obj = League.objects.using("default").filter(id=league_id)
     except Exception:
         league_obj = "Error"
 
@@ -717,7 +717,7 @@ def view_preseason_power_rankings(request):
 
     #get list of TeamSeason objects for this league_id
     try:
-        team_season_obj_list = TeamSeason.objects.using('xactly_dev').filter(league_id=league_id, season_id=season_id).order_by("-preseason_power_ranking")
+        team_season_obj_list = TeamSeason.objects.using('default').filter(league_id=league_id, season_id=season_id).order_by("-preseason_power_ranking")
     except Exception:
         team_season_obj_list = None
 
@@ -732,13 +732,13 @@ def view_preseason_power_rankings(request):
 
     # get season year for display
     try:
-        season_year = Season.objects.using("xactly_dev").filter(id=season_id).values_list('season_year', flat=True)[0]
+        season_year = Season.objects.using("default").filter(id=season_id).values_list('season_year', flat=True)[0]
     except Exception:
         season_year = -1
 
     # get league name abbreviation for display
     try:
-        league_obj = League.objects.using("xactly_dev").filter(id=league_id)
+        league_obj = League.objects.using("default").filter(id=league_id)
     except Exception:
         league_obj = "Error"
 
@@ -770,7 +770,7 @@ def choose_league(request):
 
         # load all league ids and names
         try:
-            league_obj_list = League.objects.using("xactly_dev").all().order_by("-id")
+            league_obj_list = League.objects.using("default").all().order_by("-id")
         except Exception:
             league_obj_list = []
 
@@ -786,7 +786,7 @@ def choose_league(request):
         # raw SQL query so that I can use GROUP BY
 
         try:
-            league_obj_list = League.objects.using("xactly_dev").raw("SELECT 1 as id, l.id as league_id, l.name as league_name, max(s.id) as most_recent_season_id FROM season s INNER JOIN league l ON l.id = s.league_id GROUP BY l.id")
+            league_obj_list = League.objects.using("default").raw("SELECT 1 as id, l.id as league_id, l.name as league_name, max(s.id) as most_recent_season_id FROM season s INNER JOIN league l ON l.id = s.league_id GROUP BY l.id")
         except Exception:
             league_obj_list = []
 
@@ -797,7 +797,7 @@ def choose_league(request):
 
             #query Season to determine if most_recent_season_id is active or not
             try:
-                this_season_obj = Season.objects.using("xactly_dev").filter(id=most_recent_season_id)
+                this_season_obj = Season.objects.using("default").filter(id=most_recent_season_id)
             except Exception:
                 this_season_obj = None
 
@@ -870,7 +870,7 @@ def process_create_league_form_1(request, edit_from_breadcrumb=None):
             female_setting = True if female_checkbox == 'on' else False
             neutral_site_setting = True if neutral_site_checkbox == 'on' else False
 
-            league_obj = League.objects.using("xactly_dev").get(id=league_id)
+            league_obj = League.objects.using("default").get(id=league_id)
             league_obj.name = league_name
 
             #create new abbreviation
@@ -909,7 +909,7 @@ def process_create_league_form_1(request, edit_from_breadcrumb=None):
 
         #the league has already been created, so query for the information
         try:
-            league_obj = League.objects.using("xactly_dev").filter(id=league_id)
+            league_obj = League.objects.using("default").filter(id=league_id)
         except Exception:
             league_obj = None
 
@@ -926,7 +926,7 @@ def process_create_league_form_1(request, edit_from_breadcrumb=None):
 
         #determine if the season is active or not
         try:
-            season_obj = Season.objects.using("xactly_dev").filter(league_id=league_id).order_by("-id")
+            season_obj = Season.objects.using("default").filter(league_id=league_id).order_by("-id")
 
             if season_obj[0].start_time is None:
                 season_active = False
@@ -1053,12 +1053,12 @@ def process_create_league_form_final(request):
     #start inserting form data into database tables
     #get latest League row
     try:
-        league_id = int(League.objects.using('xactly_dev').latest('id').id) + 1
+        league_id = int(League.objects.using('default').latest('id').id) + 1
     except Exception:
         league_id = 1
 
     try:
-        League.objects.using("xactly_dev").create(id=league_id, name=league_name, abbreviation=league_name_abbrev_str,
+        League.objects.using("default").create(id=league_id, name=league_name, abbreviation=league_name_abbrev_str,
                                                   weather_setting=weather_setting, injury_setting=injury_setting,
                                                   female_setting=female_setting, neutral_site_setting=neutral_site_setting,
                                                   num_playoff_teams_per_conference=number_of_playoff_teams_setting, num_weeks_regular_season=number_of_weeks_setting,
@@ -1070,7 +1070,7 @@ def process_create_league_form_final(request):
     #next, insert conference rows for this league
     try:
         conference_id = int(
-            Conference.objects.using('xactly_dev').latest('id').id) + 1
+            Conference.objects.using('default').latest('id').id) + 1
     except Exception:
         conference_id = 1
 
@@ -1084,7 +1084,7 @@ def process_create_league_form_final(request):
         conference_name_to_id_dict[this_conference_name] = conference_id
 
         try:
-            Conference.objects.using("xactly_dev").create(id=conference_id, conference_name=this_conference_name,
+            Conference.objects.using("default").create(id=conference_id, conference_name=this_conference_name,
                                                           league_id=league_id)
             db_commit_to_delete_id_dict['Conference'] = first_conference_id
         except Exception:
@@ -1097,7 +1097,7 @@ def process_create_league_form_final(request):
     #now insert division rows for this league
     try:
         division_id = int(
-            Division.objects.using('xactly_dev').latest('id').id) + 1
+            Division.objects.using('default').latest('id').id) + 1
     except Exception:
         division_id = 1
 
@@ -1113,7 +1113,7 @@ def process_create_league_form_final(request):
         division_name_to_id_dict[this_division_name] = division_id
 
         try:
-            Division.objects.using("xactly_dev").create(id=division_id, division_name=this_division_name,
+            Division.objects.using("default").create(id=division_id, division_name=this_division_name,
                                                           conference_id=this_conference_id, first_season_id=-1, league_id=league_id)
 
             db_commit_to_delete_id_dict['Division'] = first_division_id
@@ -1125,7 +1125,7 @@ def process_create_league_form_final(request):
 
     #get all default teams, so that we can associate a logo with each team. This is a first cut impl
     try:
-        default_team_obj_list = DefaultTeams.objects.using("xactly_dev").all()
+        default_team_obj_list = DefaultTeams.objects.using("default").all()
     except Exception:
         default_team_obj_list = []
 
@@ -1145,7 +1145,7 @@ def process_create_league_form_final(request):
     if source_page_hidden == 'cnl':
 
         try:
-            team_id = int(Team.objects.using('xactly_dev').latest('id').id) + 1
+            team_id = int(Team.objects.using('default').latest('id').id) + 1
         except Exception:
             team_id = 1
 
@@ -1153,7 +1153,7 @@ def process_create_league_form_final(request):
 
         #also insert team_city rows for this league
         try:
-            team_city_id = int(TeamCity.objects.using('xactly_dev').latest('team_city_id').team_city_id) + 1
+            team_city_id = int(TeamCity.objects.using('default').latest('team_city_id').team_city_id) + 1
         except Exception:
             team_city_id = 1
 
@@ -1184,7 +1184,7 @@ def process_create_league_form_final(request):
 
             this_team_city_id = city_nickname_to_city_id_dict[this_team_nickname]
 
-            stadium_row = Stadium.objects.using("xactly_dev").get(city_id=this_team_city_id)
+            stadium_row = Stadium.objects.using("default").get(city_id=this_team_city_id)
             this_team_stadium_id = stadium_row.stadium_id
 
             team_id_to_city_stadium_id_list_dict[team_id] = [this_team_city_id, this_team_stadium_id]
@@ -1193,7 +1193,7 @@ def process_create_league_form_final(request):
             this_team_logo_file_name = default_team_name_to_logo_path_dict[this_team_nickname]
 
             try:
-                Team.objects.using("xactly_dev").create(id=team_id, nickname=this_team_nickname,
+                Team.objects.using("default").create(id=team_id, nickname=this_team_nickname,
                                                         first_season_id=-1, current_season_wins=0, current_season_losses=0,
                                                         stadium_id=this_team_stadium_id, conference_id=this_team_conference_id,
                                                         division_id=this_team_division_id,league_id=league_id, logo_file_path=this_team_logo_file_name)
@@ -1204,7 +1204,7 @@ def process_create_league_form_final(request):
                 return HttpResponse(-4)
 
             try:
-                TeamCity.objects.using("xactly_dev").create(team_city_id=team_city_id, team_id=team_id,city_id=this_team_city_id,first_season_id=-1,stadium_id=this_team_stadium_id, league_id=league_id)
+                TeamCity.objects.using("default").create(team_city_id=team_city_id, team_id=team_id,city_id=this_team_city_id,first_season_id=-1,stadium_id=this_team_stadium_id, league_id=league_id)
 
                 db_commit_to_delete_id_dict['TeamCity'] = first_team_city_id
             except Exception:
@@ -1220,12 +1220,12 @@ def process_create_league_form_final(request):
         #we will only do this when creating a new league - we will update the season if editing the league
 
         try:
-            season_id = int(Season.objects.using('xactly_dev').latest('id').id) + 1
+            season_id = int(Season.objects.using('default').latest('id').id) + 1
         except Exception:
             season_id = 1
 
         try:
-            Season.objects.using("xactly_dev").create(id=season_id, start_time=None,
+            Season.objects.using("default").create(id=season_id, start_time=None,
                                                         end_time=None,
                                                         season_year=1, league_id=league_id, created_draft_list=False)
 
@@ -1238,7 +1238,7 @@ def process_create_league_form_final(request):
     if source_page_hidden == 'els':
 
         try:
-            Season.objects.using("xactly_dev").filter(league_id=league_id_hidden).update(league_id=league_id)
+            Season.objects.using("default").filter(league_id=league_id_hidden).update(league_id=league_id)
         except Exception:
             pass
 
@@ -1246,13 +1246,13 @@ def process_create_league_form_final(request):
 
             #get latest team_id in case we have new teams
             try:
-                insert_team_id = int(Team.objects.using('xactly_dev').latest('id').id) + 1
+                insert_team_id = int(Team.objects.using('default').latest('id').id) + 1
             except Exception:
                 insert_team_id = 1
 
             #also get latest team_city_id for same reason
             try:
-                insert_team_city_id = int(TeamCity.objects.using('xactly_dev').latest('team_city_id').team_city_id) + 1
+                insert_team_city_id = int(TeamCity.objects.using('default').latest('team_city_id').team_city_id) + 1
             except Exception:
                 insert_team_city_id = 1
 
@@ -1284,7 +1284,7 @@ def process_create_league_form_final(request):
                     #this is a team we already created
 
                     try:
-                        Team.objects.using("xactly_dev").filter(id=this_team_id).update(nickname=this_team_nickname, conference_id=this_team_new_conference_id, division_id=this_team_new_division_id, league_id=league_id)
+                        Team.objects.using("default").filter(id=this_team_id).update(nickname=this_team_nickname, conference_id=this_team_new_conference_id, division_id=this_team_new_division_id, league_id=league_id)
                     except Exception as e:
                         return HttpResponse("Team filter id > 0 : " + str(e))
 
@@ -1292,7 +1292,7 @@ def process_create_league_form_final(request):
 
                     #get the stadium associated with this_team_city_id
                     try:
-                        stadium_obj = Stadium.objects.using("xactly_dev").filter(city_id=this_team_city_id)
+                        stadium_obj = Stadium.objects.using("default").filter(city_id=this_team_city_id)
                     except Exception:
                         pass
 
@@ -1301,7 +1301,7 @@ def process_create_league_form_final(request):
                     #Update TeamCity object associated with this team with the new league_id and city, if the team
                     #has been switched in the standings
                     try:
-                        TeamCity.objects.using("xactly_dev").filter(league_id=league_id_hidden, team_id=this_team_id).update(league_id=league_id, city_id=this_team_city_id, stadium_id=this_team_stadium_id)
+                        TeamCity.objects.using("default").filter(league_id=league_id_hidden, team_id=this_team_id).update(league_id=league_id, city_id=this_team_city_id, stadium_id=this_team_stadium_id)
                     except Exception:
                         pass
 
@@ -1318,7 +1318,7 @@ def process_create_league_form_final(request):
                     if this_team_city_id == -1:
                         try:
                             this_city_name = " ".join(this_team_name_parts_list[0:-1])
-                            city_obj = City.objects.using("xactly_dev").filter(city_name=this_city_name)
+                            city_obj = City.objects.using("default").filter(city_name=this_city_name)
                             this_team_city_id = city_obj[0].city_id
                         except Exception:
                             pass
@@ -1326,7 +1326,7 @@ def process_create_league_form_final(request):
 
                     # get the stadium associated with this_team_city_id
                     try:
-                        stadium_obj = Stadium.objects.using("xactly_dev").filter(city_id=this_team_city_id)
+                        stadium_obj = Stadium.objects.using("default").filter(city_id=this_team_city_id)
                     except Exception:
                         pass
 
@@ -1340,14 +1340,14 @@ def process_create_league_form_final(request):
 
                     #create new Team and TeamCity objects for the new team
                     try:
-                        Team.objects.using("xactly_dev").create(id=insert_team_id, nickname=this_team_nickname, first_season_id=-1, current_season_wins=0, current_season_losses=0,
+                        Team.objects.using("default").create(id=insert_team_id, nickname=this_team_nickname, first_season_id=-1, current_season_wins=0, current_season_losses=0,
                                                         stadium_id=this_team_stadium_id, conference_id=this_team_new_conference_id,
                                                         division_id=this_team_new_division_id,league_id=league_id, logo_file_path=this_team_logo_file_name)
                     except Exception as e:
                         return HttpResponse("error: " + str(e))
 
                     try:
-                        TeamCity.objects.using("xactly_dev").create(team_city_id=insert_team_city_id, team_id=insert_team_id,city_id=this_team_city_id,first_season_id=-1, stadium_id=this_team_stadium_id,league_id=league_id)
+                        TeamCity.objects.using("default").create(team_city_id=insert_team_city_id, team_id=insert_team_id,city_id=this_team_city_id,first_season_id=-1, stadium_id=this_team_stadium_id,league_id=league_id)
                     except Exception as e:
                         return HttpResponse("error: " + str(e))
 
@@ -1365,30 +1365,30 @@ def process_create_league_form_final(request):
 
         #we need to update Player with the new league_id value
         try:
-            Player.objects.using("xactly_dev").filter(league_id=league_id_hidden).update(league_id=league_id)
+            Player.objects.using("default").filter(league_id=league_id_hidden).update(league_id=league_id)
         except Exception:
             pass
 
         #update PlayerTeam with new league_id value
         try:
-            PlayerTeam.objects.using("xactly_dev").filter(league_id=league_id_hidden).update(league_id=league_id)
+            PlayerTeam.objects.using("default").filter(league_id=league_id_hidden).update(league_id=league_id)
         except Exception:
             pass
 
         #we will go backwards from how these rows were originally committed into the db to avoid fk conflicts
         #these are the old league, division and conference rows
         try:
-            Division.objects.using("xactly_dev").filter(league_id=league_id_hidden).delete()
+            Division.objects.using("default").filter(league_id=league_id_hidden).delete()
         except Exception:
             pass
 
         try:
-            Conference.objects.using("xactly_dev").filter(league_id=league_id_hidden).delete()
+            Conference.objects.using("default").filter(league_id=league_id_hidden).delete()
         except Exception:
             pass
 
         try:
-            League.objects.using("xactly_dev").filter(league_id=league_id_hidden).delete()
+            League.objects.using("default").filter(league_id=league_id_hidden).delete()
         except Exception:
             pass
 
@@ -1433,13 +1433,13 @@ def view_draft_results(request):
 
     #query the draft_pick table for all players selected with this league_id and season_id
     try:
-        draft_pick_obj_list = DraftPick.objects.using("xactly_dev").filter(draft_id=draft_id)
+        draft_pick_obj_list = DraftPick.objects.using("default").filter(draft_id=draft_id)
     except Exception:
         draft_pick_obj_list = None
 
     #get the number of teams in the league by querying Team
     try:
-        team_list = list(Team.objects.using("xactly_dev").filter(league_id=league_id).values_list('nickname', flat=True))
+        team_list = list(Team.objects.using("default").filter(league_id=league_id).values_list('nickname', flat=True))
     except Exception:
         team_list = []
 
@@ -1491,13 +1491,13 @@ def view_draft_results(request):
 
     #get season year for display
     try:
-        season_year = Season.objects.using("xactly_dev").filter(id=season_id).values_list('season_year', flat=True)[0]
+        season_year = Season.objects.using("default").filter(id=season_id).values_list('season_year', flat=True)[0]
     except Exception:
         season_year = -1
 
     #get league name abbreviation for display
     try:
-        league_abbrev = League.objects.using("xactly_dev").filter(id=league_id).values_list('abbreviation', flat=True)[0]
+        league_abbrev = League.objects.using("default").filter(id=league_id).values_list('abbreviation', flat=True)[0]
     except Exception:
         league_abbrev = "Error"
 
@@ -1534,7 +1534,7 @@ def view_draft_list(request):
     #options page
 
     try:
-        current_season_obj = Season.objects.using("xactly_dev").filter(league_id=league_id).order_by("-id")
+        current_season_obj = Season.objects.using("default").filter(league_id=league_id).order_by("-id")
     except Exception:
         context['error_msg'] = "Failed to load current season."
         context['welcome_message'] = "Draft Options"
@@ -1556,7 +1556,7 @@ def view_draft_list(request):
         #if we just created the draft list, then we'll have to calculate player draft ranks
         # query for all the players in the draft list
         try:
-            player_obj_list = Player.objects.using("xactly_dev").filter(league_id=league_id, playing_status=PlayingStatus.DRAFT)
+            player_obj_list = Player.objects.using("default").filter(league_id=league_id, playing_status=PlayingStatus.DRAFT)
         except Exception:
             context['error_msg'] = "Failed to load draft player list."
             context['welcome_message'] = "Draft Options"
@@ -1564,7 +1564,7 @@ def view_draft_list(request):
 
         # indicate that draft player list has been created by updating the Season obj's created_draft_list property
         try:
-            Season.objects.using("xactly_dev").filter(id=league_id).update(created_draft_list=True)
+            Season.objects.using("default").filter(id=league_id).update(created_draft_list=True)
         except Exception:
             context['error_msg'] = "Failed to mark player list as created in Season db table"
             context['welcome_message'] = "Draft Options"
@@ -1577,7 +1577,7 @@ def view_draft_list(request):
             player_query_dict['primary_position'] = player_filter
 
         try:
-            player_obj_list = Player.objects.using("xactly_dev").filter(**player_query_dict)
+            player_obj_list = Player.objects.using("default").filter(**player_query_dict)
         except Exception:
             context['error_msg'] = "Failed to load draft player list."
             context['welcome_message'] = "Draft Options"
@@ -1610,7 +1610,7 @@ def view_draft_list(request):
 
             # finally, insert this_player_draft_value into the Player table
             try:
-                Player.objects.using("xactly_dev").filter(id=this_player_id).update(draft_value=this_player_draft_value)
+                Player.objects.using("default").filter(id=this_player_id).update(draft_value=this_player_draft_value)
             except Exception:
                 context['error_msg'] = "Failed to update player draft value"
                 context['welcome_message'] = "Draft Options"
@@ -1630,7 +1630,7 @@ def view_draft_list(request):
         this_player_id = this_player_info_list[-1]
 
         try:
-            Player.objects.using("xactly_dev").filter(id=this_player_id).update(draft_rank=player_rank_idx)
+            Player.objects.using("default").filter(id=this_player_id).update(draft_rank=player_rank_idx)
         except Exception:
             context['error_msg'] = "Failed to update player draft rank"
             context['welcome_message'] = "Draft Options"

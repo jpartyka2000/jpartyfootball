@@ -6,7 +6,7 @@ from jpartyfb.models import PlayerSpecsQb, PlayerSpecsRb, PlayerSpecsWr, PlayerS
 
 from operator import itemgetter
 
-from AssortedEnums import PlayingStatus
+from jpartyfb.AssortedEnums import PlayingStatus
 
 import json
 import random

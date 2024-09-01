@@ -35,7 +35,7 @@ class Conference(models.Model):
 
 class DefaultTeams(models.Model):
     id = models.IntegerField(primary_key=True)
-    city = models.ForeignKey(City)
+    city = models.ForeignKey(City, on_delete=models.DO_NOTHING)
     nickname = models.CharField(max_length=25)
     logo_file_name = models.TextField()
 
@@ -465,7 +465,7 @@ class Player(models.Model):
     salary = models.IntegerField()
     height = models.CharField(max_length=4)
     weight = models.IntegerField()
-    league = models.ForeignKey(League)
+    league = models.ForeignKey(League, on_delete=models.DO_NOTHING)
     playing_status = models.IntegerField()
     draft_value = models.FloatField()
     draft_rank = models.IntegerField()
@@ -477,7 +477,7 @@ class Player(models.Model):
 
 class PlayerGamePlays(models.Model):
     id = models.IntegerField(primary_key=True)
-    player = models.ForeignKey(Player)
+    player = models.ForeignKey(Player, on_delete=models.DO_NOTHING)
     game_play_id = models.IntegerField()
 
     class Meta:
@@ -487,9 +487,9 @@ class PlayerGamePlays(models.Model):
 
 class PlayerPool(models.Model):
     id = models.IntegerField(primary_key=True)
-    player = models.ForeignKey(Player)
+    player = models.ForeignKey(Player, on_delete=models.DO_NOTHING)
     status = models.IntegerField()
-    league = models.ForeignKey(League)
+    league = models.ForeignKey(League, on_delete=models.DO_NOTHING)
 
     class Meta:
         managed = True
@@ -498,7 +498,7 @@ class PlayerPool(models.Model):
 
 class PlayerSpecsDl(models.Model):
     id = models.IntegerField(primary_key=True)
-    player = models.ForeignKey(Player)
+    player = models.ForeignKey(Player, on_delete=models.DO_NOTHING)
     block_power_rating = models.DecimalField(max_digits=5, decimal_places=2)
     block_agility_rating = models.DecimalField(max_digits=5, decimal_places=2)
     speed_rating = models.DecimalField(max_digits=5, decimal_places=2)
@@ -516,7 +516,7 @@ class PlayerSpecsDl(models.Model):
 
 class PlayerSpecsK(models.Model):
     id = models.IntegerField(primary_key=True)
-    player = models.ForeignKey(Player)
+    player = models.ForeignKey(Player, on_delete=models.DO_NOTHING)
     leg_rating = models.DecimalField(max_digits=5, decimal_places=2)
     accuracy_rating = models.DecimalField(max_digits=5, decimal_places=2)
     adjustment_rating = models.DecimalField(max_digits=5, decimal_places=2)
@@ -531,7 +531,7 @@ class PlayerSpecsK(models.Model):
 
 class PlayerSpecsOl(models.Model):
     id = models.IntegerField(primary_key=True)
-    player = models.ForeignKey(Player)
+    player = models.ForeignKey(Player, on_delete=models.DO_NOTHING)
     block_power_rating = models.DecimalField(max_digits=5, decimal_places=2)
     block_agility_rating = models.DecimalField(max_digits=5, decimal_places=2)
     penalty_avoidance_rating = models.DecimalField(max_digits=5, decimal_places=2)
@@ -545,7 +545,7 @@ class PlayerSpecsOl(models.Model):
 
 class PlayerSpecsP(models.Model):
     id = models.IntegerField(primary_key=True)
-    player = models.ForeignKey(Player)
+    player = models.ForeignKey(Player, on_delete=models.DO_NOTHING)
     leg_rating = models.DecimalField(max_digits=5, decimal_places=2)
     directionality_rating = models.DecimalField(max_digits=5, decimal_places=2)
     hangtime_rating = models.DecimalField(max_digits=5, decimal_places=2)
@@ -561,7 +561,7 @@ class PlayerSpecsP(models.Model):
 
 class PlayerSpecsQb(models.Model):
     id = models.IntegerField(primary_key=True)
-    player = models.ForeignKey(Player)
+    player = models.ForeignKey(Player, on_delete=models.DO_NOTHING)
     arm_strength_rating = models.DecimalField(max_digits=5, decimal_places=2)
     arm_accuracy_rating = models.DecimalField(max_digits=5, decimal_places=2)
     intelligence_rating = models.DecimalField(max_digits=5, decimal_places=2)
@@ -577,7 +577,7 @@ class PlayerSpecsQb(models.Model):
 
 class PlayerSpecsRb(models.Model):
     id = models.IntegerField(primary_key=True)
-    player = models.ForeignKey(Player)
+    player = models.ForeignKey(Player, on_delete=models.DO_NOTHING)
     speed_rating = models.DecimalField(max_digits=5, decimal_places=2)
     elusiveness_rating = models.DecimalField(max_digits=5, decimal_places=2)
     strength_rating = models.DecimalField(max_digits=5, decimal_places=2)
@@ -592,7 +592,7 @@ class PlayerSpecsRb(models.Model):
 
 class PlayerSpecsFb(models.Model):
     id = models.IntegerField(primary_key=True)
-    player = models.ForeignKey(Player)
+    player = models.ForeignKey(Player, on_delete=models.DO_NOTHING)
     speed_rating = models.DecimalField(max_digits=5, decimal_places=2)
     elusiveness_rating = models.DecimalField(max_digits=5, decimal_places=2)
     strength_rating = models.DecimalField(max_digits=5, decimal_places=2)
@@ -608,7 +608,7 @@ class PlayerSpecsFb(models.Model):
 
 class PlayerSpecsLb(models.Model):
     id = models.IntegerField(primary_key=True)
-    player = models.ForeignKey(Player)
+    player = models.ForeignKey(Player, on_delete=models.DO_NOTHING)
     speed_rating = models.DecimalField(max_digits=5, decimal_places=2)
     route_rating = models.DecimalField(max_digits=5, decimal_places=2)
     pass_defense_rating = models.DecimalField(max_digits=5, decimal_places=2)
@@ -624,7 +624,7 @@ class PlayerSpecsLb(models.Model):
 
 class PlayerSpecsCb(models.Model):
     id = models.IntegerField(primary_key=True)
-    player = models.ForeignKey(Player)
+    player = models.ForeignKey(Player, on_delete=models.DO_NOTHING)
     speed_rating = models.DecimalField(max_digits=5, decimal_places=2)
     route_rating = models.DecimalField(max_digits=5, decimal_places=2)
     pass_defense_rating = models.DecimalField(max_digits=5, decimal_places=2)
@@ -640,7 +640,7 @@ class PlayerSpecsCb(models.Model):
 
 class PlayerSpecsSf(models.Model):
     id = models.IntegerField(primary_key=True)
-    player = models.ForeignKey(Player)
+    player = models.ForeignKey(Player, on_delete=models.DO_NOTHING)
     speed_rating = models.DecimalField(max_digits=5, decimal_places=2)
     route_rating = models.DecimalField(max_digits=5, decimal_places=2)
     pass_defense_rating = models.DecimalField(max_digits=5, decimal_places=2)
@@ -656,7 +656,7 @@ class PlayerSpecsSf(models.Model):
 
 class PlayerSpecsStd(models.Model):
     id = models.IntegerField(primary_key=True)
-    player = models.ForeignKey(Player)
+    player = models.ForeignKey(Player, on_delete=models.DO_NOTHING)
     speed_rating = models.DecimalField(max_digits=5, decimal_places=2)
     agility_rating = models.DecimalField(max_digits=5, decimal_places=2)
     tackle_rating = models.DecimalField(max_digits=5, decimal_places=2)
@@ -670,7 +670,7 @@ class PlayerSpecsStd(models.Model):
 
 class PlayerSpecsSto(models.Model):
     id = models.IntegerField(primary_key=True)
-    player = models.ForeignKey(Player)
+    player = models.ForeignKey(Player, on_delete=models.DO_NOTHING)
     speed_rating = models.DecimalField(max_digits=5, decimal_places=2)
     elusiveness_rating = models.DecimalField(max_digits=5, decimal_places=2)
     strength_rating = models.DecimalField(max_digits=5, decimal_places=2)
@@ -684,7 +684,7 @@ class PlayerSpecsSto(models.Model):
 
 class PlayerSpecsTe(models.Model):
     id = models.IntegerField(primary_key=True)
-    player = models.ForeignKey(Player)
+    player = models.ForeignKey(Player, on_delete=models.DO_NOTHING)
     catching_rating = models.DecimalField(max_digits=5, decimal_places=2)
     route_rating = models.DecimalField(max_digits=5, decimal_places=2)
     speed_rating = models.DecimalField(max_digits=5, decimal_places=2)
@@ -702,7 +702,7 @@ class PlayerSpecsTe(models.Model):
 
 class PlayerSpecsWr(models.Model):
     id = models.IntegerField(primary_key=True)
-    player = models.ForeignKey(Player)
+    player = models.ForeignKey(Player, on_delete=models.DO_NOTHING)
     catching_rating = models.DecimalField(max_digits=5, decimal_places=2)
     route_rating = models.DecimalField(max_digits=5, decimal_places=2)
     jumping_rating = models.DecimalField(max_digits=5, decimal_places=2)
@@ -722,7 +722,7 @@ class Season(models.Model):
     start_time = models.DateTimeField()
     end_time = models.DateTimeField()
     season_year = models.IntegerField()
-    league = models.ForeignKey(League)
+    league = models.ForeignKey(League, on_delete=models.DO_NOTHING)
     created_draft_list = models.BooleanField()
 
     class Meta:
@@ -734,7 +734,7 @@ class Stadium(models.Model):
     stadium_id = models.IntegerField(primary_key=True)
     stadium_name = models.CharField(max_length=60)
     stadium_capacity = models.IntegerField()
-    city = models.ForeignKey(City)
+    city = models.ForeignKey(City, on_delete=models.DO_NOTHING)
     is_dome = models.BooleanField()
 
     class Meta:
@@ -748,10 +748,10 @@ class Team(models.Model):
     first_season_id = models.IntegerField()
     current_season_wins = models.IntegerField()
     current_season_losses = models.IntegerField()
-    stadium = models.ForeignKey(Stadium)
-    conference = models.ForeignKey(Conference)
-    division = models.ForeignKey(Division)
-    league = models.ForeignKey(League)
+    stadium = models.ForeignKey(Stadium, on_delete=models.DO_NOTHING)
+    conference = models.ForeignKey(Conference, on_delete=models.DO_NOTHING)
+    division = models.ForeignKey(Division, on_delete=models.DO_NOTHING)
+    league = models.ForeignKey(League, on_delete=models.DO_NOTHING)
     logo_file_path = models.TextField()
 
     class Meta:
@@ -760,19 +760,19 @@ class Team(models.Model):
 
 class Game(models.Model):
     id = models.IntegerField(primary_key=True)
-    season = models.ForeignKey(Season)
+    season = models.ForeignKey(Season, on_delete=models.DO_NOTHING)
     gamedate = models.DateField()
     first_team_id = models.IntegerField()
     second_team_id = models.IntegerField()
-    host_city_id = models.ForeignKey(City, db_column='host_city_id')
+    host_city_id = models.ForeignKey(City, on_delete=models.DO_NOTHING, db_column='host_city_id')
     week = models.IntegerField()
-    game_type = models.ForeignKey(GameType)
+    game_type = models.ForeignKey(GameType, on_delete=models.DO_NOTHING)
     first_team_points = models.IntegerField()
     second_team_points = models.IntegerField()
     num_overtimes = models.IntegerField()
-    stadium = models.ForeignKey(Stadium)
+    stadium = models.ForeignKey(Stadium, on_delete=models.DO_NOTHING)
     attendance = models.IntegerField()
-    league = models.ForeignKey(League)
+    league = models.ForeignKey(League, on_delete=models.DO_NOTHING)
     is_neutral_site_game = models.BooleanField()
     game_status = models.IntegerField()
 
@@ -785,7 +785,7 @@ class Draft(models.Model):
     host_city_id = models.IntegerField()
     season_id = models.IntegerField()
     num_rounds = models.IntegerField()
-    league = models.ForeignKey(League)
+    league = models.ForeignKey(League, on_delete=models.DO_NOTHING)
 
     class Meta:
         managed = True
@@ -793,11 +793,11 @@ class Draft(models.Model):
 
 class DraftPick(models.Model):
     id = models.IntegerField(primary_key=True)
-    draft = models.ForeignKey(Draft)
+    draft = models.ForeignKey(Draft, on_delete=models.DO_NOTHING)
     round = models.IntegerField()
     pick_number = models.IntegerField()
-    team = models.ForeignKey(Team)
-    player = models.ForeignKey(Player)
+    team = models.ForeignKey(Team, on_delete=models.DO_NOTHING)
+    player = models.ForeignKey(Player, on_delete=models.DO_NOTHING)
 
     class Meta:
         managed = True
@@ -805,10 +805,10 @@ class DraftPick(models.Model):
 
 class PlayerTeam(models.Model):
     player_team_id = models.IntegerField(primary_key=True)
-    player = models.ForeignKey(Player)
-    team = models.ForeignKey(Team)
+    player = models.ForeignKey(Player, on_delete=models.DO_NOTHING)
+    team = models.ForeignKey(Team, on_delete=models.DO_NOTHING)
     season_id = models.IntegerField()
-    league = models.ForeignKey(League)
+    league = models.ForeignKey(League, on_delete=models.DO_NOTHING)
 
     class Meta:
         managed = True
@@ -816,11 +816,11 @@ class PlayerTeam(models.Model):
 
 class TeamCity(models.Model):
     team_city_id = models.IntegerField(primary_key=True)
-    team = models.ForeignKey(Team)
-    city = models.ForeignKey(City)
+    team = models.ForeignKey(Team, on_delete=models.DO_NOTHING)
+    city = models.ForeignKey(City, on_delete=models.DO_NOTHING)
     first_season_id = models.IntegerField()
-    stadium = models.ForeignKey(Stadium)
-    league = models.ForeignKey(League)
+    stadium = models.ForeignKey(Stadium, on_delete=models.DO_NOTHING)
+    league = models.ForeignKey(League, on_delete=models.DO_NOTHING)
 
     class Meta:
         managed = True
@@ -829,9 +829,9 @@ class TeamCity(models.Model):
 
 class TeamSeason(models.Model):
     id = models.IntegerField(primary_key=True)
-    team = models.ForeignKey(Team)
-    season = models.ForeignKey(Season)
-    league = models.ForeignKey(League)
+    team = models.ForeignKey(Team, on_delete=models.DO_NOTHING)
+    season = models.ForeignKey(Season, on_delete=models.DO_NOTHING)
+    league = models.ForeignKey(League, on_delete=models.DO_NOTHING)
     preseason_power_ranking = models.DecimalField(max_digits=5, decimal_places=2)
 
     class Meta:
