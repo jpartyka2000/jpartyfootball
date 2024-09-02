@@ -304,13 +304,15 @@
             success: function(data) {
 
                //alert(JSON.stringify(data))
+               //return
+               
                $("#loading_image").hide()
                //return
 
                if (data == "-1") {
                    alert("Error in trying to save to League db table")
                    return
-               }
+               } 
 
                if (data == "-2") {
                    alert("Error in trying to save to Conference db table")

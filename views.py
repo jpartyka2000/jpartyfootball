@@ -1199,7 +1199,8 @@ def process_create_league_form_final(request):
                                                         division_id=this_team_division_id,league_id=league_id, logo_file_path=this_team_logo_file_name)
 
                 db_commit_to_delete_id_dict['Team'] = first_team_id
-            except Exception:
+            except Exception as e:
+                exception_str = str(e)
                 retract_prior_db_commits(db_commit_to_delete_id_dict)
                 return HttpResponse(-4)
 
