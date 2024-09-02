@@ -91,7 +91,7 @@ def calculate_player_draft_value(this_player_id, this_player_primary_position):
     if this_player_primary_position == 'dl':
 
         try:
-            player_stats_obj = PlayerSpecsDl.objects.using('xactly_dev').filter(player_id=this_player_id)
+            player_stats_obj = PlayerSpecsDl.objects.using('default').filter(player_id=this_player_id)
         except Exception:
             return 0.0
 
@@ -101,7 +101,7 @@ def calculate_player_draft_value(this_player_id, this_player_primary_position):
     elif this_player_primary_position == 'cb':
 
         try:
-            player_stats_obj = PlayerSpecsCb.objects.using('xactly_dev').filter(player_id=this_player_id)
+            player_stats_obj = PlayerSpecsCb.objects.using('default').filter(player_id=this_player_id)
         except Exception:
             return 0.0
 
@@ -111,7 +111,7 @@ def calculate_player_draft_value(this_player_id, this_player_primary_position):
     elif this_player_primary_position == 'fb':
 
         try:
-            player_stats_obj = PlayerSpecsFb.objects.using('xactly_dev').filter(player_id=this_player_id)
+            player_stats_obj = PlayerSpecsFb.objects.using('default').filter(player_id=this_player_id)
         except Exception:
             return 0.0
 
@@ -121,7 +121,7 @@ def calculate_player_draft_value(this_player_id, this_player_primary_position):
     elif this_player_primary_position == 'k':
 
         try:
-            player_stats_obj = PlayerSpecsK.objects.using('xactly_dev').filter(player_id=this_player_id)
+            player_stats_obj = PlayerSpecsK.objects.using('default').filter(player_id=this_player_id)
         except Exception:
             return 0.0
 
@@ -131,7 +131,7 @@ def calculate_player_draft_value(this_player_id, this_player_primary_position):
     elif this_player_primary_position == 'lb':
 
         try:
-            player_stats_obj = PlayerSpecsLb.objects.using('xactly_dev').filter(player_id=this_player_id)
+            player_stats_obj = PlayerSpecsLb.objects.using('default').filter(player_id=this_player_id)
         except Exception:
             return 0.0
 
@@ -141,7 +141,7 @@ def calculate_player_draft_value(this_player_id, this_player_primary_position):
     elif this_player_primary_position == 'ol':
 
         try:
-            player_stats_obj = PlayerSpecsOl.objects.using('xactly_dev').filter(player_id=this_player_id)
+            player_stats_obj = PlayerSpecsOl.objects.using('default').filter(player_id=this_player_id)
         except Exception:
             return 0.0
 
@@ -151,7 +151,7 @@ def calculate_player_draft_value(this_player_id, this_player_primary_position):
     elif this_player_primary_position == 'p':
 
         try:
-            player_stats_obj = PlayerSpecsP.objects.using('xactly_dev').filter(player_id=this_player_id)
+            player_stats_obj = PlayerSpecsP.objects.using('default').filter(player_id=this_player_id)
         except Exception:
             return 0.0
 
@@ -161,7 +161,7 @@ def calculate_player_draft_value(this_player_id, this_player_primary_position):
     elif this_player_primary_position == 'qb':
 
         try:
-            player_stats_obj = PlayerSpecsQb.objects.using('xactly_dev').filter(player_id=this_player_id)
+            player_stats_obj = PlayerSpecsQb.objects.using('default').filter(player_id=this_player_id)
         except Exception:
             return 0.0
 
@@ -171,7 +171,7 @@ def calculate_player_draft_value(this_player_id, this_player_primary_position):
     elif this_player_primary_position == 'rb':
 
         try:
-            player_stats_obj = PlayerSpecsRb.objects.using('xactly_dev').filter(player_id=this_player_id)
+            player_stats_obj = PlayerSpecsRb.objects.using('default').filter(player_id=this_player_id)
         except Exception:
             return 0.0
 
@@ -181,7 +181,7 @@ def calculate_player_draft_value(this_player_id, this_player_primary_position):
     elif this_player_primary_position == 'sf':
 
         try:
-            player_stats_obj = PlayerSpecsSf.objects.using('xactly_dev').filter(player_id=this_player_id)
+            player_stats_obj = PlayerSpecsSf.objects.using('default').filter(player_id=this_player_id)
         except Exception:
             return 0.0
 
@@ -191,7 +191,7 @@ def calculate_player_draft_value(this_player_id, this_player_primary_position):
     elif this_player_primary_position == 'std':
 
         try:
-            player_stats_obj = PlayerSpecsStd.objects.using('xactly_dev').filter(player_id=this_player_id)
+            player_stats_obj = PlayerSpecsStd.objects.using('default').filter(player_id=this_player_id)
         except Exception:
             return 0.0
 
@@ -201,7 +201,7 @@ def calculate_player_draft_value(this_player_id, this_player_primary_position):
     elif this_player_primary_position == 'sto':
 
         try:
-            player_stats_obj = PlayerSpecsSto.objects.using('xactly_dev').filter(player_id=this_player_id)
+            player_stats_obj = PlayerSpecsSto.objects.using('default').filter(player_id=this_player_id)
         except Exception:
             return 0.0
 
@@ -211,7 +211,7 @@ def calculate_player_draft_value(this_player_id, this_player_primary_position):
     elif this_player_primary_position == 'te':
 
         try:
-            player_stats_obj = PlayerSpecsTe.objects.using('xactly_dev').filter(player_id=this_player_id)
+            player_stats_obj = PlayerSpecsTe.objects.using('default').filter(player_id=this_player_id)
         except Exception:
             return 0.0
 
@@ -221,7 +221,7 @@ def calculate_player_draft_value(this_player_id, this_player_primary_position):
     elif this_player_primary_position == 'wr':
 
         try:
-            player_stats_obj = PlayerSpecsWr.objects.using('xactly_dev').filter(player_id=this_player_id)
+            player_stats_obj = PlayerSpecsWr.objects.using('default').filter(player_id=this_player_id)
         except Exception:
             return 0.0
 
@@ -317,7 +317,7 @@ def determine_draft_picks(league_id, season_id):
     #check to see if this draft has already been created - if so, then return 1. This may only be a relevant
     #check for debugging purposes
     try:
-        draft_exists_obj = Draft.objects.using('xactly_dev').filter(league_id=league_id, season_id=season_id)
+        draft_exists_obj = Draft.objects.using('default').filter(league_id=league_id, season_id=season_id)
     except Exception:
         return -1, None
 
@@ -327,36 +327,36 @@ def determine_draft_picks(league_id, season_id):
 
     #first, create a row in the Draft table - this officially starts the draft
     try:
-        draft_id = int(Draft.objects.using('xactly_dev').latest('id').id) + 1
+        draft_id = int(Draft.objects.using('default').latest('id').id) + 1
     except Exception:
         draft_id = 1
 
     # determine the host city - it is completely random
     try:
-        city_id_list = City.objects.using("xactly_dev").all().values_list('city_id', flat=True)
+        city_id_list = City.objects.using("default").all().values_list('city_id', flat=True)
     except Exception:
         return -1, draft_id
 
     draft_host_city_id = random.choice(city_id_list)
 
     try:
-        Draft.objects.using('xactly_dev').create(id=draft_id, host_city_id=draft_host_city_id, season_id=season_id, num_rounds=NUMBER_OF_DRAFT_ROUNDS, league_id=league_id)
+        Draft.objects.using('default').create(id=draft_id, host_city_id=draft_host_city_id, season_id=season_id, num_rounds=NUMBER_OF_DRAFT_ROUNDS, league_id=league_id)
     except Exception:
         return -1, draft_id
 
     try:
-        draft_pick_id = int(DraftPick.objects.using('xactly_dev').latest('id').id) + 1
+        draft_pick_id = int(DraftPick.objects.using('default').latest('id').id) + 1
     except Exception:
         draft_pick_id = 1
 
     try:
-        player_team_id = int(PlayerTeam.objects.using('xactly_dev').latest('player_team_id').player_team_id) + 1
+        player_team_id = int(PlayerTeam.objects.using('default').latest('player_team_id').player_team_id) + 1
     except Exception:
         player_team_id = 1
 
     #first, get all teams in this league by querying Team table
     try:
-        team_obj_list = Team.objects.using("xactly_dev").filter(league_id=league_id)
+        team_obj_list = Team.objects.using("default").filter(league_id=league_id)
     except Exception:
         team_obj_list = None
 
@@ -383,7 +383,7 @@ def determine_draft_picks(league_id, season_id):
     #drafting order for teams. Otherwise, it will be determined by league rankings of the teams.
 
     try:
-        season_obj = Season.objects.using("xactly_dev").filter(id=season_id)
+        season_obj = Season.objects.using("default").filter(id=season_id)
     except Exception:
         season_obj = None
 
@@ -411,7 +411,7 @@ def determine_draft_picks(league_id, season_id):
     #it randomly by +- 6
 
     try:
-        draft_player_obj_list = Player.objects.using("xactly_dev").filter(league_id=league_id, playing_status=PlayingStatus.DRAFT).order_by("-draft_value")
+        draft_player_obj_list = Player.objects.using("default").filter(league_id=league_id, playing_status=PlayingStatus.DRAFT).order_by("-draft_value")
     except Exception:
         draft_player_obj_list = None
 
@@ -445,7 +445,7 @@ def determine_draft_picks(league_id, season_id):
     #get all players in this league that are already on teams and create data structure to hold their information
 
     try:
-        roster_player_team_obj_list = PlayerTeam.objects.using("xactly_dev").filter(league_id=league_id)
+        roster_player_team_obj_list = PlayerTeam.objects.using("default").filter(league_id=league_id)
     except Exception:
         roster_player_team_obj_list = None
 
@@ -464,7 +464,7 @@ def determine_draft_picks(league_id, season_id):
             if this_player_primary_position == 'dl':
 
                 try:
-                    player_stats_obj = PlayerSpecsDl.objects.using('xactly_dev').filter(player_id=this_player_id)
+                    player_stats_obj = PlayerSpecsDl.objects.using('default').filter(player_id=this_player_id)
                 except Exception:
                     return -1, draft_id
 
@@ -474,7 +474,7 @@ def determine_draft_picks(league_id, season_id):
             elif this_player_primary_position == 'cb':
 
                 try:
-                    player_stats_obj = PlayerSpecsCb.objects.using('xactly_dev').filter(player_id=this_player_id)
+                    player_stats_obj = PlayerSpecsCb.objects.using('default').filter(player_id=this_player_id)
                 except Exception:
                     return -1, draft_id
 
@@ -484,7 +484,7 @@ def determine_draft_picks(league_id, season_id):
             elif this_player_primary_position == 'fb':
 
                 try:
-                    player_stats_obj = PlayerSpecsFb.objects.using('xactly_dev').filter(player_id=this_player_id)
+                    player_stats_obj = PlayerSpecsFb.objects.using('default').filter(player_id=this_player_id)
                 except Exception:
                     return -1, draft_id
 
@@ -494,7 +494,7 @@ def determine_draft_picks(league_id, season_id):
             elif this_player_primary_position == 'k':
 
                 try:
-                    player_stats_obj = PlayerSpecsK.objects.using('xactly_dev').filter(player_id=this_player_id)
+                    player_stats_obj = PlayerSpecsK.objects.using('default').filter(player_id=this_player_id)
                 except Exception:
                     return -1, draft_id
 
@@ -504,7 +504,7 @@ def determine_draft_picks(league_id, season_id):
             elif this_player_primary_position == 'lb':
 
                 try:
-                    player_stats_obj = PlayerSpecsLb.objects.using('xactly_dev').filter(player_id=this_player_id)
+                    player_stats_obj = PlayerSpecsLb.objects.using('default').filter(player_id=this_player_id)
                 except Exception:
                     return -1, draft_id
 
@@ -514,7 +514,7 @@ def determine_draft_picks(league_id, season_id):
             elif this_player_primary_position == 'ol':
 
                 try:
-                    player_stats_obj = PlayerSpecsOl.objects.using('xactly_dev').filter(player_id=this_player_id)
+                    player_stats_obj = PlayerSpecsOl.objects.using('default').filter(player_id=this_player_id)
                 except Exception:
                     return -1, draft_id
 
@@ -524,7 +524,7 @@ def determine_draft_picks(league_id, season_id):
             elif this_player_primary_position == 'p':
 
                 try:
-                    player_stats_obj = PlayerSpecsP.objects.using('xactly_dev').filter(player_id=this_player_id)
+                    player_stats_obj = PlayerSpecsP.objects.using('default').filter(player_id=this_player_id)
                 except Exception:
                     return -1, draft_id
 
@@ -534,7 +534,7 @@ def determine_draft_picks(league_id, season_id):
             elif this_player_primary_position == 'qb':
 
                 try:
-                    player_stats_obj = PlayerSpecsQb.objects.using('xactly_dev').filter(player_id=this_player_id)
+                    player_stats_obj = PlayerSpecsQb.objects.using('default').filter(player_id=this_player_id)
                 except Exception:
                     return -1, draft_id
 
@@ -544,7 +544,7 @@ def determine_draft_picks(league_id, season_id):
             elif this_player_primary_position == 'rb':
 
                 try:
-                    player_stats_obj = PlayerSpecsRb.objects.using('xactly_dev').filter(player_id=this_player_id)
+                    player_stats_obj = PlayerSpecsRb.objects.using('default').filter(player_id=this_player_id)
                 except Exception:
                     return -1, draft_id
 
@@ -554,7 +554,7 @@ def determine_draft_picks(league_id, season_id):
             elif this_player_primary_position == 'sf':
 
                 try:
-                    player_stats_obj = PlayerSpecsSf.objects.using('xactly_dev').filter(player_id=this_player_id)
+                    player_stats_obj = PlayerSpecsSf.objects.using('default').filter(player_id=this_player_id)
                 except Exception:
                     return -1, draft_id
 
@@ -564,7 +564,7 @@ def determine_draft_picks(league_id, season_id):
             elif this_player_primary_position == 'std':
 
                 try:
-                    player_stats_obj = PlayerSpecsStd.objects.using('xactly_dev').filter(player_id=this_player_id)
+                    player_stats_obj = PlayerSpecsStd.objects.using('default').filter(player_id=this_player_id)
                 except Exception:
                     return -1, draft_id
 
@@ -574,7 +574,7 @@ def determine_draft_picks(league_id, season_id):
             elif this_player_primary_position == 'sto':
 
                 try:
-                    player_stats_obj = PlayerSpecsSto.objects.using('xactly_dev').filter(player_id=this_player_id)
+                    player_stats_obj = PlayerSpecsSto.objects.using('default').filter(player_id=this_player_id)
                 except Exception:
                     return -1, draft_id
 
@@ -584,7 +584,7 @@ def determine_draft_picks(league_id, season_id):
             elif this_player_primary_position == 'te':
 
                 try:
-                    player_stats_obj = PlayerSpecsTe.objects.using('xactly_dev').filter(player_id=this_player_id)
+                    player_stats_obj = PlayerSpecsTe.objects.using('default').filter(player_id=this_player_id)
                 except Exception:
                     return -1, draft_id
 
@@ -594,7 +594,7 @@ def determine_draft_picks(league_id, season_id):
             elif this_player_primary_position == 'wr':
 
                 try:
-                    player_stats_obj = PlayerSpecsWr.objects.using('xactly_dev').filter(player_id=this_player_id)
+                    player_stats_obj = PlayerSpecsWr.objects.using('default').filter(player_id=this_player_id)
                 except Exception:
                     return -1, draft_id
 
@@ -722,13 +722,13 @@ def determine_draft_picks(league_id, season_id):
 
             #we will need to perform an update on Player to make player_status = 0 for this player_id
             try:
-                Player.objects.using("xactly_dev").filter(id=this_team_id_player_id_selected).update(playing_status=PlayingStatus.ROSTER)
+                Player.objects.using("default").filter(id=this_team_id_player_id_selected).update(playing_status=PlayingStatus.ROSTER)
             except Exception:
                 return -1, draft_id
 
             # we will need to insert a new row into PlayerTeam for this player_id
             try:
-                PlayerTeam.objects.using('xactly_dev').create(player_team_id=player_team_id, player_id=this_team_id_player_id_selected, team_id=this_team_id, season_id=season_id, league_id=league_id)
+                PlayerTeam.objects.using('default').create(player_team_id=player_team_id, player_id=this_team_id_player_id_selected, team_id=this_team_id, season_id=season_id, league_id=league_id)
 
                 player_team_id += 1
             except Exception:
@@ -736,7 +736,7 @@ def determine_draft_picks(league_id, season_id):
 
             #we will need to insert a new row into draft pick for this pick
             try:
-                DraftPick.objects.using('xactly_dev').create(id=draft_pick_id, draft_id=draft_id, round=round_num, pick_number=round_pick_number, team_id=this_team_id, player_id=this_team_id_player_id_selected)
+                DraftPick.objects.using('default').create(id=draft_pick_id, draft_id=draft_id, round=round_num, pick_number=round_pick_number, team_id=this_team_id, player_id=this_team_id_player_id_selected)
 
                 draft_pick_id += 1
             except Exception:

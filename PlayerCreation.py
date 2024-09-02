@@ -551,7 +551,7 @@ def initialize_spec_db_table_ids(player_position_list):
     # get initial db table ids for all position spec db tables
     try:
         player_specs_dl_id = int(
-            PlayerSpecsDl.objects.using('xactly_dev').latest('id').id) + 1
+            PlayerSpecsDl.objects.using('default').latest('id').id) + 1
     except Exception:
         player_specs_dl_id = 1
 
@@ -559,7 +559,7 @@ def initialize_spec_db_table_ids(player_position_list):
 
     try:
         player_specs_cb_id = int(
-            PlayerSpecsCb.objects.using('xactly_dev').latest('id').id) + 1
+            PlayerSpecsCb.objects.using('default').latest('id').id) + 1
     except Exception:
         player_specs_cb_id = 1
 
@@ -567,7 +567,7 @@ def initialize_spec_db_table_ids(player_position_list):
 
     try:
         player_specs_fb_id = int(
-            PlayerSpecsFb.objects.using('xactly_dev').latest('id').id) + 1
+            PlayerSpecsFb.objects.using('default').latest('id').id) + 1
     except Exception:
         player_specs_fb_id = 1
 
@@ -575,7 +575,7 @@ def initialize_spec_db_table_ids(player_position_list):
 
     try:
         player_specs_k_id = int(
-            PlayerSpecsK.objects.using('xactly_dev').latest('id').id) + 1
+            PlayerSpecsK.objects.using('default').latest('id').id) + 1
     except Exception:
         player_specs_k_id = 1
 
@@ -583,7 +583,7 @@ def initialize_spec_db_table_ids(player_position_list):
 
     try:
         player_specs_lb_id = int(
-            PlayerSpecsLb.objects.using('xactly_dev').latest('id').id) + 1
+            PlayerSpecsLb.objects.using('default').latest('id').id) + 1
     except Exception:
         player_specs_lb_id = 1
 
@@ -591,7 +591,7 @@ def initialize_spec_db_table_ids(player_position_list):
 
     try:
         player_specs_ol_id = int(
-            PlayerSpecsOl.objects.using('xactly_dev').latest('id').id) + 1
+            PlayerSpecsOl.objects.using('default').latest('id').id) + 1
     except Exception:
         player_specs_ol_id = 1
 
@@ -599,7 +599,7 @@ def initialize_spec_db_table_ids(player_position_list):
 
     try:
         player_specs_p_id = int(
-            PlayerSpecsP.objects.using('xactly_dev').latest('id').id) + 1
+            PlayerSpecsP.objects.using('default').latest('id').id) + 1
     except Exception:
         player_specs_p_id = 1
 
@@ -607,7 +607,7 @@ def initialize_spec_db_table_ids(player_position_list):
 
     try:
         player_specs_qb_id = int(
-            PlayerSpecsQb.objects.using('xactly_dev').latest('id').id) + 1
+            PlayerSpecsQb.objects.using('default').latest('id').id) + 1
     except Exception:
         player_specs_qb_id = 1
 
@@ -615,7 +615,7 @@ def initialize_spec_db_table_ids(player_position_list):
 
     try:
         player_specs_rb_id = int(
-            PlayerSpecsRb.objects.using('xactly_dev').latest('id').id) + 1
+            PlayerSpecsRb.objects.using('default').latest('id').id) + 1
     except Exception:
         player_specs_rb_id = 1
 
@@ -623,7 +623,7 @@ def initialize_spec_db_table_ids(player_position_list):
 
     try:
         player_specs_sf_id = int(
-            PlayerSpecsSf.objects.using('xactly_dev').latest('id').id) + 1
+            PlayerSpecsSf.objects.using('default').latest('id').id) + 1
     except Exception:
         player_specs_sf_id = 1
 
@@ -631,7 +631,7 @@ def initialize_spec_db_table_ids(player_position_list):
 
     try:
         player_specs_std_id = int(
-            PlayerSpecsStd.objects.using('xactly_dev').latest('id').id) + 1
+            PlayerSpecsStd.objects.using('default').latest('id').id) + 1
     except Exception:
         player_specs_std_id = 1
 
@@ -639,7 +639,7 @@ def initialize_spec_db_table_ids(player_position_list):
 
     try:
         player_specs_sto_id = int(
-            PlayerSpecsSto.objects.using('xactly_dev').latest('id').id) + 1
+            PlayerSpecsSto.objects.using('default').latest('id').id) + 1
     except Exception:
         player_specs_sto_id = 1
 
@@ -647,7 +647,7 @@ def initialize_spec_db_table_ids(player_position_list):
 
     try:
         player_specs_te_id = int(
-            PlayerSpecsTe.objects.using('xactly_dev').latest('id').id) + 1
+            PlayerSpecsTe.objects.using('default').latest('id').id) + 1
     except Exception:
         player_specs_te_id = 1
 
@@ -655,7 +655,7 @@ def initialize_spec_db_table_ids(player_position_list):
 
     try:
         player_specs_wr_id = int(
-            PlayerSpecsWr.objects.using('xactly_dev').latest('id').id) + 1
+            PlayerSpecsWr.objects.using('default').latest('id').id) + 1
     except Exception:
         player_specs_wr_id = 1
 
@@ -671,14 +671,14 @@ def create_players(team_name_list, team_name_to_team_id_dict, league_id, female_
 
     # get latest id value of player
     try:
-        player_id = int(Player.objects.using('xactly_dev').latest('id').id) + 1
+        player_id = int(Player.objects.using('default').latest('id').id) + 1
     except Exception:
         player_id = 1
 
     first_player_id = player_id
 
     try:
-        player_team_id = int(PlayerTeam.objects.using('xactly_dev').latest('player_team_id').player_team_id) + 1
+        player_team_id = int(PlayerTeam.objects.using('default').latest('player_team_id').player_team_id) + 1
     except Exception:
         player_team_id = 1
 
@@ -903,7 +903,7 @@ def create_players(team_name_list, team_name_to_team_id_dict, league_id, female_
             #create Player db object
             try:
                 this_player_db_obj = Player(**this_player_dict)
-                this_player_db_obj.save(using="xactly_dev")
+                this_player_db_obj.save(using="default")
                 db_commit_to_delete_id_dict["Player"] = first_player_id
             except Exception as e:
                 exception_str = str(e)
@@ -916,7 +916,7 @@ def create_players(team_name_list, team_name_to_team_id_dict, league_id, female_
                 #Create PlayerTeam db object
                 try:
                     this_player_team_db_obj = PlayerTeam(player_team_id=player_team_id, player_id=player_id, team_id=this_team_id, season_id=1, league_id=league_id)
-                    this_player_team_db_obj.save(using="xactly_dev")
+                    this_player_team_db_obj.save(using="default")
                     db_commit_to_delete_id_dict["PlayerTeam"] = first_player_team_id
                 except Exception as e:
                     exception_str = str(e)
@@ -960,7 +960,7 @@ def create_players(team_name_list, team_name_to_team_id_dict, league_id, female_
                 elif player_position == 'std':
                     player_specs_db_obj = PlayerSpecsStd(id=player_position_to_db_id_dict[player_position], player_id=player_id, career_arc_dict=str(this_player_career_arc_list_dict), **this_player_attribute_value_dict)
 
-                player_specs_db_obj.save(using="xactly_dev")
+                player_specs_db_obj.save(using="default")
                 db_commit_to_delete_id_dict["PlayerSpec"] = first_ids_player_position_to_db_id_dict
 
             except Exception as e:

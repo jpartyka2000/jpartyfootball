@@ -192,7 +192,7 @@ def create_season_schedule(league_id, season_id):
 
     #first,we need to get the league settings
     try:
-        league_obj = League.objects.using("xactly_dev").filter(id=league_id)
+        league_obj = League.objects.using("default").filter(id=league_id)
     except Exception:
         return -1
 
@@ -206,7 +206,7 @@ def create_season_schedule(league_id, season_id):
 
     #get the teams associated with this league_id and season_id
     try:
-        team_obj_list = TeamSeason.objects.using("xactly_dev").filter(league_id=league_id, season_id=season_id)
+        team_obj_list = TeamSeason.objects.using("default").filter(league_id=league_id, season_id=season_id)
     except Exception:
         return -1
 
@@ -2116,13 +2116,13 @@ def create_season_schedule(league_id, season_id):
                 team_id_to_game_inserted_dict[this_team_id][this_week_number] = False
 
         try:
-            game_id = int(Game.objects.using('xactly_dev').latest('id').id) + 1
+            game_id = int(Game.objects.using('default').latest('id').id) + 1
         except Exception:
             game_id = 1
 
         #create neutral_site_city_id_list
         try:
-            neutral_site_city_obj_list = City.objects.using('xactly_dev').filter(city_id__gte=33)
+            neutral_site_city_obj_list = City.objects.using('default').filter(city_id__gte=33)
         except Exception:
             neutral_site_city_obj_list = []
 
@@ -2143,7 +2143,7 @@ def create_season_schedule(league_id, season_id):
         team_id_to_city_id_dict = {}
 
         try:
-            team_city_obj_list = TeamCity.objects.using('xactly_dev').filter(league_id=league_id)
+            team_city_obj_list = TeamCity.objects.using('default').filter(league_id=league_id)
         except Exception:
             team_city_obj_list = []
 
@@ -2161,7 +2161,7 @@ def create_season_schedule(league_id, season_id):
 
         #finally, finish mapping city_id_to_stadium_id_dict
         try:
-            stadium_obj_list = Stadium.objects.using('xactly_dev').all()
+            stadium_obj_list = Stadium.objects.using('default').all()
         except Exception:
             stadium_obj_list = []
 
@@ -2233,7 +2233,7 @@ def create_season_schedule(league_id, season_id):
                 this_game_obj_dict['game_status'] = 0
 
                 this_game_db_obj = Game(**this_game_obj_dict)
-                this_game_db_obj.save(using="xactly_dev")
+                this_game_db_obj.save(using="default")
 
                 #mark this game as inserted into DB
                 team_id_to_game_inserted_dict[this_team_id][this_week_number] = True

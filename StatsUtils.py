@@ -18,7 +18,7 @@ def calculate_team_preseason_power_rankings(league_id, season_id):
 
     #get all players by querying PlayerTeam for this league_id and season_id
     try:
-        player_team_obj_list = PlayerTeam.objects.using('xactly_dev').filter(league_id=league_id, season_id=season_id).order_by("team_id")
+        player_team_obj_list = PlayerTeam.objects.using('default').filter(league_id=league_id, season_id=season_id).order_by("team_id")
     except Exception:
         return -1, team_id_to_power_ranking_dict
 
@@ -49,7 +49,7 @@ def calculate_team_preseason_power_rankings(league_id, season_id):
 
         #update TeamSeason row with this_team_power_ranking for this season_id
         try:
-            TeamSeason.objects.using('xactly_dev').filter(league_id=league_id, season_id=season_id, team_id=this_team_id).update(preseason_power_ranking=this_team_power_ranking)
+            TeamSeason.objects.using('default').filter(league_id=league_id, season_id=season_id, team_id=this_team_id).update(preseason_power_ranking=this_team_power_ranking)
         except Exception:
             return -1, {}
 
@@ -64,7 +64,7 @@ def calculate_this_season_player_value(this_player_id, current_season_index, thi
     if this_player_primary_position == 'dl':
 
         try:
-            player_stats_obj = PlayerSpecsDl.objects.using('xactly_dev').filter(player_id=this_player_id)
+            player_stats_obj = PlayerSpecsDl.objects.using('default').filter(player_id=this_player_id)
         except Exception:
             return 0.0
 
@@ -74,7 +74,7 @@ def calculate_this_season_player_value(this_player_id, current_season_index, thi
     elif this_player_primary_position == 'cb':
 
         try:
-            player_stats_obj = PlayerSpecsCb.objects.using('xactly_dev').filter(player_id=this_player_id)
+            player_stats_obj = PlayerSpecsCb.objects.using('default').filter(player_id=this_player_id)
         except Exception:
             return 0.0
 
@@ -84,7 +84,7 @@ def calculate_this_season_player_value(this_player_id, current_season_index, thi
     elif this_player_primary_position == 'fb':
 
         try:
-            player_stats_obj = PlayerSpecsFb.objects.using('xactly_dev').filter(player_id=this_player_id)
+            player_stats_obj = PlayerSpecsFb.objects.using('default').filter(player_id=this_player_id)
         except Exception:
             return 0.0
 
@@ -94,7 +94,7 @@ def calculate_this_season_player_value(this_player_id, current_season_index, thi
     elif this_player_primary_position == 'k':
 
         try:
-            player_stats_obj = PlayerSpecsK.objects.using('xactly_dev').filter(player_id=this_player_id)
+            player_stats_obj = PlayerSpecsK.objects.using('default').filter(player_id=this_player_id)
         except Exception:
             return 0.0
 
@@ -104,7 +104,7 @@ def calculate_this_season_player_value(this_player_id, current_season_index, thi
     elif this_player_primary_position == 'lb':
 
         try:
-            player_stats_obj = PlayerSpecsLb.objects.using('xactly_dev').filter(player_id=this_player_id)
+            player_stats_obj = PlayerSpecsLb.objects.using('default').filter(player_id=this_player_id)
         except Exception:
             return 0.0
 
@@ -114,7 +114,7 @@ def calculate_this_season_player_value(this_player_id, current_season_index, thi
     elif this_player_primary_position == 'ol':
 
         try:
-            player_stats_obj = PlayerSpecsOl.objects.using('xactly_dev').filter(player_id=this_player_id)
+            player_stats_obj = PlayerSpecsOl.objects.using('default').filter(player_id=this_player_id)
         except Exception:
             return 0.0
 
@@ -124,7 +124,7 @@ def calculate_this_season_player_value(this_player_id, current_season_index, thi
     elif this_player_primary_position == 'p':
 
         try:
-            player_stats_obj = PlayerSpecsP.objects.using('xactly_dev').filter(player_id=this_player_id)
+            player_stats_obj = PlayerSpecsP.objects.using('default').filter(player_id=this_player_id)
         except Exception:
             return 0.0
 
@@ -134,7 +134,7 @@ def calculate_this_season_player_value(this_player_id, current_season_index, thi
     elif this_player_primary_position == 'qb':
 
         try:
-            player_stats_obj = PlayerSpecsQb.objects.using('xactly_dev').filter(player_id=this_player_id)
+            player_stats_obj = PlayerSpecsQb.objects.using('default').filter(player_id=this_player_id)
         except Exception:
             return 0.0
 
@@ -144,7 +144,7 @@ def calculate_this_season_player_value(this_player_id, current_season_index, thi
     elif this_player_primary_position == 'rb':
 
         try:
-            player_stats_obj = PlayerSpecsRb.objects.using('xactly_dev').filter(player_id=this_player_id)
+            player_stats_obj = PlayerSpecsRb.objects.using('default').filter(player_id=this_player_id)
         except Exception:
             return 0.0
 
@@ -154,7 +154,7 @@ def calculate_this_season_player_value(this_player_id, current_season_index, thi
     elif this_player_primary_position == 'sf':
 
         try:
-            player_stats_obj = PlayerSpecsSf.objects.using('xactly_dev').filter(player_id=this_player_id)
+            player_stats_obj = PlayerSpecsSf.objects.using('default').filter(player_id=this_player_id)
         except Exception:
             return 0.0
 
@@ -164,7 +164,7 @@ def calculate_this_season_player_value(this_player_id, current_season_index, thi
     elif this_player_primary_position == 'std':
 
         try:
-            player_stats_obj = PlayerSpecsStd.objects.using('xactly_dev').filter(player_id=this_player_id)
+            player_stats_obj = PlayerSpecsStd.objects.using('default').filter(player_id=this_player_id)
         except Exception:
             return 0.0
 
@@ -174,7 +174,7 @@ def calculate_this_season_player_value(this_player_id, current_season_index, thi
     elif this_player_primary_position == 'sto':
 
         try:
-            player_stats_obj = PlayerSpecsSto.objects.using('xactly_dev').filter(player_id=this_player_id)
+            player_stats_obj = PlayerSpecsSto.objects.using('default').filter(player_id=this_player_id)
         except Exception:
             return 0.0
 
@@ -184,7 +184,7 @@ def calculate_this_season_player_value(this_player_id, current_season_index, thi
     elif this_player_primary_position == 'te':
 
         try:
-            player_stats_obj = PlayerSpecsTe.objects.using('xactly_dev').filter(player_id=this_player_id)
+            player_stats_obj = PlayerSpecsTe.objects.using('default').filter(player_id=this_player_id)
         except Exception:
             return 0.0
 
@@ -194,7 +194,7 @@ def calculate_this_season_player_value(this_player_id, current_season_index, thi
     elif this_player_primary_position == 'wr':
 
         try:
-            player_stats_obj = PlayerSpecsWr.objects.using('xactly_dev').filter(player_id=this_player_id)
+            player_stats_obj = PlayerSpecsWr.objects.using('default').filter(player_id=this_player_id)
         except Exception:
             return 0.0
 

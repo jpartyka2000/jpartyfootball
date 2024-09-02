@@ -1916,7 +1916,7 @@ def build_choose_teams_html(number_of_divisions_select, number_of_teams_conf_sel
     if source_page == 'els':
 
         try:
-            team_city_obj_tuple = TeamCity.objects.using("xactly_dev").filter(league_id=league_id)
+            team_city_obj_tuple = TeamCity.objects.using("default").filter(league_id=league_id)
         except Exception:
             pass
 
@@ -2087,7 +2087,7 @@ def build_choose_teams_html(number_of_divisions_select, number_of_teams_conf_sel
 
         division_counter = 1
 
-        for this_default_team in DefaultTeams.objects.using("xactly_dev").filter(id__lte=(number_of_teams_conf_select * 2)).order_by("id"):
+        for this_default_team in DefaultTeams.objects.using("default").filter(id__lte=(number_of_teams_conf_select * 2)).order_by("id"):
             this_default_team_nickname = this_default_team.nickname
             this_default_team_city_name = this_default_team.city.city_name
             this_default_team_city_id = this_default_team.city.city_id
